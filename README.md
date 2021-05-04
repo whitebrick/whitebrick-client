@@ -1,4 +1,4 @@
-# whitebrick
+# whitebrick jamstack client
 Open source alternative to Airtable
 
 ## Sprint: Intro and init
