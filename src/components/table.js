@@ -42,9 +42,7 @@ const Table = () => {
 
   const generateQuery = ({ name, fields }) => {
     let queryFields = '';
-    fields.map(field => {
-      queryFields += ' '+ field.name;
-    });
+    fields.forEach(field => { queryFields += ' '+ field.name });
     return `query ($limit: Int!, $offset: Int!) { ${name} (limit: $limit, offset: $offset) { ${queryFields} } ${name + '_aggregate'} {aggregate{ count } } }`;
   };
 
@@ -61,11 +59,15 @@ const Table = () => {
       }
     };
     handleTableChange();
-  }, [table, limit, offset]);
+  }, [table, limit, offset, fetchQueryFields]);
 
   const handlePagination = (current, pageSize) => {
     setOffset(Math.ceil((current - 1) * pageSize))
     setCurrent(current);
+  };
+
+  const onCellValueChanged = (params) => {
+    console.log(params);
   };
 
   if (loading) return 'Loading...'
@@ -76,7 +78,7 @@ const Table = () => {
       <select value={table} onChange={e => setTable(e.target.value)}>
         <option defaultChecked>Select a table</option>
         {data['__schema'].queryType.fields.map(field => (
-          <option value={field.name}>{field.name}</option>
+          <option value={field.name} key={field.name}>{field.name}</option>
         ))}
       </select>
       <select value={limit} onChange={e => setLimit(parseInt(e.target.value))}>
@@ -92,9 +94,20 @@ const Table = () => {
         <React.Fragment>
           <p>Total {count} records found</p>
           <AgGridReact
-            rowData={tableData}>
+            rowData={tableData}
+            singleClickEdit
+            undoRedoCellEditing
+            undoRedoCellEditingLimit={20}
+            defaultColDef={{
+              flex: 1,
+              minWidth: 100,
+              editable: true,
+              resizable: true,
+            }}
+            onCellValueChanged={onCellValueChanged}
+          >
             {Object.keys(tableData[0]).map(key => (
-              <AgGridColumn field={key} />
+              <AgGridColumn field={key} key={key} />
             ))}
           </AgGridReact>
         </React.Fragment>
