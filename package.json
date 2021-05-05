@@ -18,6 +18,7 @@
     "graphql-hooks": "^5.1.1",
     "isomorphic-fetch": "^3.0.0",
     "prop-types": "^15.7.2",
+    "rc-pagination": "^3.1.6",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0"

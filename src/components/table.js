@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { AgGridColumn, AgGridReact } from 'ag-grid-react'
 import { useManualQuery, useQuery } from 'graphql-hooks'
+import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
 
@@ -30,6 +31,8 @@ const Table = () => {
   const {loading, error, data} = useQuery(TABLES_QUERY);
 
   const [table, setTable] = useState('');
+  const [count, setCount] = useState(0);
+  const [current, setCurrent] = useState(1);
   const [tableData, setData] = useState([]);
 
   const [limit, setLimit] = useState(10);
@@ -42,7 +45,7 @@ const Table = () => {
     fields.map(field => {
       queryFields += ' '+ field.name;
     });
-    return `query ($limit: Int!, $offset: Int!) { ${name} (limit: $limit, offset: $offset) { ${queryFields} } }`;
+    return `query ($limit: Int!, $offset: Int!) { ${name} (limit: $limit, offset: $offset) { ${queryFields} } ${name + '_aggregate'} {aggregate{ count } } }`;
   };
 
   useEffect(() => {
@@ -53,17 +56,23 @@ const Table = () => {
         const fetchData = async () => await graphQLFetch({ query, variables: { limit, offset } });
         fetchData().then(({ data }) => {
           setData(data[table]);
+          setCount(data[table + '_aggregate'].aggregate.count);
         });
       }
     };
     handleTableChange();
   }, [table, limit, offset]);
 
+  const handlePagination = (current, pageSize) => {
+    setOffset(Math.ceil((current - 1) * pageSize))
+    setCurrent(current);
+  };
+
   if (loading) return 'Loading...'
   if (error) return 'Something Bad Happened'
 
   return (
-    <div className="ag-theme-alpine" style={{ height: '100vh' }}>
+    <div className="ag-theme-alpine" style={{ height: '85vh'}}>
       <select value={table} onChange={e => setTable(e.target.value)}>
         <option defaultChecked>Select a table</option>
         {data['__schema'].queryType.fields.map(field => (
@@ -78,10 +87,10 @@ const Table = () => {
         <option>100</option>
         <option>500</option>
       </select>
-      <button disabled={offset === 0} onClick={() => setOffset(offset - limit)}>Previous Page</button>
-      <button onClick={() => setOffset(offset + limit)}>Next Page</button>
+      records per page
       {table !== '' && tableData.length > 0 ?
         <React.Fragment>
+          <p>Total {count} records found</p>
           <AgGridReact
             rowData={tableData}>
             {Object.keys(tableData[0]).map(key => (
@@ -90,6 +99,14 @@ const Table = () => {
           </AgGridReact>
         </React.Fragment>
         : <p>Please select a table to render</p>
+      }
+      {table !== '' &&
+        <Pagination
+          total={count}
+          pageSize={limit}
+          current={current}
+          onChange={(current, pageSize) => handlePagination(current, pageSize)}
+        />
       }
     </div>
   )
