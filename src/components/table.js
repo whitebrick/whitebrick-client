@@ -50,9 +50,11 @@ const Table = () => {
         const { name, fields } = data['__type'];
         let f = []
         fields.map(field => f.push(field.name))
+        let primaryKey = table.split('_').pop().concat('id')
+        let orderByType = table.concat('_order_by!')
         const operation = gql.query({
           operation: name,
-          variables: { limit, offset },
+          variables: { limit, offset, order_by: { value: { [primaryKey]: `asc` } ,type: `[${orderByType}]` } },
           fields: f
         })
         const operationAgg = gql.query({
