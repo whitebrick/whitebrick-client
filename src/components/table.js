@@ -36,6 +36,7 @@ const Table = () => {
   const [count, setCount] = useState(0);
   const [current, setCurrent] = useState(1);
   const [tableData, setData] = useState([]);
+  const [refetch, setRefetch] = useState(0);
 
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
@@ -69,7 +70,7 @@ const Table = () => {
       }
     };
     handleTableChange();
-  }, [table, limit, offset, fetchQueryFields]);
+  }, [table, limit, offset, fetchQueryFields, refetch]);
 
   const handlePagination = (current, pageSize) => {
     setOffset(Math.ceil((current - 1) * pageSize))
@@ -77,7 +78,20 @@ const Table = () => {
   };
 
   const onCellValueChanged = (params) => {
-    console.log(params);
+    let data = params.data;
+    data[params.colDef.field] = params.oldValue;
+    let variables = { where: {}, _set: {} };
+    for (let key in data) {
+      variables.where[key] = {_eq: data[key]};
+    }
+    variables['_set'][params.colDef.field] = params.newValue;
+    const operation = gql.mutation({
+      operation: ''.concat('update_', table),
+      variables: { where: { value: variables.where , type: 'chinook_album_bool_exp', required: true }, _set: { value: variables['_set'], type: 'chinook_album_set_input' }},
+      fields: ['affected_rows']
+    })
+    const fetchData = async () => await graphQLFetch({ query: operation.query, variables: operation.variables });
+    fetchData().then(({ data }) => setRefetch(refetch + 1));
   };
 
   if (loading) return 'Loading...'
