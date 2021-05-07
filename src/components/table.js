@@ -103,9 +103,13 @@ const Table = () => {
     <div className="ag-theme-alpine" style={{ height: '85vh'}}>
       <select value={table} onChange={e => setTable(e.target.value)}>
         <option defaultChecked>Select a table</option>
-        {data['__schema'].queryType.fields.map(field => (
-          <option value={field.name} key={field.name}>{field.name}</option>
-        ))}
+        {data['__schema'].queryType.fields.map(field => {
+          let lastWord = field.name.split('_').pop();
+          if (lastWord !== 'pk' && lastWord !== 'aggregate')
+            return (
+              <option value={field.name} key={field.name}>{field.name}</option>
+            )
+        })}
       </select>
       <select value={limit} onChange={e => setLimit(parseInt(e.target.value))}>
         <option>5</option>
