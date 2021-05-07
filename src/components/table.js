@@ -51,10 +51,12 @@ const Table = () => {
         let f = []
         fields.map(field => f.push(field.name))
         let primaryKey = table.split('_').pop().concat('id')
+        let primary_key = table.split('_').pop().concat('_id')
+        let orderByParameter = f.includes(primaryKey) ? primaryKey: f.includes(primary_key) ? primary_key: f[0];
         let orderByType = table.concat('_order_by!')
         const operation = gql.query({
           operation: name,
-          variables: { limit, offset, order_by: { value: { [primaryKey]: `asc` } ,type: `[${orderByType}]` } },
+          variables: { limit, offset, order_by: { value: { [orderByParameter]: `asc` } ,type: `[${orderByType}]` } },
           fields: f
         })
         const operationAgg = gql.query({
@@ -96,11 +98,15 @@ const Table = () => {
     fetchData().then(({ data }) => setRefetch(refetch + 1));
   };
 
+  const onFirstDataRendered = (params) => {
+    params.api.sizeColumnsToFit();
+  };
+
   if (loading) return 'Loading...'
   if (error) return 'Something Bad Happened'
 
   return (
-    <div className="ag-theme-alpine" style={{ height: '85vh'}}>
+    <div className="ag-theme-alpine">
       <select value={table} onChange={e => setTable(e.target.value)}>
         <option defaultChecked>Select a table</option>
         {data['__schema'].queryType.fields.map(field => {
@@ -111,15 +117,6 @@ const Table = () => {
             )
         })}
       </select>
-      <select value={limit} onChange={e => setLimit(parseInt(e.target.value))}>
-        <option>5</option>
-        <option>10</option>
-        <option>20</option>
-        <option>50</option>
-        <option>100</option>
-        <option>500</option>
-      </select>
-      records per page
       {table !== '' && tableData.length > 0 ?
         <React.Fragment>
           <p>Total {count} records found</p>
@@ -133,8 +130,16 @@ const Table = () => {
               minWidth: 100,
               editable: true,
               resizable: true,
+              enableRowGroup: true,
+              enablePivot: true,
+              enableValue: true,
+              sortable: true,
+              filter: true,
             }}
+            onFirstDataRendered={onFirstDataRendered}
             onCellValueChanged={onCellValueChanged}
+            domLayout={'autoHeight'}
+            animateRows={true}
           >
             {Object.keys(tableData[0]).map(key => (
               <AgGridColumn field={key} key={key} />
@@ -143,13 +148,25 @@ const Table = () => {
         </React.Fragment>
         : <p>Please select a table to render</p>
       }
-      {table !== '' &&
-        <Pagination
-          total={count}
-          pageSize={limit}
-          current={current}
-          onChange={(current, pageSize) => handlePagination(current, pageSize)}
-        />
+      {tableData.length > 0 &&
+        <div className="p-4">
+          <select value={limit} onChange={e => setLimit(parseInt(e.target.value))}>
+            <option>5</option>
+            <option>10</option>
+            <option>20</option>
+            <option>50</option>
+            <option>100</option>
+            <option>500</option>
+          </select> records per page
+          <div className="float-right">
+            <Pagination
+              total={count}
+              pageSize={limit}
+              current={current}
+              onChange={(current, pageSize) => handlePagination(current, pageSize)}
+            />
+          </div>
+        </div>
       }
     </div>
   )
