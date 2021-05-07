@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import * as gql from 'gql-query-builder'
+
 import { AgGridColumn, AgGridReact } from 'ag-grid-react'
 import { useManualQuery, useQuery } from 'graphql-hooks'
 import Pagination from 'rc-pagination';
@@ -40,20 +42,28 @@ const Table = () => {
 
   const [fetchQueryFields] = useManualQuery(GET_TABLE_FIELDS);
 
-  const generateQuery = ({ name, fields }) => {
-    let queryFields = '';
-    fields.forEach(field => { queryFields += ' '+ field.name });
-    return `query ($limit: Int!, $offset: Int!) { ${name} (limit: $limit, offset: $offset) { ${queryFields} } ${name + '_aggregate'} {aggregate{ count } } }`;
-  };
-
   useEffect(() => {
     const handleTableChange = async () => {
       if (table !== '') {
         const { data } = await fetchQueryFields({ variables: { name: table }})
-        const query = generateQuery(data['__type']);
-        const fetchData = async () => await graphQLFetch({ query, variables: { limit, offset } });
+        const { name, fields } = data['__type'];
+        let f = []
+        fields.map(field => f.push(field.name))
+        const operation = gql.query({
+          operation: name,
+          variables: { limit, offset },
+          fields: f
+        })
+        const operationAgg = gql.query({
+          operation: name.concat('_aggregate'),
+          fields: [{ aggregate: [ 'count' ]}]
+        })
+        const fetchData = async () => await graphQLFetch({ query: operation.query, variables: operation.variables });
         fetchData().then(({ data }) => {
           setData(data[table]);
+        });
+        const fetchCount = async () => await graphQLFetch({ query: operationAgg.query });
+        fetchCount().then(({ data }) => {
           setCount(data[table + '_aggregate'].aggregate.count);
         });
       }
