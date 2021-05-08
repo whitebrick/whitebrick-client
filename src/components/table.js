@@ -35,6 +35,8 @@ const Table = () => {
   const [table, setTable] = useState('');
   const [count, setCount] = useState(0);
   const [current, setCurrent] = useState(1);
+  const [orderBy, setOrderBy] = useState(null);
+  const [fields, setFields] = useState([]);
   const [tableData, setData] = useState([]);
   const [refetch, setRefetch] = useState(0);
 
@@ -50,9 +52,8 @@ const Table = () => {
         const { name, fields } = data['__type'];
         let f = []
         fields.map(field => f.push(field.name))
-        let primaryKey = table.split('_').pop().concat('id')
-        let primary_key = table.split('_').pop().concat('_id')
-        let orderByParameter = f.includes(primaryKey) ? primaryKey: f.includes(primary_key) ? primary_key: f[0];
+        setFields(f);
+        let orderByParameter = orderBy ? orderBy: f[0];
         let orderByType = table.concat('_order_by!')
         const operation = gql.query({
           operation: name,
@@ -74,7 +75,7 @@ const Table = () => {
       }
     };
     handleTableChange();
-  }, [table, limit, offset, fetchQueryFields, refetch]);
+  }, [table, limit, offset, fetchQueryFields, refetch, orderBy]);
 
   const handlePagination = (current, pageSize) => {
     setOffset(Math.ceil((current - 1) * pageSize))
@@ -108,7 +109,7 @@ const Table = () => {
   return (
     <div className="ag-theme-alpine">
       <select value={table} onChange={e => setTable(e.target.value)}>
-        <option defaultChecked>Select a table</option>
+        <option defaultChecked value={''}>Select a table</option>
         {data['__schema'].queryType.fields.map(field => {
           let lastWord = field.name.split('_').pop();
           if (lastWord !== 'pk' && lastWord !== 'aggregate')
@@ -130,12 +131,10 @@ const Table = () => {
               minWidth: 100,
               editable: true,
               resizable: true,
-              enableRowGroup: true,
-              enablePivot: true,
-              enableValue: true,
               sortable: true,
               filter: true,
             }}
+            sortingOrder={['desc', 'asc', null]}
             onFirstDataRendered={onFirstDataRendered}
             onCellValueChanged={onCellValueChanged}
             domLayout={'autoHeight'}
@@ -148,7 +147,7 @@ const Table = () => {
         </React.Fragment>
         : <p>Please select a table to render</p>
       }
-      {tableData.length > 0 &&
+      {table !== '' && tableData.length > 0 &&
         <div className="p-4">
           <select value={limit} onChange={e => setLimit(parseInt(e.target.value))}>
             <option>5</option>
@@ -158,6 +157,12 @@ const Table = () => {
             <option>100</option>
             <option>500</option>
           </select> records per page
+          <div className="float-right px-2">
+            <select value={orderBy} onChange={e => setOrderBy(e.target.value)}>
+              <option value={fields[0]}>Select field to orderby</option>
+              {fields.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
           <div className="float-right">
             <Pagination
               total={count}
