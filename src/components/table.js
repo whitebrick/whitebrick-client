@@ -2,23 +2,11 @@ import React, { useEffect, useState } from 'react'
 import * as gql from 'gql-query-builder'
 
 import { AgGridColumn, AgGridReact } from 'ag-grid-react'
-import { useManualQuery, useQuery } from 'graphql-hooks'
+import { useManualQuery } from 'graphql-hooks'
 import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
-
-const TABLES_QUERY = `
-{
-  __schema{
-    queryType{
-      fields{
-        name
-      }
-    }
-  }
-}
-`;
-
+import { Link } from "gatsby"
 
 const GET_TABLE_FIELDS = `query ($name: String!){
   __type(name: $name) {
@@ -29,10 +17,7 @@ const GET_TABLE_FIELDS = `query ($name: String!){
   }
 }`;
 
-const Table = () => {
-  const {loading, error, data} = useQuery(TABLES_QUERY);
-
-  const [table, setTable] = useState('');
+const Table = ({ table }) => {
   const [count, setCount] = useState(0);
   const [current, setCurrent] = useState(1);
   const [orderBy, setOrderBy] = useState(null);
@@ -103,24 +88,27 @@ const Table = () => {
     params.api.sizeColumnsToFit();
   };
 
-  if (loading) return 'Loading...'
-  if (error) return 'Something Bad Happened'
-
   return (
     <div className="ag-theme-alpine">
-      <select value={table} onChange={e => setTable(e.target.value)}>
-        <option defaultChecked value={''}>Select a table</option>
-        {data['__schema'].queryType.fields.map(field => {
-          let lastWord = field.name.split('_').pop();
-          if (lastWord !== 'pk' && lastWord !== 'aggregate')
-            return (
-              <option value={field.name} key={field.name}>{field.name}</option>
-            )
-        })}
-      </select>
       {table !== '' && tableData.length > 0 ?
         <React.Fragment>
-          <p>Total {count} records found</p>
+          <div className="card my-3 rounded-0">
+            <div
+              style={{ padding: `1rem` }}
+            >
+              <h3 style={{ margin: 0 }}>
+                <Link
+                  to="/"
+                  style={{
+                    color: `black`,
+                    textDecoration: `none`,
+                  }}
+                >
+                  {table}
+                </Link>
+              </h3>
+            </div>
+          </div>
           <AgGridReact
             rowData={tableData}
             singleClickEdit

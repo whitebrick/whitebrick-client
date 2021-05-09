@@ -11,8 +11,10 @@ import { useStaticQuery, graphql } from "gatsby"
 
 import Header from "./header"
 import "./layout.css"
+import Seo from "./seo"
+import { useQuery } from "graphql-hooks"
 
-const Layout = ({ children }) => {
+const Layout = ({ children, tableName, setTableName }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -23,26 +25,47 @@ const Layout = ({ children }) => {
     }
   `)
 
+  const TABLES_QUERY = `{
+  __schema{
+    queryType{
+      fields{
+        name
+      }
+    }
+  }
+}
+`;
+
+  const { loading, error, data: tables } = useQuery(TABLES_QUERY);
+
+  if (loading) return 'Loading...'
+  if (error) return 'Something Bad Happened'
+
   return (
     <>
+      <Seo title={data.site.siteMetadata?.title || `Title`} />
       <Header siteTitle={data.site.siteMetadata?.title || `Title`} />
-      <div
-        style={{
-          margin: `0 auto`,
-          maxWidth: 960,
-          padding: `0 1.0875rem 1.45rem`,
-        }}
-      >
-        <main>{children}</main>
-        <footer
-          style={{
-            marginTop: `2rem`,
-          }}
-        >
-          © {new Date().getFullYear()}, Built with
-          {` `}
-          <a href="https://www.gatsbyjs.com">Gatsby</a>
-        </footer>
+      <div>
+        <div className="row m-0">
+          <aside className="col-2 p-0" id="left" style={{ overflow: 'scroll' }}>
+            <div className="list-group w-100 rounded-0">
+              {tables['__schema'].queryType.fields.map(field => {
+                let lastWord = field.name.split('_').pop();
+                if (lastWord !== 'pk' && lastWord !== 'aggregate')
+                  return (
+                    <a
+                      style={{ textDecoration: `none`, cursor: 'pointer' }}
+                      onClick={() => setTableName(field.name)}
+                      className={`list-group-item  ${tableName === field.name && 'active'}`}
+                    >
+                      {field.name}
+                    </a>
+                  )
+              })}
+            </div>
+          </aside>
+          <main className="col-10">{children}</main>
+        </div>
       </div>
     </>
   )
