@@ -1,6 +1,9 @@
 import * as React from "react"
 import Table from '../components/table'
 import { GraphQLClient, ClientContext } from "graphql-hooks"
+import { Provider } from 'react-redux'
+
+import store from '../store';
 
 import 'rc-pagination/assets/index.css';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -19,11 +22,13 @@ const IndexPage = () => {
   const [tableName, setTableName] = useState('');
 
   return (
-    <ClientContext.Provider value={client}>
-      <Layout tableName={tableName} setTableName={setTableName}>
-        <Table table={tableName} />
-      </Layout>
-    </ClientContext.Provider>
+    <Provider store={store}>
+      <ClientContext.Provider value={client}>
+        <Layout tableName={tableName} setTableName={setTableName}>
+          <Table table={tableName} />
+        </Layout>
+      </ClientContext.Provider>
+    </Provider>
   )
 }
 

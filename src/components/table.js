@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import * as gql from 'gql-query-builder'
 
+import { connect } from "react-redux";
+import { bindActionCreators } from 'redux';
+import { actions } from '../actions/index'
+
 import { AgGridColumn, AgGridReact } from 'ag-grid-react'
 import { useManualQuery } from 'graphql-hooks'
 import Pagination from 'rc-pagination';
@@ -17,12 +21,11 @@ const GET_TABLE_FIELDS = `query ($name: String!){
   }
 }`;
 
-const Table = ({ table }) => {
+const Table = ({ table, rows, actions }) => {
   const [count, setCount] = useState(0);
   const [current, setCurrent] = useState(1);
   const [orderBy, setOrderBy] = useState(null);
   const [fields, setFields] = useState([]);
-  const [tableData, setData] = useState([]);
   const [refetch, setRefetch] = useState(0);
 
   const [limit, setLimit] = useState(10);
@@ -50,13 +53,9 @@ const Table = ({ table }) => {
           fields: [{ aggregate: [ 'count' ]}]
         })
         const fetchData = async () => await graphQLFetch({ query: operation.query, variables: operation.variables });
-        fetchData().then(({ data }) => {
-          setData(data[table]);
-        });
+        fetchData().then(({ data }) => actions.setRows(data[table]));
         const fetchCount = async () => await graphQLFetch({ query: operationAgg.query });
-        fetchCount().then(({ data }) => {
-          setCount(data[table + '_aggregate'].aggregate.count);
-        });
+        fetchCount().then(({ data }) => setCount(data[table + '_aggregate'].aggregate.count));
       }
     };
     handleTableChange();
@@ -90,7 +89,7 @@ const Table = ({ table }) => {
 
   return (
     <div className="ag-theme-alpine">
-      {table !== '' && tableData.length > 0 ?
+      {table !== '' && rows.length > 0 ?
         <React.Fragment>
           <div className="card my-3 rounded-0">
             <div
@@ -110,7 +109,7 @@ const Table = ({ table }) => {
             </div>
           </div>
           <AgGridReact
-            rowData={tableData}
+            rowData={rows}
             singleClickEdit
             undoRedoCellEditing
             undoRedoCellEditingLimit={20}
@@ -128,14 +127,14 @@ const Table = ({ table }) => {
             domLayout={'autoHeight'}
             animateRows={true}
           >
-            {Object.keys(tableData[0]).map(key => (
+            {Object.keys(rows[0]).map(key => (
               <AgGridColumn field={key} key={key} />
             ))}
           </AgGridReact>
         </React.Fragment>
         : <p>Please select a table to render</p>
       }
-      {table !== '' && tableData.length > 0 &&
+      {table !== '' && rows.length > 0 &&
         <div className="p-4">
           <select value={limit} onChange={e => setLimit(parseInt(e.target.value))}>
             <option>5</option>
@@ -165,4 +164,12 @@ const Table = ({ table }) => {
   )
 };
 
-export default Table;
+const mapStateToProps = (state) => ({
+  rows: state.rowData
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  actions: bindActionCreators(actions, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Table);
