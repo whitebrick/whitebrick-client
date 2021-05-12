@@ -60,7 +60,7 @@ const Layout = ({ children, tableName, setTableName, user }) => {
       <Header siteTitle={data.site.siteMetadata?.title || `Title`} />
       <div>
         <div className="row m-0">
-          <aside className="col-2 p-0" id="left" style={{ overflow: 'scroll' }}>
+          <aside className="col-2 p-0" id="sidebar" style={{ overflow: 'scroll' }}>
             <div className="list-group w-100 rounded-0">
               {schemas.wbSchemas.map(field =>
                 <a
@@ -69,13 +69,16 @@ const Layout = ({ children, tableName, setTableName, user }) => {
                   className={`list-group-item  ${tableName === field.name && 'active'}`}
                 >
                   {field.name}
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M16.95 10.707a1 1 0 10-1.414-1.414L12 12.828 8.464 9.293a1 1 0 10-1.414 1.414l4.243 4.243a1 1 0 001.414 0l4.243-4.243z" fill="currentColor" />
+                  </svg>
                   {schema === field.name && (
                     <div className="list-group w-100 rounded-0">
                       {tables.map(table =>
                         <a
                           style={{ textDecoration: `none`, cursor: 'pointer' }}
                           onClick={() => setTableName(schema + '_' + table)}
-                          className={`list-group-item  ${tableName === schema + '_' + table && 'active'}`}
+                          className={`list-group-item py-1 ${tableName === schema + '_' + table && 'active'}`}
                         >
                           {table}
                         </a>

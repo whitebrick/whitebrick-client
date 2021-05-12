@@ -6,6 +6,7 @@ import Modal from 'react-modal';
 
 import store from '../store';
 
+import '../styles/sidebar.css';
 import 'rc-pagination/assets/index.css';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
@@ -14,7 +15,6 @@ import Layout from "../components/layout"
 import { useState } from "react"
 
 const IndexPage = () => {
-
   const client = new GraphQLClient({
     url: process.env.GATSBY_HASURA_GRAPHQL_URL,
     headers: { 'x-hasura-admin-secret': process.env.GATSBY_HASURA_GRAPHQL_ADMIN_SECRET }

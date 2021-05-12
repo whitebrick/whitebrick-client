@@ -1,0 +1,16 @@
+#sidebar {
+    background: #ffffff;
+    min-height: 94vh;
+    border-right: 1px solid #DFE1EB;
+}
+
+#sidebar .list-group-item {
+    border: none!important;
+    color: #5E6A7B;
+    border-radius: 5px;
+}
+
+#sidebar .list-group-item .active {
+    background: #f1f4fa !important;
+    color: #1543B7!important;
+}
