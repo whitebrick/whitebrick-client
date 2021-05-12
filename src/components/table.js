@@ -17,6 +17,12 @@ const GET_TABLE_FIELDS = `query ($name: String!){
     name
     fields {
       name
+      type{
+        kind
+        ofType{
+          kind
+        }
+      }
     }
   }
 }`;
@@ -39,7 +45,11 @@ const Table = ({ table, rows, actions }) => {
         const { data } = await fetchQueryFields({ variables: { name: table }})
         const { name, fields } = data['__type'];
         let f = []
-        fields.map(field => f.push(field.name))
+        fields.map(field => {
+          let kind = field.type?.kind;
+          let type = field.type.ofType?.kind ? field.type.ofType.kind: 'SCALAR';
+          if (kind !== 'OBJECT' && kind !== 'LIST' && type !== 'OBJECT' && type !== 'LIST') f.push(field.name)
+        })
         setFields(f);
         let orderByParameter = orderBy ? orderBy: f[0];
         let orderByType = table.concat('_order_by!')
