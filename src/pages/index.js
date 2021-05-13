@@ -32,6 +32,7 @@ const IndexPage = () => {
   })
 
   const [tableName, setTableName] = useState('');
+  const [fields, setFields] = useState([]);
   const [user, setUser] = useState('');
 
   const customStyles = {
@@ -48,7 +49,7 @@ const IndexPage = () => {
   return (
     <Provider store={store}>
       <ClientContext.Provider value={client}>
-        <Layout user={user} tableName={tableName} setTableName={setTableName}>
+        <Layout user={user} tableName={tableName} setTableName={setTableName} setFields={setFields}>
           <Modal
             isOpen={user === ''}
             style={customStyles}
@@ -70,7 +71,7 @@ const IndexPage = () => {
               </li>
             </ul>
           </Modal>
-          {user !== '' && tableName !== '' && <Table table={tableName} />}
+          {user !== '' && tableName !== '' && fields.length > 0 && <Table table={tableName} fields={fields} />}
         </Layout>
       </ClientContext.Provider>
     </Provider>

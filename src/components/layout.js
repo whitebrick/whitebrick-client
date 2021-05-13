@@ -15,7 +15,22 @@ import Seo from "./seo"
 import { useManualQuery, useQuery } from "graphql-hooks"
 import { useEffect, useState } from "react"
 
-const Layout = ({ children, tableName, setTableName, user }) => {
+const GET_TABLE_FIELDS = `query ($name: String!){
+  __type(name: $name) {
+    name
+    fields {
+      name
+      type{
+        kind
+        ofType{
+          kind
+        }
+      }
+    }
+  }
+}`;
+
+const Layout = ({ children, tableName, setTableName, user, setFields }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -40,6 +55,7 @@ const Layout = ({ children, tableName, setTableName, user }) => {
   const [schema, setSchema] = useState('');
   const [tables, setTables] = useState([]);
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
+  const [fetchQueryFields] = useManualQuery(GET_TABLE_FIELDS);
 
   useEffect(() => {
     const fetchTables = async () => {
@@ -50,6 +66,28 @@ const Layout = ({ children, tableName, setTableName, user }) => {
     }
     fetchTables();
   }, [schema]);
+
+  useEffect(() => {
+    const fetchFields = async () => {
+      if (tableName !== '') {
+        const { data } = await fetchQueryFields({ variables: { name: tableName }})
+        const { fields } = data['__type'];
+        let f = []
+        fields.map(field => {
+          let kind = field.type?.kind;
+          let type = field.type.ofType?.kind ? field.type.ofType.kind: 'SCALAR';
+          if (kind !== 'OBJECT' && kind !== 'LIST' && type !== 'OBJECT' && type !== 'LIST') f.push(field.name)
+        })
+        setFields(f);
+      }
+    }
+    fetchFields();
+  }, [tableName]);
+
+  const setTable = (name) => {
+    setTableName(name);
+    setFields([]);
+  };
 
   if (loading) return 'Loading...'
   if (error) return 'Something Bad Happened'
@@ -78,7 +116,7 @@ const Layout = ({ children, tableName, setTableName, user }) => {
                       {tables.map(table =>
                         <a
                           style={{ textDecoration: `none`, cursor: 'pointer' }}
-                          onClick={() => setTableName(schema + '_' + table)}
+                          onClick={() => setTable(schema + '_' + table)}
                           className={`list-group-item py-1 ${tableName === schema + '_' + table && 'active'}`}
                           key={table}
                         >

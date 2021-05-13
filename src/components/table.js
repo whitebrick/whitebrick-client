@@ -8,67 +8,40 @@ import { actions } from '../actions/index'
 import { AgGridColumn, AgGridReact } from 'ag-grid-react'
 import 'ag-grid-enterprise';
 
-import { useManualQuery, useSubscription } from 'graphql-hooks'
+import { useSubscription } from 'graphql-hooks'
 import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
 import { Link } from "gatsby"
 
-const GET_TABLE_FIELDS = `query ($name: String!){
-  __type(name: $name) {
-    name
-    fields {
-      name
-      type{
-        kind
-        ofType{
-          kind
-        }
-      }
-    }
-  }
-}`;
-
-const Table = ({ table, rows, actions }) => {
+const Table = ({ table, rows, fields, actions }) => {
   const [count, setCount] = useState(0);
   const [current, setCurrent] = useState(1);
   const [orderBy, setOrderBy] = useState('');
-  const [fields, setFields] = useState([]);
 
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
 
-  const [fetchQueryFields] = useManualQuery(GET_TABLE_FIELDS);
-
   useEffect(() => {
     const handleTableChange = async () => {
-      const { data } = await fetchQueryFields({ variables: { name: table }})
-      const { name, fields } = data['__type'];
-      let f = []
-      fields.map(field => {
-        let kind = field.type?.kind;
-        let type = field.type.ofType?.kind ? field.type.ofType.kind: 'SCALAR';
-        if (kind !== 'OBJECT' && kind !== 'LIST' && type !== 'OBJECT' && type !== 'LIST') f.push(field.name)
-      })
-      setFields(f);
-      let orderByParameter = f.includes(orderBy) ? orderBy: f[0];
+      let orderByParameter = fields.includes(orderBy) ? orderBy: fields[0];
       let orderByType = table.concat('_order_by!')
       const operation = gql.query({
-        operation: name,
+        operation: table,
         variables: { limit, offset, order_by: { value: { [orderByParameter]: `asc` } ,type: `[${orderByType}]` } },
-        fields: f
+        fields
       })
       const operationAgg = gql.query({
-        operation: name.concat('_aggregate'),
+        operation: table.concat('_aggregate'),
         fields: [{ aggregate: [ 'count' ]}]
       })
-      const fetchData = async () => await graphQLFetch({ query: operation.query, variables: operation.variables });
+      const fetchData = async () => await graphQLFetch(operation);
       fetchData().then(({ data }) => actions.setRows(data[table]));
-      const fetchCount = async () => await graphQLFetch({ query: operationAgg.query });
+      const fetchCount = async () => await graphQLFetch(operationAgg);
       fetchCount().then(({ data }) => setCount(data[table + '_aggregate'].aggregate.count));
     };
     handleTableChange();
-  }, [table, limit, offset, fetchQueryFields, orderBy]);
+  }, [table, limit, offset, orderBy]);
 
   const handlePagination = (current, pageSize) => {
     setOffset(Math.ceil((current - 1) * pageSize))
@@ -104,15 +77,15 @@ const Table = ({ table, rows, actions }) => {
     operation: table,
     variables: { limit, offset, order_by: { value: { [orderByParameter]: `asc` } ,type: `[${table.concat('_order_by!')}]` } },
     fields
-  })
+  });
 
-  useSubscription({ query: subscription.query, variables: subscription.variables }, ({ data, errors }) => {
+  useSubscription(subscription, ({ data, errors }) => {
     if (errors && errors.length > 0) {
       console.log(errors);
       return
     }
     actions.setRows(data[table])
-  })
+  });
 
   return (
     <div className="ag-theme-alpine">
