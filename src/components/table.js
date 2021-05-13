@@ -51,7 +51,7 @@ const Table = ({ table, rows, actions }) => {
           if (kind !== 'OBJECT' && kind !== 'LIST' && type !== 'OBJECT' && type !== 'LIST') f.push(field.name)
         })
         setFields(f);
-        let orderByParameter = orderBy ? orderBy: f[0];
+        let orderByParameter = f.includes(orderBy) ? orderBy: f[0];
         let orderByType = table.concat('_order_by!')
         const operation = gql.query({
           operation: name,
@@ -159,7 +159,6 @@ const Table = ({ table, rows, actions }) => {
           </select> records per page
           <div className="float-right px-2">
             <select value={orderBy} onChange={e => setOrderBy(e.target.value)}>
-              <option value={fields[0]}>Select field to orderby</option>
               {fields.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
