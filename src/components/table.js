@@ -86,7 +86,10 @@ const Table = ({ table, rows, actions }) => {
     variables['_set'][params.colDef.field] = params.newValue;
     const operation = gql.mutation({
       operation: ''.concat('update_', table),
-      variables: { where: { value: variables.where , type: 'chinook_album_bool_exp', required: true }, _set: { value: variables['_set'], type: 'chinook_album_set_input' }},
+      variables: {
+        where: { value: variables.where , type: `${table}_bool_exp`, required: true },
+        _set: { value: variables['_set'], type: `${table}_set_input` }
+      },
       fields: ['affected_rows']
     })
     const fetchData = async () => await graphQLFetch({ query: operation.query, variables: operation.variables });
