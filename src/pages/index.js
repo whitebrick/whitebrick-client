@@ -1,6 +1,7 @@
 import * as React from "react"
 import Table from '../components/table'
 import { GraphQLClient, ClientContext } from "graphql-hooks"
+import { SubscriptionClient } from 'subscriptions-transport-ws'
 import { Provider } from 'react-redux'
 import Modal from 'react-modal';
 
@@ -17,6 +18,16 @@ import { useState } from "react"
 const IndexPage = () => {
   const client = new GraphQLClient({
     url: process.env.GATSBY_HASURA_GRAPHQL_URL,
+    subscriptionClient: new SubscriptionClient(process.env.GATSBY_HASURA_GRAPHQL_WSS_URL, {
+      reconnect: true,
+      minTimeout: 3000,
+      lazy: true,
+      connectionParams: {
+        headers: {
+          'x-hasura-admin-secret': process.env.GATSBY_HASURA_GRAPHQL_ADMIN_SECRET
+        }
+      }
+    }),
     headers: { 'x-hasura-admin-secret': process.env.GATSBY_HASURA_GRAPHQL_ADMIN_SECRET }
   })
 
@@ -42,6 +53,7 @@ const IndexPage = () => {
             isOpen={user === ''}
             style={customStyles}
             contentLabel="Example Modal"
+            ariaHideApp={false}
           >
             <ul className="list-group p-4 m-4" style={{ cursor: 'pointer' }}>
               <li className="list-group-item" onClick={() => setUser('test_donna@example.com')}>
@@ -58,7 +70,7 @@ const IndexPage = () => {
               </li>
             </ul>
           </Modal>
-          {user !== '' && <Table table={tableName} />}
+          {user !== '' && tableName !== '' && <Table table={tableName} />}
         </Layout>
       </ClientContext.Provider>
     </Provider>

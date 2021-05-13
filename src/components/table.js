@@ -6,7 +6,9 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../actions/index'
 
 import { AgGridColumn, AgGridReact } from 'ag-grid-react'
-import { useManualQuery } from 'graphql-hooks'
+import 'ag-grid-enterprise';
+
+import { useManualQuery, useSubscription } from 'graphql-hooks'
 import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
@@ -30,9 +32,8 @@ const GET_TABLE_FIELDS = `query ($name: String!){
 const Table = ({ table, rows, actions }) => {
   const [count, setCount] = useState(0);
   const [current, setCurrent] = useState(1);
-  const [orderBy, setOrderBy] = useState(null);
+  const [orderBy, setOrderBy] = useState('');
   const [fields, setFields] = useState([]);
-  const [refetch, setRefetch] = useState(0);
 
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
@@ -41,35 +42,33 @@ const Table = ({ table, rows, actions }) => {
 
   useEffect(() => {
     const handleTableChange = async () => {
-      if (table !== '') {
-        const { data } = await fetchQueryFields({ variables: { name: table }})
-        const { name, fields } = data['__type'];
-        let f = []
-        fields.map(field => {
-          let kind = field.type?.kind;
-          let type = field.type.ofType?.kind ? field.type.ofType.kind: 'SCALAR';
-          if (kind !== 'OBJECT' && kind !== 'LIST' && type !== 'OBJECT' && type !== 'LIST') f.push(field.name)
-        })
-        setFields(f);
-        let orderByParameter = f.includes(orderBy) ? orderBy: f[0];
-        let orderByType = table.concat('_order_by!')
-        const operation = gql.query({
-          operation: name,
-          variables: { limit, offset, order_by: { value: { [orderByParameter]: `asc` } ,type: `[${orderByType}]` } },
-          fields: f
-        })
-        const operationAgg = gql.query({
-          operation: name.concat('_aggregate'),
-          fields: [{ aggregate: [ 'count' ]}]
-        })
-        const fetchData = async () => await graphQLFetch({ query: operation.query, variables: operation.variables });
-        fetchData().then(({ data }) => actions.setRows(data[table]));
-        const fetchCount = async () => await graphQLFetch({ query: operationAgg.query });
-        fetchCount().then(({ data }) => setCount(data[table + '_aggregate'].aggregate.count));
-      }
+      const { data } = await fetchQueryFields({ variables: { name: table }})
+      const { name, fields } = data['__type'];
+      let f = []
+      fields.map(field => {
+        let kind = field.type?.kind;
+        let type = field.type.ofType?.kind ? field.type.ofType.kind: 'SCALAR';
+        if (kind !== 'OBJECT' && kind !== 'LIST' && type !== 'OBJECT' && type !== 'LIST') f.push(field.name)
+      })
+      setFields(f);
+      let orderByParameter = f.includes(orderBy) ? orderBy: f[0];
+      let orderByType = table.concat('_order_by!')
+      const operation = gql.query({
+        operation: name,
+        variables: { limit, offset, order_by: { value: { [orderByParameter]: `asc` } ,type: `[${orderByType}]` } },
+        fields: f
+      })
+      const operationAgg = gql.query({
+        operation: name.concat('_aggregate'),
+        fields: [{ aggregate: [ 'count' ]}]
+      })
+      const fetchData = async () => await graphQLFetch({ query: operation.query, variables: operation.variables });
+      fetchData().then(({ data }) => actions.setRows(data[table]));
+      const fetchCount = async () => await graphQLFetch({ query: operationAgg.query });
+      fetchCount().then(({ data }) => setCount(data[table + '_aggregate'].aggregate.count));
     };
     handleTableChange();
-  }, [table, limit, offset, fetchQueryFields, refetch, orderBy]);
+  }, [table, limit, offset, fetchQueryFields, orderBy]);
 
   const handlePagination = (current, pageSize) => {
     setOffset(Math.ceil((current - 1) * pageSize))
@@ -93,12 +92,27 @@ const Table = ({ table, rows, actions }) => {
       fields: ['affected_rows']
     })
     const fetchData = async () => await graphQLFetch({ query: operation.query, variables: operation.variables });
-    fetchData().then(({ data }) => setRefetch(refetch + 1));
+    fetchData();
   };
 
   const onFirstDataRendered = (params) => {
     params.api.sizeColumnsToFit();
   };
+
+  let orderByParameter = fields.includes(orderBy) ? orderBy: fields[0];
+  const subscription = gql.subscription({
+    operation: table,
+    variables: { limit, offset, order_by: { value: { [orderByParameter]: `asc` } ,type: `[${table.concat('_order_by!')}]` } },
+    fields
+  })
+
+  useSubscription({ query: subscription.query, variables: subscription.variables }, ({ data, errors }) => {
+    if (errors && errors.length > 0) {
+      console.log(errors);
+      return
+    }
+    actions.setRows(data[table])
+  })
 
   return (
     <div className="ag-theme-alpine">
@@ -123,7 +137,9 @@ const Table = ({ table, rows, actions }) => {
           </div>
           <AgGridReact
             rowData={rows}
-            singleClickEdit
+            sideBar
+            enableRangeSelection
+            enableFillHandle
             undoRedoCellEditing
             undoRedoCellEditingLimit={20}
             defaultColDef={{

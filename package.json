@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "dependencies": {
+    "ag-grid-enterprise": "^25.2.1",
     "ag-grid-react": "^25.2.0",
     "bootstrap": "^4.6.0",
     "gatsby": "^3.4.0",
@@ -26,7 +27,8 @@
     "react-helmet": "^6.1.0",
     "react-modal": "^3.13.1",
     "react-redux": "^7.2.4",
-    "redux": "^4.1.0"
+    "redux": "^4.1.0",
+    "subscriptions-transport-ws": "^0.9.18"
   },
   "devDependencies": {
     "prettier": "2.2.1"

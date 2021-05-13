@@ -63,10 +63,11 @@ const Layout = ({ children, tableName, setTableName, user }) => {
           <aside className="col-2 p-0" id="sidebar" style={{ overflow: 'scroll' }}>
             <div className="list-group w-100 rounded-0">
               {schemas.wbSchemas.map(field =>
-                <a
+                <div
                   style={{ textDecoration: `none`, cursor: 'pointer' }}
                   onClick={() => setSchema(field.name)}
                   className={`list-group-item  ${tableName === field.name && 'active'}`}
+                  key={field.name}
                 >
                   {field.name}
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -79,13 +80,14 @@ const Layout = ({ children, tableName, setTableName, user }) => {
                           style={{ textDecoration: `none`, cursor: 'pointer' }}
                           onClick={() => setTableName(schema + '_' + table)}
                           className={`list-group-item py-1 ${tableName === schema + '_' + table && 'active'}`}
+                          key={table}
                         >
                           {table}
                         </a>
                       )}
                     </div>
                   )}
-                </a>
+                </div>
               )}
             </div>
           </aside>
