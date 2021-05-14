@@ -1,4 +1,4 @@
-import { types } from "../types/gridTypes"
+import { types } from '../types/gridTypes';
 
 export default function gridReducer(state = {}, action) {
   const payload = action.payload;
@@ -6,32 +6,32 @@ export default function gridReducer(state = {}, action) {
     case types.SET_USER:
       return {
         ...state,
-        user: payload.user
+        user: payload.user,
       };
     case types.SET_ROWS:
       return {
         ...state,
-        rowData: payload.rows
+        rowData: payload.rows,
       };
     case types.SET_SCHEMA:
       return {
         ...state,
-        schema: payload.schema
+        schema: payload.schema,
       };
     case types.SET_TABLES:
       return {
         ...state,
-        tables: payload.tables
+        tables: payload.tables,
       };
     case types.SET_TABLE:
       return {
         ...state,
-        table: payload.table
+        table: payload.table,
       };
     case types.SET_FIELDS:
       return {
         ...state,
-        fields: payload.fields
+        fields: payload.fields,
       };
     default:
       return state;
