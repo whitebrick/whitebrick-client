@@ -24,24 +24,26 @@ const Table = ({ table, rows, fields, actions }) => {
 
   useEffect(() => {
     const handleTableChange = async () => {
-      let orderByParameter = fields.includes(orderBy) ? orderBy: fields[0];
-      let orderByType = table.concat('_order_by!')
-      const operation = gql.query({
-        operation: table,
-        variables: { limit, offset, order_by: { value: { [orderByParameter]: `asc` } ,type: `[${orderByType}]` } },
-        fields
-      })
-      const operationAgg = gql.query({
-        operation: table.concat('_aggregate'),
-        fields: [{ aggregate: [ 'count' ]}]
-      })
-      const fetchData = async () => await graphQLFetch(operation);
-      fetchData().then(({ data }) => actions.setRows(data[table]));
-      const fetchCount = async () => await graphQLFetch(operationAgg);
-      fetchCount().then(({ data }) => setCount(data[table + '_aggregate'].aggregate.count));
+      if(fields.length > 0) {
+        let orderByParameter = fields.includes(orderBy) ? orderBy: fields[0];
+        let orderByType = table.concat('_order_by!')
+        const operation = gql.query({
+          operation: table,
+          variables: { limit, offset, order_by: { value: { [orderByParameter]: `asc` } ,type: `[${orderByType}]` } },
+          fields
+        })
+        const operationAgg = gql.query({
+          operation: table.concat('_aggregate'),
+          fields: [{ aggregate: [ 'count' ]}]
+        })
+        const fetchData = async () => await graphQLFetch(operation);
+        fetchData().then(({ data }) => actions.setRows(data[table]));
+        const fetchCount = async () => await graphQLFetch(operationAgg);
+        fetchCount().then(({ data }) => setCount(data[table + '_aggregate'].aggregate.count));
+      }
     };
     handleTableChange();
-  }, [table, limit, offset, orderBy]);
+  }, [table, fields, limit, offset, orderBy]);
 
   const handlePagination = (current, pageSize) => {
     setOffset(Math.ceil((current - 1) * pageSize))
@@ -128,6 +130,7 @@ const Table = ({ table, rows, fields, actions }) => {
             onCellValueChanged={onCellValueChanged}
             domLayout={'autoHeight'}
             animateRows={true}
+            onGridReady={params => params.api.sizeColumnsToFit()}
           >
             {Object.keys(rows[0]).map(key => (
               <AgGridColumn field={key} key={key} />
@@ -166,7 +169,9 @@ const Table = ({ table, rows, fields, actions }) => {
 };
 
 const mapStateToProps = (state) => ({
-  rows: state.rowData
+  rows: state.rowData,
+  table: state.table,
+  fields: state.fields
 });
 
 const mapDispatchToProps = (dispatch) => ({

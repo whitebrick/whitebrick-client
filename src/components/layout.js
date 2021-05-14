@@ -12,8 +12,14 @@ import { useStaticQuery, graphql } from "gatsby"
 import Header from "./header"
 import "./layout.css"
 import Seo from "./seo"
-import { useManualQuery, useQuery } from "graphql-hooks"
+import { ClientContext, useManualQuery, useQuery } from "graphql-hooks"
 import { useEffect, useState } from "react"
+import { bindActionCreators } from "redux"
+import { actions } from "../actions"
+import { connect } from "react-redux"
+import Modal from "react-modal"
+import store from "../store"
+import Table from "./table"
 
 const GET_TABLE_FIELDS = `query ($name: String!){
   __type(name: $name) {
@@ -30,7 +36,28 @@ const GET_TABLE_FIELDS = `query ($name: String!){
   }
 }`;
 
-const Layout = ({ children, tableName, setTableName, user, setFields }) => {
+const SCHEMAS_QUERY = `query ($userEmail: String!) {
+  wbSchemas(userEmail: $userEmail) {
+    name
+  }
+}`;
+
+const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
+  wbSchemaTableNames(schemaName: $schemaName)
+}`;
+
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
+
+const Layout = ({ table, user, schema, tables, fields, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -41,27 +68,15 @@ const Layout = ({ children, tableName, setTableName, user, setFields }) => {
     }
   `)
 
-  const SCHEMAS_QUERY = `query ($userEmail: String!) {
-  wbSchemas(userEmail: $userEmail) {
-    name
-  }
-}`;
-
-  const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
-  wbSchemaTableNames(schemaName: $schemaName)
-}`;
-
   const { loading, error, data: schemas } = useQuery(SCHEMAS_QUERY, { variables: { userEmail: user }});
-  const [schema, setSchema] = useState('');
-  const [tables, setTables] = useState([]);
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [fetchQueryFields] = useManualQuery(GET_TABLE_FIELDS);
 
   useEffect(() => {
     const fetchTables = async () => {
-      if (schema !== '') {
+      if (schema !== '' && schema !== undefined) {
         const { data } = await fetchSchemaTables({ variables: { schemaName: schema } });
-        setTables(data.wbSchemaTableNames);
+        actions.setTables(data.wbSchemaTableNames);
       }
     }
     fetchTables();
@@ -69,8 +84,8 @@ const Layout = ({ children, tableName, setTableName, user, setFields }) => {
 
   useEffect(() => {
     const fetchFields = async () => {
-      if (tableName !== '') {
-        const { data } = await fetchQueryFields({ variables: { name: tableName }})
+      if (table !== '' && table !== undefined) {
+        const { data } = await fetchQueryFields({ variables: { name: table }})
         const { fields } = data['__type'];
         let f = []
         fields.map(field => {
@@ -78,15 +93,15 @@ const Layout = ({ children, tableName, setTableName, user, setFields }) => {
           let type = field.type.ofType?.kind ? field.type.ofType.kind: 'SCALAR';
           if (kind !== 'OBJECT' && kind !== 'LIST' && type !== 'OBJECT' && type !== 'LIST') f.push(field.name)
         })
-        setFields(f);
+        actions.setFields(f);
       }
     }
     fetchFields();
-  }, [tableName]);
+  }, [table]);
 
   const setTable = (name) => {
-    setTableName(name);
-    setFields([]);
+    actions.setTable(name);
+    actions.setFields([]);
   };
 
   if (loading) return 'Loading...'
@@ -103,8 +118,8 @@ const Layout = ({ children, tableName, setTableName, user, setFields }) => {
               {schemas.wbSchemas.map(field =>
                 <div
                   style={{ textDecoration: `none`, cursor: 'pointer' }}
-                  onClick={() => setSchema(field.name)}
-                  className={`list-group-item  ${tableName === field.name && 'active'}`}
+                  onClick={() => actions.setSchema(field.name)}
+                  className={`list-group-item  ${table === field.name && 'active'}`}
                   key={field.name}
                 >
                   {field.name}
@@ -113,14 +128,14 @@ const Layout = ({ children, tableName, setTableName, user, setFields }) => {
                   </svg>
                   {schema === field.name && (
                     <div className="list-group w-100 rounded-0">
-                      {tables.map(table =>
+                      {tables && tables.map(tableName =>
                         <a
                           style={{ textDecoration: `none`, cursor: 'pointer' }}
-                          onClick={() => setTable(schema + '_' + table)}
-                          className={`list-group-item py-1 ${tableName === schema + '_' + table && 'active'}`}
-                          key={table}
+                          onClick={() => setTable(schema + '_' + tableName)}
+                          className={`list-group-item py-1 ${table === schema + '_' + tableName && 'active'}`}
+                          key={tableName}
                         >
-                          {table}
+                          {tableName}
                         </a>
                       )}
                     </div>
@@ -129,7 +144,30 @@ const Layout = ({ children, tableName, setTableName, user, setFields }) => {
               )}
             </div>
           </aside>
-          <main className="col-10">{children}</main>
+          <main className="col-10">
+            <Modal
+              isOpen={user === ''}
+              style={customStyles}
+              contentLabel="Example Modal"
+              ariaHideApp={false}
+            >
+              <ul className="list-group p-4 m-4" style={{ cursor: 'pointer' }}>
+                <li className="list-group-item" onClick={() => actions.setUser('test_donna@example.com')}>
+                  test_donna@example.com
+                </li>
+                <li className="list-group-item" onClick={() => actions.setUser('test_debbie@example.com')}>
+                  test_debbie@example.com
+                </li>
+                <li className="list-group-item" onClick={() => actions.setUser('test_daisy@example.com')}>
+                  test_daisy@example.com
+                </li>
+                <li className="list-group-item" onClick={() => actions.setUser('test_nick_north@example.com')}>
+                  test_nick_north@example.com
+                </li>
+              </ul>
+            </Modal>
+            {user !== '' && table !== '' && fields.length > 0 && <Table key={table} />}
+          </main>
         </div>
       </div>
     </>
@@ -140,4 +178,16 @@ Layout.propTypes = {
   children: PropTypes.node.isRequired,
 }
 
-export default Layout
+const mapStateToProps = (state) => ({
+  user: state.user,
+  schema: state.schema,
+  tables: state.tables,
+  table: state.table,
+  fields: state.fields
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  actions: bindActionCreators(actions, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Layout);
