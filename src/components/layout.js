@@ -12,13 +12,12 @@ import { useStaticQuery, graphql } from "gatsby"
 import Header from "./header"
 import "./layout.css"
 import Seo from "./seo"
-import { ClientContext, useManualQuery, useQuery } from "graphql-hooks"
-import { useEffect, useState } from "react"
+import { useManualQuery, useQuery } from "graphql-hooks"
+import { useEffect } from "react"
 import { bindActionCreators } from "redux"
 import { actions } from "../actions"
 import { connect } from "react-redux"
 import Modal from "react-modal"
-import store from "../store"
 import Table from "./table"
 
 const GET_TABLE_FIELDS = `query ($name: String!){
@@ -80,7 +79,7 @@ const Layout = ({ table, user, schema, tables, fields, actions }) => {
       }
     }
     fetchTables();
-  }, [schema]);
+  }, [schema, fetchSchemaTables, actions]);
 
   useEffect(() => {
     const fetchFields = async () => {
@@ -88,7 +87,7 @@ const Layout = ({ table, user, schema, tables, fields, actions }) => {
         const { data } = await fetchQueryFields({ variables: { name: table }})
         const { fields } = data['__type'];
         let f = []
-        fields.map(field => {
+        fields.forEach(field => {
           let kind = field.type?.kind;
           let type = field.type.ofType?.kind ? field.type.ofType.kind: 'SCALAR';
           if (kind !== 'OBJECT' && kind !== 'LIST' && type !== 'OBJECT' && type !== 'LIST') f.push(field.name)
@@ -97,7 +96,7 @@ const Layout = ({ table, user, schema, tables, fields, actions }) => {
       }
     }
     fetchFields();
-  }, [table]);
+  }, [table, fetchQueryFields, actions]);
 
   const setTable = (name) => {
     actions.setTable(name);
@@ -129,14 +128,14 @@ const Layout = ({ table, user, schema, tables, fields, actions }) => {
                   {schema === field.name && (
                     <div className="list-group w-100 rounded-0">
                       {tables && tables.map(tableName =>
-                        <a
+                        <div
                           style={{ textDecoration: `none`, cursor: 'pointer' }}
                           onClick={() => setTable(schema + '_' + tableName)}
                           className={`list-group-item py-1 ${table === schema + '_' + tableName && 'active'}`}
                           key={tableName}
                         >
                           {tableName}
-                        </a>
+                        </div>
                       )}
                     </div>
                   )}
@@ -148,20 +147,35 @@ const Layout = ({ table, user, schema, tables, fields, actions }) => {
             <Modal
               isOpen={user === ''}
               style={customStyles}
-              contentLabel="Example Modal"
               ariaHideApp={false}
             >
               <ul className="list-group p-4 m-4" style={{ cursor: 'pointer' }}>
-                <li className="list-group-item" onClick={() => actions.setUser('test_donna@example.com')}>
+                <li
+                  className="list-group-item"
+                  onClick={() => actions.setUser('test_donna@example.com')}
+                  onKeyDown={() => actions.setUser('test_donna@example.com')}
+                >
                   test_donna@example.com
                 </li>
-                <li className="list-group-item" onClick={() => actions.setUser('test_debbie@example.com')}>
+                <li
+                  className="list-group-item"
+                  onClick={() => actions.setUser('test_debbie@example.com')}
+                  onKeyDown={() => actions.setUser('test_debbie@example.com')}
+                >
                   test_debbie@example.com
                 </li>
-                <li className="list-group-item" onClick={() => actions.setUser('test_daisy@example.com')}>
+                <li
+                  className="list-group-item"
+                  onClick={() => actions.setUser('test_daisy@example.com')}
+                  onKeyDown={() => actions.setUser('test_daisy@example.com')}
+                >
                   test_daisy@example.com
                 </li>
-                <li className="list-group-item" onClick={() => actions.setUser('test_nick_north@example.com')}>
+                <li
+                  className="list-group-item"
+                  onClick={() => actions.setUser('test_nick_north@example.com')}
+                  onKeyDown={() => actions.setUser('test_nick_north@example.com')}
+                >
                   test_nick_north@example.com
                 </li>
               </ul>

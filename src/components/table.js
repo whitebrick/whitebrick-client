@@ -43,7 +43,7 @@ const Table = ({ table, rows, fields, actions }) => {
       }
     };
     handleTableChange();
-  }, [table, fields, limit, offset, orderBy]);
+  }, [table, fields, limit, offset, orderBy, actions]);
 
   const handlePagination = (current, pageSize) => {
     setOffset(Math.ceil((current - 1) * pageSize))

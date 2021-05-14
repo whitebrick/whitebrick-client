@@ -1,9 +1,7 @@
-import React, { useState } from "react"
-import Table from '../components/table'
+import React from "react"
 import { GraphQLClient, ClientContext } from "graphql-hooks"
 import { SubscriptionClient } from 'subscriptions-transport-ws'
-import { Provider, useStore } from 'react-redux'
-import Modal from 'react-modal';
+import { Provider } from 'react-redux'
 
 import store from '../store';
 
@@ -29,9 +27,6 @@ const IndexPage = () => {
     }),
     headers: { 'x-hasura-admin-secret': process.env.GATSBY_HASURA_GRAPHQL_ADMIN_SECRET }
   })
-
-  const [user, setUser] = useState('');
-  const state = store.getState();
 
   return (
     <Provider store={store}>
