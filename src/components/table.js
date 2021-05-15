@@ -19,6 +19,8 @@ const Table = ({ table, rows, fields, actions }) => {
   const [current, setCurrent] = useState(1);
   const [orderBy, setOrderBy] = useState('');
 
+  const [changedValues, setChangedValues] = useState([]);
+
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
 
@@ -59,18 +61,7 @@ const Table = ({ table, rows, fields, actions }) => {
     setCurrent(current);
   };
 
-  const onCellValueChanged = params => {
-    let data = params.data;
-    data[params.colDef.field] = params.oldValue;
-    let variables = { where: {}, _set: {} };
-    for (let key in data) {
-      variables.where[key] = {
-        _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
-      };
-    }
-    variables['_set'][params.colDef.field] = parseInt(params.newValue)
-      ? parseInt(params.newValue)
-      : params.newValue;
+  const doMutation = (variables) => {
     const operation = gql.mutation({
       operation: ''.concat('update_', table),
       variables: {
@@ -88,7 +79,44 @@ const Table = ({ table, rows, fields, actions }) => {
         query: operation.query,
         variables: operation.variables,
       });
-    fetchData();
+    fetchData().then(r => console.log(r));
+  };
+
+  const editValues = (values) => {
+    values = [...new Set(values)];
+    values.map((params, index) => {
+      let filteredParams = values.filter(value => params.rowIndex === value.rowIndex);
+      let data = params.data;
+      data[params.colDef?.field] = params.oldValue;
+      filteredParams.map(param => {
+        data[param.colDef?.field] = param.oldValue;
+      })
+      let variables = { where: {}, _set: {} };
+      for (let key in data) {
+        variables.where[key] = {
+          _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
+        };
+      }
+      variables['_set'][params.colDef.field] = parseInt(params.newValue)
+        ? parseInt(params.newValue)
+        : params.newValue;
+      filteredParams.map(param => {
+        variables['_set'][param.colDef.field] = parseInt(param.newValue)
+          ? parseInt(param.newValue)
+          : param.newValue;
+      })
+      values.splice(index, 1);
+      values = values.filter((el) => !filteredParams.includes(el));
+      setChangedValues(values);
+      doMutation(variables);
+    })
+  };
+
+  const onCellValueChanged = params => {
+    let values = changedValues;
+    values.push(params);
+    setChangedValues(values);
+    setTimeout(() => editValues(values), 500);
   };
 
   const onFirstDataRendered = params => {
