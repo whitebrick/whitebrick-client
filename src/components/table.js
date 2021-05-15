@@ -64,9 +64,13 @@ const Table = ({ table, rows, fields, actions }) => {
     data[params.colDef.field] = params.oldValue;
     let variables = { where: {}, _set: {} };
     for (let key in data) {
-      variables.where[key] = { _eq: data[key] };
+      variables.where[key] = {
+        _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
+      };
     }
-    variables['_set'][params.colDef.field] = params.newValue;
+    variables['_set'][params.colDef.field] = parseInt(params.newValue)
+      ? parseInt(params.newValue)
+      : params.newValue;
     const operation = gql.mutation({
       operation: ''.concat('update_', table),
       variables: {
