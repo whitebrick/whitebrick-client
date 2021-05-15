@@ -9,7 +9,6 @@ import * as React from 'react';
 import { useStaticQuery, graphql } from 'gatsby';
 
 import Header from './header';
-import './layout.css';
 import Seo from './seo';
 import { useManualQuery, useQuery } from 'graphql-hooks';
 import { useEffect } from 'react';

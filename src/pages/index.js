@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 
 import store from '../store';
 
-import '../styles/sidebar.css';
+import '../styles/style.css';
 import 'rc-pagination/assets/index.css';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
