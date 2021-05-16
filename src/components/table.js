@@ -12,12 +12,36 @@ import { useSubscription } from 'graphql-hooks';
 import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
+import Modal from 'react-modal';
 
-const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset, actions }) => {
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
+
+const Table = ({
+  table,
+  rows,
+  fields,
+  rowCount,
+  current,
+  orderBy,
+  limit,
+  offset,
+  views,
+  defaultView,
+  actions,
+}) => {
   const [columnAPI, setColumnAPI] = useState(null);
   const [changedValues, setChangedValues] = useState([]);
-
-  console.log(columnAPI?.getAllColumns());
+  const [popup, setPopup] = useState(false);
+  const [name, setName] = useState('');
 
   useEffect(() => {
     const handleTableChange = async () => {
@@ -46,7 +70,7 @@ const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset,
         const fetchCount = async () => await graphQLFetch(operationAgg);
         fetchCount().then(({ data }) =>
           actions.setRowCount(data[table + '_aggregate'].aggregate.count),
-      );
+        );
       }
     };
     handleTableChange();
@@ -55,14 +79,14 @@ const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset,
   useEffect(() => {
     actions.setOffset(0);
     actions.setCurrent(1);
-  }, [table])
+  }, [table]);
 
   const handlePagination = (current, pageSize) => {
     actions.setOffset(Math.ceil((current - 1) * pageSize));
     actions.setCurrent(current);
   };
 
-  const doMutation = (variables) => {
+  const doMutation = variables => {
     const operation = gql.mutation({
       operation: ''.concat('update_', table),
       variables: {
@@ -83,15 +107,17 @@ const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset,
     fetchData();
   };
 
-  const editValues = (values) => {
+  const editValues = values => {
     values = [...new Set(values)];
     values.map((params, index) => {
-      let filteredParams = values.filter(value => params.rowIndex === value.rowIndex);
+      let filteredParams = values.filter(
+        value => params.rowIndex === value.rowIndex,
+      );
       let data = params.data;
       data[params.colDef?.field] = params.oldValue;
       filteredParams.map(param => {
         data[param.colDef?.field] = param.oldValue;
-      })
+      });
       let variables = { where: {}, _set: {} };
       for (let key in data) {
         variables.where[key] = {
@@ -105,12 +131,12 @@ const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset,
         variables['_set'][param.colDef.field] = parseInt(param.newValue)
           ? parseInt(param.newValue)
           : param.newValue;
-      })
+      });
       values.splice(index, 1);
-      values = values.filter((el) => !filteredParams.includes(el));
+      values = values.filter(el => !filteredParams.includes(el));
       setChangedValues(values);
       doMutation(variables);
-    })
+    });
   };
 
   const onCellValueChanged = params => {
@@ -118,10 +144,6 @@ const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset,
     values.push(params);
     setChangedValues(values);
     setTimeout(() => editValues(values), 500);
-  };
-
-  const onFirstDataRendered = params => {
-    params.api.sizeColumnsToFit();
   };
 
   let orderByParameter = fields.includes(orderBy) ? orderBy : fields[0];
@@ -138,6 +160,38 @@ const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset,
     fields,
   });
 
+  const saveView = (defaultView = null) => {
+    if (defaultView) {
+      let viewObj = views.filter(
+        view => view.table === table && view.name === defaultView,
+      )[0];
+      let index = views.indexOf(viewObj);
+      if (index !== -1) {
+        viewObj = {
+          table,
+          name: defaultView,
+          state: columnAPI.getColumnState(),
+          orderBy,
+          limit,
+        };
+        views[index] = viewObj;
+        actions.setViews(views);
+      }
+    } else {
+      let viewObj = {
+        table,
+        name,
+        state: columnAPI.getColumnState(),
+        orderBy,
+        limit,
+      };
+      actions.setView(viewObj);
+      actions.setDefaultView(name);
+      setPopup(false);
+      setName('');
+    }
+  };
+
   useSubscription(subscription, ({ data, errors }) => {
     if (errors && errors.length > 0) {
       console.log(errors);
@@ -150,10 +204,52 @@ const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset,
     <div className="ag-theme-alpine">
       {table !== '' && rows.length > 0 ? (
         <React.Fragment>
-          <div className="my-3 rounded-0">
+          <div className="my-3">
             <div style={{ padding: `1rem` }}>
               <h3 style={{ margin: 0 }}>{table}</h3>
               <p className="p-1">Total {rowCount} records</p>
+              <div>
+                {views &&
+                  views.map(view => {
+                    if (view.table === table)
+                      return (
+                        <div
+                          onClick={() => {
+                            columnAPI.applyColumnState({
+                              state: view.state,
+                              applyOrder: true,
+                            });
+                            actions.setLimit(view.limit);
+                            actions.setOrderBy(view.orderBy);
+                            actions.setDefaultView(view.name);
+                          }}
+                          className={`badge badge-pill mr-1 p-2 ${
+                            defaultView === view.name
+                              ? 'badge-primary'
+                              : 'badge-secondary'
+                          }`}
+                          style={{ cursor: 'pointer' }}>
+                          {view.name}
+                        </div>
+                      );
+                  })}
+                <div
+                  onClick={() => setPopup(true)}
+                  className="badge badge-pill badge-dark p-2"
+                  style={{ cursor: 'pointer' }}>
+                  + Create a view
+                </div>
+                {defaultView !== 'Default View' && (
+                  <div className="float-right">
+                    <div
+                      onClick={() => saveView(defaultView)}
+                      className="badge badge-dark p-2 mr-2"
+                      style={{ cursor: 'pointer' }}>
+                      Save to {defaultView}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <AgGridReact
@@ -172,16 +268,52 @@ const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset,
               filter: true,
             }}
             sortingOrder={['desc', 'asc', null]}
-            onFirstDataRendered={onFirstDataRendered}
             onCellValueChanged={onCellValueChanged}
             domLayout={'autoHeight'}
             animateRows={true}
-            onGridReady={params => setColumnAPI(params.columnApi)}
-            gridSizeChanged={params => params.api.sizeColumnsToFit()}>
+            onGridReady={params => {
+              setColumnAPI(params.columnApi);
+              let viewObj = {
+                table,
+                name: 'Default View',
+                state: params.columnApi.getColumnState(),
+                orderBy,
+                limit,
+              };
+              actions.setView(viewObj);
+            }}>
             {Object.keys(rows[0]).map(key => (
               <AgGridColumn field={key} key={key} />
             ))}
           </AgGridReact>
+          <Modal
+            isOpen={popup}
+            style={customStyles}
+            onRequestClose={() => setPopup(false)}
+            ariaHideApp={false}>
+            <div style={{ padding: '1rem' }}>
+              <div className="form-group">
+                <label>Name of the view</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Enter Name"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                />
+              </div>
+              <button
+                onClick={() => setPopup(false)}
+                className="btn btn-danger float-left">
+                Cancel
+              </button>
+              <button
+                onClick={() => saveView()}
+                className="btn btn-primary float-right">
+                Save
+              </button>
+            </div>
+          </Modal>
         </React.Fragment>
       ) : (
         <p>Please select a table to render</p>
@@ -200,7 +332,9 @@ const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset,
           </select>{' '}
           records per page
           <div className="float-right px-2">
-            <select value={orderBy} onChange={e => actions.setOrderBy(e.target.value)}>
+            <select
+              value={orderBy}
+              onChange={e => actions.setOrderBy(e.target.value)}>
               {fields.map(f => (
                 <option key={f} value={f}>
                   {f}
@@ -233,6 +367,8 @@ const mapStateToProps = state => ({
   orderBy: state.orderBy,
   limit: state.limit,
   offset: state.offset,
+  views: state.views,
+  defaultView: state.defaultView,
 });
 
 const mapDispatchToProps = dispatch => ({

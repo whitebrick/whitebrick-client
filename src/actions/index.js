@@ -67,4 +67,22 @@ export const actions = {
       payload: { current },
     };
   },
+  setViews(views) {
+    return {
+      type: types.SET_VIEWS,
+      payload: { views },
+    };
+  },
+  setView(view) {
+    return {
+      type: types.SET_VIEW,
+      payload: { view },
+    };
+  },
+  setDefaultView(defaultView) {
+    return {
+      type: types.SET_DEFAULT_VIEW,
+      payload: { defaultView },
+    };
+  },
 };

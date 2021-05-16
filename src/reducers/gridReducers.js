@@ -58,6 +58,21 @@ export default function gridReducer(state = {}, action) {
         ...state,
         offset: payload.offset,
       };
+    case types.SET_VIEWS:
+      return {
+        ...state,
+        views: payload.views,
+      };
+    case types.SET_VIEW:
+      return {
+        ...state,
+        views: [...state.views, payload.view],
+      };
+    case types.SET_DEFAULT_VIEW:
+      return {
+        ...state,
+        defaultView: payload.defaultView,
+      };
     default:
       return state;
   }

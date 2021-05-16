@@ -13,6 +13,8 @@ const initialState = {
   orderBy: '',
   limit: 10,
   offset: 0,
+  views: [],
+  defaultView: 'Default View',
 };
 
 export default createStore(gridReducer, initialState);
