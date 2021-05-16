@@ -37,4 +37,34 @@ export const actions = {
       payload: { table },
     };
   },
+  setRowCount(rowCount) {
+    return {
+      type: types.SET_ROW_COUNT,
+      payload: { rowCount },
+    };
+  },
+  setOrderBy(orderBy) {
+    return {
+      type: types.SET_ORDER_BY,
+      payload: { orderBy },
+    };
+  },
+  setLimit(limit) {
+    return {
+      type: types.SET_LIMIT,
+      payload: { limit },
+    };
+  },
+  setOffset(offset) {
+    return {
+      type: types.SET_OFFSET,
+      payload: { offset },
+    };
+  },
+  setCurrent(current) {
+    return {
+      type: types.SET_CURRENT,
+      payload: { current },
+    };
+  },
 };

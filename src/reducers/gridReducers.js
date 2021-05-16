@@ -33,6 +33,31 @@ export default function gridReducer(state = {}, action) {
         ...state,
         fields: payload.fields,
       };
+    case types.SET_ROW_COUNT:
+      return {
+        ...state,
+        rowCount: payload.rowCount,
+      };
+    case types.SET_CURRENT:
+      return {
+        ...state,
+        currentPage: payload.current,
+      };
+    case types.SET_ORDER_BY:
+      return {
+        ...state,
+        orderBy: payload.orderBy,
+      };
+    case types.SET_LIMIT:
+      return {
+        ...state,
+        limit: payload.limit,
+      };
+    case types.SET_OFFSET:
+      return {
+        ...state,
+        offset: payload.offset,
+      };
     default:
       return state;
   }

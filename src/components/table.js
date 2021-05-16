@@ -12,22 +12,18 @@ import { useSubscription } from 'graphql-hooks';
 import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
-import { Link } from 'gatsby';
 
-const Table = ({ table, rows, fields, actions }) => {
-  const [count, setCount] = useState(0);
-  const [current, setCurrent] = useState(1);
-  const [orderBy, setOrderBy] = useState('');
-
+const Table = ({ table, rows, fields, rowCount, current, orderBy, limit, offset, actions }) => {
+  const [columnAPI, setColumnAPI] = useState(null);
   const [changedValues, setChangedValues] = useState([]);
 
-  const [limit, setLimit] = useState(10);
-  const [offset, setOffset] = useState(0);
+  console.log(columnAPI?.getAllColumns());
 
   useEffect(() => {
     const handleTableChange = async () => {
       if (fields.length > 0) {
         let orderByParameter = fields.includes(orderBy) ? orderBy : fields[0];
+        actions.setOrderBy(orderByParameter);
         let orderByType = table.concat('_order_by!');
         const operation = gql.query({
           operation: table,
@@ -49,16 +45,21 @@ const Table = ({ table, rows, fields, actions }) => {
         fetchData().then(({ data }) => actions.setRows(data[table]));
         const fetchCount = async () => await graphQLFetch(operationAgg);
         fetchCount().then(({ data }) =>
-          setCount(data[table + '_aggregate'].aggregate.count),
-        );
+          actions.setRowCount(data[table + '_aggregate'].aggregate.count),
+      );
       }
     };
     handleTableChange();
   }, [table, fields, limit, offset, orderBy, actions]);
 
+  useEffect(() => {
+    actions.setOffset(0);
+    actions.setCurrent(1);
+  }, [table])
+
   const handlePagination = (current, pageSize) => {
-    setOffset(Math.ceil((current - 1) * pageSize));
-    setCurrent(current);
+    actions.setOffset(Math.ceil((current - 1) * pageSize));
+    actions.setCurrent(current);
   };
 
   const doMutation = (variables) => {
@@ -79,7 +80,7 @@ const Table = ({ table, rows, fields, actions }) => {
         query: operation.query,
         variables: operation.variables,
       });
-    fetchData().then(r => console.log(r));
+    fetchData();
   };
 
   const editValues = (values) => {
@@ -149,18 +150,10 @@ const Table = ({ table, rows, fields, actions }) => {
     <div className="ag-theme-alpine">
       {table !== '' && rows.length > 0 ? (
         <React.Fragment>
-          <div className="card my-3 rounded-0">
+          <div className="my-3 rounded-0">
             <div style={{ padding: `1rem` }}>
-              <h3 style={{ margin: 0 }}>
-                <Link
-                  to="/"
-                  style={{
-                    color: `black`,
-                    textDecoration: `none`,
-                  }}>
-                  {table}
-                </Link>
-              </h3>
+              <h3 style={{ margin: 0 }}>{table}</h3>
+              <p className="p-1">Total {rowCount} records</p>
             </div>
           </div>
           <AgGridReact
@@ -183,7 +176,8 @@ const Table = ({ table, rows, fields, actions }) => {
             onCellValueChanged={onCellValueChanged}
             domLayout={'autoHeight'}
             animateRows={true}
-            onGridReady={params => params.api.sizeColumnsToFit()}>
+            onGridReady={params => setColumnAPI(params.columnApi)}
+            gridSizeChanged={params => params.api.sizeColumnsToFit()}>
             {Object.keys(rows[0]).map(key => (
               <AgGridColumn field={key} key={key} />
             ))}
@@ -196,7 +190,7 @@ const Table = ({ table, rows, fields, actions }) => {
         <div className="p-4">
           <select
             value={limit}
-            onChange={e => setLimit(parseInt(e.target.value))}>
+            onChange={e => actions.setLimit(parseInt(e.target.value))}>
             <option>5</option>
             <option>10</option>
             <option>20</option>
@@ -206,7 +200,7 @@ const Table = ({ table, rows, fields, actions }) => {
           </select>{' '}
           records per page
           <div className="float-right px-2">
-            <select value={orderBy} onChange={e => setOrderBy(e.target.value)}>
+            <select value={orderBy} onChange={e => actions.setOrderBy(e.target.value)}>
               {fields.map(f => (
                 <option key={f} value={f}>
                   {f}
@@ -216,7 +210,7 @@ const Table = ({ table, rows, fields, actions }) => {
           </div>
           <div className="float-right">
             <Pagination
-              total={count}
+              total={rowCount}
               pageSize={limit}
               current={current}
               onChange={(current, pageSize) =>
@@ -234,6 +228,11 @@ const mapStateToProps = state => ({
   rows: state.rowData,
   table: state.table,
   fields: state.fields,
+  rowCount: state.rowCount,
+  current: state.current,
+  orderBy: state.orderBy,
+  limit: state.limit,
+  offset: state.offset,
 });
 
 const mapDispatchToProps = dispatch => ({
