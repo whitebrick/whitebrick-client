@@ -239,16 +239,14 @@ const Table = ({
                   style={{ cursor: 'pointer' }}>
                   + Create a view
                 </div>
-                {defaultView !== 'Default View' && (
-                  <div className="float-right">
-                    <div
-                      onClick={() => saveView(defaultView)}
-                      className="badge badge-dark p-2 mr-2"
-                      style={{ cursor: 'pointer' }}>
-                      Save to {defaultView}
-                    </div>
+                <div className="float-right">
+                  <div
+                    onClick={() => saveView(defaultView)}
+                    className="badge badge-dark p-2 mr-2"
+                    style={{ cursor: 'pointer' }}>
+                    Save to {defaultView}
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
@@ -273,14 +271,16 @@ const Table = ({
             animateRows={true}
             onGridReady={params => {
               setColumnAPI(params.columnApi);
-              let viewObj = {
-                table,
-                name: 'Default View',
-                state: params.columnApi.getColumnState(),
-                orderBy,
-                limit,
-              };
-              actions.setView(viewObj);
+              if(views.filter(view => view.name === 'Default View' && view.table === table).length <=0){
+                let viewObj = {
+                  table,
+                  name: 'Default View',
+                  state: params.columnApi.getColumnState(),
+                  orderBy,
+                  limit,
+                };
+                actions.setView(viewObj);
+              }
             }}>
             {Object.keys(rows[0]).map(key => (
               <AgGridColumn field={key} key={key} />
