@@ -3,3 +3,22 @@
 body {
     background: #F6F6F6!important;
 }
+
+
+.ReactModal__Overlay {
+    background: rgba(0, 0, 0, 0.65)!important;
+    z-index: 99999;
+}
+
+.modal-body {
+    height: 100%;
+    border-radius: 0;
+    position:relative;
+}
+
+.modal-footer {
+    border-radius: 0;
+    bottom:0;
+    position:absolute;
+    width:100%;
+}

@@ -13,6 +13,7 @@ import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
 import Modal from 'react-modal';
+import SidePanel from './sidePanel';
 
 const customStyles = {
   content: {
@@ -42,6 +43,13 @@ const Table = ({
   const [changedValues, setChangedValues] = useState([]);
   const [popup, setPopup] = useState(false);
   const [name, setName] = useState('');
+  const [type, setType] = useState('');
+  const [formData, setFormData] = useState({});
+  const [show, setShow] = useState(false);
+  const [column, setColumn] = useState('');
+  const [columns, setColumns] = useState(
+    rows.length > 0 ? Object.keys(rows[0]) : [],
+  );
 
   useEffect(() => {
     const handleTableChange = async () => {
@@ -66,7 +74,10 @@ const Table = ({
           fields: [{ aggregate: ['count'] }],
         });
         const fetchData = async () => await graphQLFetch(operation);
-        fetchData().then(({ data }) => actions.setRows(data[table]));
+        fetchData().then(({ data }) => {
+          actions.setRows(data[table]);
+          setColumns(Object.keys(data[table][0]));
+        });
         const fetchCount = async () => await graphQLFetch(operationAgg);
         fetchCount().then(({ data }) =>
           actions.setRowCount(data[table + '_aggregate'].aggregate.count),
@@ -192,6 +203,61 @@ const Table = ({
     }
   };
 
+  const getContextMenuItems = params => {
+    setFormData({});
+    return [
+      {
+        name: 'Add Column',
+        action: () => {
+          setType('add');
+          setShow(true);
+          setColumn(params.column.colId);
+        },
+      },
+      {
+        name: 'Edit Column',
+        action: () => {
+          setType('edit');
+          setShow(true);
+          setFormData({ name: params.column.colId });
+          setColumn(params.column.colId);
+        },
+      },
+      {
+        name: 'Remove Column',
+        action: () => onRemove(params.column.colId),
+      },
+      'separator',
+      'copy',
+      'copyWithHeaders',
+      'paste',
+      'export',
+    ];
+  };
+
+  const onSave = () => {
+    let col = columns.filter(c => c === column)[0];
+    let index = columns.indexOf(col);
+    columns.splice(index, 0, formData.name);
+    setColumns(columns);
+    setShow(false);
+  };
+
+  const onEdit = () => {
+    let col = columns.filter(c => c === column)[0];
+    let index = columns.indexOf(col);
+    columns.splice(index, 1, formData.name);
+    setColumns(columns);
+    setShow(false);
+  };
+
+  const onRemove = colID => {
+    let col = columns.filter(c => c === colID)[0];
+    let index = columns.indexOf(col);
+    columns.splice(index, 1);
+    setColumns(columns);
+  };
+
   useSubscription(subscription, ({ data, errors }) => {
     if (errors && errors.length > 0) {
       console.log(errors);
@@ -269,9 +335,15 @@ const Table = ({
             onCellValueChanged={onCellValueChanged}
             domLayout={'autoHeight'}
             animateRows={true}
+            allowContextMenuWithControlKey={true}
+            getContextMenuItems={getContextMenuItems}
             onGridReady={params => {
               setColumnAPI(params.columnApi);
-              if(views.filter(view => view.name === 'Default View' && view.table === table).length <=0){
+              if (
+                views.filter(
+                  view => view.name === 'Default View' && view.table === table,
+                ).length <= 0
+              ) {
                 let viewObj = {
                   table,
                   name: 'Default View',
@@ -282,7 +354,7 @@ const Table = ({
                 actions.setView(viewObj);
               }
             }}>
-            {Object.keys(rows[0]).map(key => (
+            {columns.map(key => (
               <AgGridColumn field={key} key={key} />
             ))}
           </AgGridReact>
@@ -354,6 +426,42 @@ const Table = ({
           </div>
         </div>
       )}
+      <SidePanel
+        show={show}
+        setShow={setShow}
+        onSave={onSave}
+        onEdit={onEdit}
+        type={type}
+        name={
+          type === 'add'
+            ? `Add column to '${table.split('_').pop()}'`
+            : `Edit column '${column}'`
+        }>
+        <div className="mt-3">
+          <label>Column Name</label>
+          <input
+            className="form-control"
+            value={formData?.name}
+            onChange={e =>
+              setFormData({ ...formData, name: e.target.value })
+            }
+          />
+        </div>
+        <div className="mt-3">
+          <label>Column Type</label>
+          <select
+            className="form-control"
+            value={formData?.type}
+            onChange={e =>
+              setFormData({ ...formData, type: e.target.value })
+            }>
+            <option value="string">String</option>
+            <option value="integer">Integer</option>
+            <option value="date">Date</option>
+            <option value="timestamp">Timestamp</option>
+          </select>
+        </div>
+      </SidePanel>
     </div>
   );
 };
