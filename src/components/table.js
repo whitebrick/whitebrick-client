@@ -40,6 +40,7 @@ const Table = ({
   actions,
 }) => {
   const [columnAPI, setColumnAPI] = useState(null);
+  const [gridAPI, setGridAPI] = useState(null);
   const [changedValues, setChangedValues] = useState([]);
   const [popup, setPopup] = useState(false);
   const [name, setName] = useState('');
@@ -228,6 +229,15 @@ const Table = ({
         action: () => onRemove(params.column.colId),
       },
       'separator',
+      {
+        name: 'Add Row',
+        action: () => onAddRow(),
+      },
+      {
+        name: 'Delete Row',
+        action: () => onDeleteRow(params),
+      },
+      'separator',
       'copy',
       'copyWithHeaders',
       'paste',
@@ -236,11 +246,32 @@ const Table = ({
   };
 
   const onSave = () => {
-    let col = columns.filter(c => c === column)[0];
-    let index = columns.indexOf(col);
-    columns.splice(index, 0, formData.name);
-    setColumns(columns);
-    setShow(false);
+    if (type === 'newRow') {
+      const operation = gql.mutation({
+        operation: ''.concat('insert_', table),
+        variables: {
+          objects: {
+            value: formData,
+            type: `[${table}_insert_input!]`,
+            required: true,
+          },
+        },
+        fields: ['affected_rows'],
+      });
+      const fetchData = async () =>
+        await graphQLFetch({
+          query: operation.query,
+          variables: operation.variables,
+        });
+      fetchData();
+      setShow(false);
+    } else {
+      let col = columns.filter(c => c === column)[0];
+      let index = columns.indexOf(col);
+      columns.splice(index, 0, formData.name);
+      setColumns(columns);
+      setShow(false);
+    }
   };
 
   const onEdit = () => {
@@ -256,6 +287,38 @@ const Table = ({
     let index = columns.indexOf(col);
     columns.splice(index, 1);
     setColumns(columns);
+  };
+
+  const onAddRow = () => {
+    setType('newRow');
+    setShow(true);
+  };
+
+  const onDeleteRow = params => {
+    let variables = { where: {} };
+    let data = params.node.data;
+    for (let key in data) {
+      variables.where[key] = {
+        _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
+      };
+    }
+    const operation = gql.mutation({
+      operation: ''.concat('delete_', table),
+      variables: {
+        where: {
+          value: variables.where,
+          type: `${table}_bool_exp`,
+          required: true,
+        },
+      },
+      fields: ['affected_rows'],
+    });
+    const fetchData = async () =>
+      await graphQLFetch({
+        query: operation.query,
+        variables: operation.variables,
+      });
+    fetchData();
   };
 
   useSubscription(subscription, ({ data, errors }) => {
@@ -337,7 +400,9 @@ const Table = ({
             animateRows={true}
             allowContextMenuWithControlKey={true}
             getContextMenuItems={getContextMenuItems}
+            popupParent={document.querySelector('body')}
             onGridReady={params => {
+              setGridAPI(params.api);
               setColumnAPI(params.columnApi);
               if (
                 views.filter(
@@ -435,32 +500,58 @@ const Table = ({
         name={
           type === 'add'
             ? `Add column to '${table.split('_').pop()}'`
+            : type === 'newRow'
+            ? `Add new row to '${table.split('_').pop()}'`
             : `Edit column '${column}'`
         }>
-        <div className="mt-3">
-          <label>Column Name</label>
-          <input
-            className="form-control"
-            value={formData?.name}
-            onChange={e =>
-              setFormData({ ...formData, name: e.target.value })
-            }
-          />
-        </div>
-        <div className="mt-3">
-          <label>Column Type</label>
-          <select
-            className="form-control"
-            value={formData?.type}
-            onChange={e =>
-              setFormData({ ...formData, type: e.target.value })
-            }>
-            <option value="string">String</option>
-            <option value="integer">Integer</option>
-            <option value="date">Date</option>
-            <option value="timestamp">Timestamp</option>
-          </select>
-        </div>
+        {type === 'newRow' ? (
+          <React.Fragment>
+            {columns.map(c => (
+              <div className="mt-3">
+                <label>{c}</label>
+                <input
+                  className="form-control"
+                  value={formData ? formData[c] : ''}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      [c]: parseInt(e.target.value)
+                        ? parseInt(e.target.value)
+                        : e.target.value,
+                    })
+                  }
+                />
+              </div>
+            ))}
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <div className="mt-3">
+              <label>Column Name</label>
+              <input
+                className="form-control"
+                value={formData?.name}
+                onChange={e =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+              />
+            </div>
+            <div className="mt-3">
+              <label>Column Type</label>
+              <select
+                className="form-control"
+                value={formData?.type}
+                onChange={e =>
+                  setFormData({ ...formData, type: e.target.value })
+                }>
+                <option value="string">String</option>
+                <option value="integer">Integer</option>
+                <option value="date">Date</option>
+                <option value="timestamp">Timestamp</option>
+              </select>
+            </div>
+          </React.Fragment>
+        )}
       </SidePanel>
     </div>
   );

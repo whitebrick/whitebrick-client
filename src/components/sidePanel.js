@@ -30,7 +30,7 @@ const SidePanel = ({ name, show, setShow, onSave, onEdit, type, children }) => {
           Cancel
         </button>
         <button
-          onClick={type === 'add' ? onSave : onEdit}
+          onClick={type !== 'edit' ? onSave : onEdit}
           className="btn btn-primary">
           Save
         </button>
