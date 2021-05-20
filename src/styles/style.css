@@ -22,3 +22,16 @@ body {
     position:absolute;
     width:100%;
 }
+
+.avatar img {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    right: 0!important;
+    left: auto!important;
+}

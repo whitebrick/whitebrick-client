@@ -2,15 +2,16 @@ import React from 'react';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { Provider } from 'react-redux';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
 
 import store from '../store';
+import Layout from '../components/layout';
 
 import '../styles/style.css';
 import 'rc-pagination/assets/index.css';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Layout from '../components/layout';
 
 const IndexPage = () => {
   const client = new GraphQLClient({
@@ -43,4 +44,4 @@ const IndexPage = () => {
   );
 };
 
-export default IndexPage;
+export default withAuthenticationRequired(IndexPage);

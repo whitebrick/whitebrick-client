@@ -1,31 +1,56 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'gatsby';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useState } from 'react';
 
-const Header = ({ siteTitle }) => (
-  <header
-    style={{
-      background: `#fff`,
-      borderBottom: `1px solid #dfe1eb`,
-    }}
-    className="text-center">
-    <div
+const Header = ({ siteTitle }) => {
+  const { user, logout } = useAuth0();
+  const [show, setShow] = useState(false);
+
+  const menuClass = `dropdown-menu${show ? ' show' : ''}`;
+  return (
+    <header
       style={{
-        padding: `1rem`,
-      }}>
-      <h3 style={{ margin: 0 }}>
-        <Link
-          to="/"
-          style={{
-            color: `#1443b7`,
-            textDecoration: `none`,
-          }}>
-          {siteTitle}
-        </Link>
-      </h3>
-    </div>
-  </header>
-);
+        background: `#fff`,
+        borderBottom: `1px solid #dfe1eb`,
+      }}
+      className="text-center">
+      <nav className="navbar">
+        <span className="navbar-brand mb-0 h1">{siteTitle}</span>
+        <span className="navbar-text">
+          <div className="dropdown avatar" onClick={() => setShow(!show)}>
+            <img
+              onClick={() => setShow(!show)}
+              src={user.picture}
+              alt={`${user.nickname}'s picture`}
+            />
+            <div className={menuClass}>
+              <div className="p-4 text-center">
+                <img
+                  src={user.picture}
+                  alt={`${user.nickname}'s picture`}
+                  style={{ width: '50px', height: '50px' }}
+                />
+                <div className="mt-2">
+                  <b>{user.name}</b>
+                  <div style={{ color: '#757575', fontSize: '0.875rem' }}>
+                    {user.email}
+                  </div>
+                </div>
+              </div>
+              <div className="dropdown-divider" />
+              <button
+                className="dropdown-item"
+                onClick={() => logout({ returnTo: window.location.origin })}>
+                Log out
+              </button>
+            </div>
+          </div>
+        </span>
+      </nav>
+    </header>
+  );
+};
 
 Header.propTypes = {
   siteTitle: PropTypes.string,

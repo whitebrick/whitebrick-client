@@ -15,8 +15,8 @@ import { useEffect } from 'react';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
-import Modal from 'react-modal';
 import Table from './table';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const GET_TABLE_FIELDS = `query ($name: String!){
   __type(name: $name) {
@@ -54,7 +54,7 @@ const customStyles = {
   },
 };
 
-const Layout = ({ table, user, schema, tables, fields, actions }) => {
+const Layout = ({ table, schema, tables, fields, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -65,8 +65,9 @@ const Layout = ({ table, user, schema, tables, fields, actions }) => {
     }
   `);
 
+  const { user } = useAuth0();
   const { loading, error, data: schemas } = useQuery(SCHEMAS_QUERY, {
-    variables: { userEmail: user },
+    variables: { userEmail: user.email },
   });
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [fetchQueryFields] = useManualQuery(GET_TABLE_FIELDS);
@@ -173,42 +174,7 @@ const Layout = ({ table, user, schema, tables, fields, actions }) => {
             </div>
           </aside>
           <main className="col-10">
-            <Modal
-              isOpen={user === ''}
-              style={customStyles}
-              ariaHideApp={false}>
-              <ul className="list-group p-4 m-4" style={{ cursor: 'pointer' }}>
-                <li
-                  className="list-group-item"
-                  onClick={() => actions.setUser('test_donna@example.com')}
-                  onKeyDown={() => actions.setUser('test_donna@example.com')}>
-                  test_donna@example.com
-                </li>
-                <li
-                  className="list-group-item"
-                  onClick={() => actions.setUser('test_debbie@example.com')}
-                  onKeyDown={() => actions.setUser('test_debbie@example.com')}>
-                  test_debbie@example.com
-                </li>
-                <li
-                  className="list-group-item"
-                  onClick={() => actions.setUser('test_daisy@example.com')}
-                  onKeyDown={() => actions.setUser('test_daisy@example.com')}>
-                  test_daisy@example.com
-                </li>
-                <li
-                  className="list-group-item"
-                  onClick={() => actions.setUser('test_nick_north@example.com')}
-                  onKeyDown={() =>
-                    actions.setUser('test_nick_north@example.com')
-                  }>
-                  test_nick_north@example.com
-                </li>
-              </ul>
-            </Modal>
-            {user !== '' && table !== '' && fields.length > 0 && (
-              <Table key={table} />
-            )}
+            {user && table !== '' && fields.length > 0 && <Table key={table} />}
           </main>
         </div>
       </div>
@@ -217,7 +183,6 @@ const Layout = ({ table, user, schema, tables, fields, actions }) => {
 };
 
 const mapStateToProps = state => ({
-  user: state.user,
   schema: state.schema,
   tables: state.tables,
   table: state.table,
