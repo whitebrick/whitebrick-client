@@ -5,18 +5,19 @@
  * See: https://www.gatsbyjs.com/docs/use-static-query/
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useStaticQuery, graphql } from 'gatsby';
 
 import Header from './header';
 import Seo from './seo';
-import { useManualQuery, useQuery } from 'graphql-hooks';
+import { useManualQuery, useMutation, useQuery } from 'graphql-hooks';
 import { FaPlus } from 'react-icons/fa';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
 import Table from './table';
 import { useAuth0 } from '@auth0/auth0-react';
+import SidePanel from './sidePanel';
 
 const GET_TABLE_FIELDS = `query ($name: String!){
   __type(name: $name) {
@@ -43,6 +44,12 @@ const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
   wbSchemaTableNames(schemaName: $schemaName)
 }`;
 
+const CREATE_SCHEMA_MUTATION = `mutation ($name: String!, $label: String!, $email: String!){
+  wbCreateSchema(name: $name, label: $label, userOwnerEmail: $email){
+    name
+  }
+}`;
+
 const Layout = ({ table, schema, tables, fields, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
@@ -55,11 +62,14 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
   `);
 
   const { user } = useAuth0();
-  const { loading, error, data: schemas } = useQuery(SCHEMAS_QUERY, {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({});
+  const { loading, error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
     variables: { userEmail: user.email },
   });
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [fetchQueryFields] = useManualQuery(GET_TABLE_FIELDS);
+  const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
 
   useEffect(() => {
     actions.setTables([]);
@@ -102,6 +112,20 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
   const setTable = name => {
     actions.setTable(name);
     actions.setFields([]);
+  };
+
+  const onSave = () => {
+    const { error, loading } = createSchema({
+      variables: {
+        name: formData.name,
+        label: formData.label,
+        email: user.email,
+      },
+    });
+    if (!loading && !error) {
+      refetch();
+      setShow(false);
+    }
   };
 
   if (loading) return 'Loading...';
@@ -151,6 +175,7 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
             </div>
             <div className="create-button p-2 d-flex align-items-center">
               <button
+                onClick={() => setShow(true)}
                 className="btn btn-primary btn-block"
                 style={{ position: 'absolute', bottom: '30px' }}>
                 <FaPlus /> Create new
@@ -159,6 +184,37 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
           </aside>
           <main className="col-10">
             {user && table !== '' && fields.length > 0 && <Table key={table} />}
+            <SidePanel
+              show={show}
+              setShow={setShow}
+              onSave={onSave}
+              type="save"
+              name="Create a new database">
+              <React.Fragment>
+                <div className="mt-3">
+                  <label htmlFor="name">Name</label>
+                  <input
+                    className="form-control"
+                    value={formData?.name}
+                    onChange={e =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="mt-3">
+                  <label htmlFor="label">Label</label>
+                  <input
+                    className="form-control"
+                    value={formData?.label}
+                    onChange={e =>
+                      setFormData({ ...formData, label: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              </React.Fragment>
+            </SidePanel>
           </main>
         </div>
       </div>
