@@ -5,13 +5,13 @@
  * See: https://www.gatsbyjs.com/docs/use-static-query/
  */
 
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { useStaticQuery, graphql } from 'gatsby';
 
 import Header from './header';
 import Seo from './seo';
 import { useManualQuery, useQuery } from 'graphql-hooks';
-import { useEffect } from 'react';
+import { FaPlus } from 'react-icons/fa';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
@@ -43,17 +43,6 @@ const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
   wbSchemaTableNames(schemaName: $schemaName)
 }`;
 
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  },
-};
-
 const Layout = ({ table, schema, tables, fields, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
@@ -73,6 +62,7 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
   const [fetchQueryFields] = useManualQuery(GET_TABLE_FIELDS);
 
   useEffect(() => {
+    actions.setTables([]);
     const fetchTables = async () => {
       if (schema !== '' && schema !== undefined) {
         const { data } = await fetchSchemaTables({
@@ -123,33 +113,19 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
       <Header siteTitle={data.site.siteMetadata?.title || `Title`} />
       <div>
         <div className="row m-0">
-          <aside
-            className="col-2 p-0"
-            id="sidebar"
-            style={{ overflow: 'scroll' }}>
+          <aside className="col-2 p-0" id="sidebar">
             <div className="list-group w-100 rounded-0">
+              <div className="sidebar-heading list-group-item">Databases</div>
               {schemas.wbSchemas.map(field => (
                 <div
-                  style={{ textDecoration: `none`, cursor: 'pointer' }}
+                  style={{ cursor: 'pointer' }}
                   onClick={() => actions.setSchema(field.name)}
-                  className={`list-group-item  ${
+                  aria-hidden="true"
+                  className={`list-group-item schema  ${
                     table === field.name && 'active'
                   }`}
                   key={field.name}>
                   {field.name}
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M16.95 10.707a1 1 0 10-1.414-1.414L12 12.828 8.464 9.293a1 1 0 10-1.414 1.414l4.243 4.243a1 1 0 001.414 0l4.243-4.243z"
-                      fill="currentColor"
-                    />
-                  </svg>
                   {schema === field.name && (
                     <div className="list-group w-100 rounded-0">
                       {tables &&
@@ -160,6 +136,7 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
                               cursor: 'pointer',
                             }}
                             onClick={() => setTable(schema + '_' + tableName)}
+                            aria-hidden="true"
                             className={`list-group-item py-1 ${
                               table === schema + '_' + tableName && 'active'
                             }`}
@@ -171,6 +148,13 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
                   )}
                 </div>
               ))}
+            </div>
+            <div className="create-button p-2 d-flex align-items-center">
+              <button
+                className="btn btn-primary btn-block"
+                style={{ position: 'absolute', bottom: '30px' }}>
+                <FaPlus /> Create new
+              </button>
             </div>
           </aside>
           <main className="col-10">

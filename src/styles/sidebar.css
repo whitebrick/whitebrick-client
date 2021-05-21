@@ -10,7 +10,30 @@
     border-radius: 5px;
 }
 
+.schema{
+    margin-bottom: -15px!important;
+}
+
+#sidebar .list-group-item :hover {
+    background: #f1f4fa !important;
+    color: #1543B7!important;
+}
+
 #sidebar .list-group-item .active {
     background: #f1f4fa !important;
     color: #1543B7!important;
+}
+
+#sidebar .sidebar-heading {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: -16px;
+    color: #1543B7;
+    display: flex;
+    align-items: center;
+}
+
+#sidebar .create-button button {
+    width: 90%!important;
 }

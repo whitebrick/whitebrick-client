@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-export default ({ query, variables }) => {
+const GraphQLFetch = ({ query, variables }) => {
   const body = {
     query,
     variables,
@@ -34,3 +34,5 @@ export default ({ query, variables }) => {
     throw response;
   });
 };
+
+export default GraphQLFetch;

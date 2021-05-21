@@ -40,7 +40,6 @@ const Table = ({
   actions,
 }) => {
   const [columnAPI, setColumnAPI] = useState(null);
-  const [gridAPI, setGridAPI] = useState(null);
   const [changedValues, setChangedValues] = useState([]);
   const [popup, setPopup] = useState(false);
   const [name, setName] = useState('');
@@ -91,7 +90,7 @@ const Table = ({
   useEffect(() => {
     actions.setOffset(0);
     actions.setCurrent(1);
-  }, [table]);
+  }, [table, actions]);
 
   const handlePagination = (current, pageSize) => {
     actions.setOffset(Math.ceil((current - 1) * pageSize));
@@ -121,13 +120,13 @@ const Table = ({
 
   const editValues = values => {
     values = [...new Set(values)];
-    values.map((params, index) => {
+    values.forEach((params, index) => {
       let filteredParams = values.filter(
         value => params.rowIndex === value.rowIndex,
       );
       let data = params.data;
       data[params.colDef?.field] = params.oldValue;
-      filteredParams.map(param => {
+      filteredParams.forEach(param => {
         data[param.colDef?.field] = param.oldValue;
       });
       let variables = { where: {}, _set: {} };
@@ -139,7 +138,7 @@ const Table = ({
       variables['_set'][params.colDef.field] = parseInt(params.newValue)
         ? parseInt(params.newValue)
         : params.newValue;
-      filteredParams.map(param => {
+      filteredParams.forEach(param => {
         variables['_set'][param.colDef.field] = parseInt(param.newValue)
           ? parseInt(param.newValue)
           : param.newValue;
@@ -338,7 +337,7 @@ const Table = ({
               <h3 style={{ margin: 0 }}>{table}</h3>
               <p className="p-1">Total {rowCount} records</p>
               <div>
-                {views &&
+                {views.length > 0 &&
                   views.map(view => {
                     if (view.table === table)
                       return (
@@ -352,6 +351,7 @@ const Table = ({
                             actions.setOrderBy(view.orderBy);
                             actions.setDefaultView(view.name);
                           }}
+                          aria-hidden="true"
                           className={`badge badge-pill mr-1 p-2 ${
                             defaultView === view.name
                               ? 'badge-primary'
@@ -364,6 +364,7 @@ const Table = ({
                   })}
                 <div
                   onClick={() => setPopup(true)}
+                  aria-hidden="true"
                   className="badge badge-pill badge-dark p-2"
                   style={{ cursor: 'pointer' }}>
                   + Create a view
@@ -371,6 +372,7 @@ const Table = ({
                 <div className="float-right">
                   <div
                     onClick={() => saveView(defaultView)}
+                    aria-hidden="true"
                     className="badge badge-dark p-2 mr-2"
                     style={{ cursor: 'pointer' }}>
                     Save to {defaultView}
@@ -402,7 +404,6 @@ const Table = ({
             getContextMenuItems={getContextMenuItems}
             popupParent={document.querySelector('body')}
             onGridReady={params => {
-              setGridAPI(params.api);
               setColumnAPI(params.columnApi);
               if (
                 views.filter(
@@ -430,7 +431,7 @@ const Table = ({
             ariaHideApp={false}>
             <div style={{ padding: '1rem' }}>
               <div className="form-group">
-                <label>Name of the view</label>
+                <label htmlFor="name">Name of the view</label>
                 <input
                   type="text"
                   className="form-control"
@@ -459,6 +460,7 @@ const Table = ({
         <div className="p-4">
           <select
             value={limit}
+            onBlur={e => actions.setLimit(parseInt(e.target.value))}
             onChange={e => actions.setLimit(parseInt(e.target.value))}>
             <option>5</option>
             <option>10</option>
@@ -471,6 +473,7 @@ const Table = ({
           <div className="float-right px-2">
             <select
               value={orderBy}
+              onBlur={e => actions.setOrderBy(e.target.value)}
               onChange={e => actions.setOrderBy(e.target.value)}>
               {fields.map(f => (
                 <option key={f} value={f}>
@@ -527,7 +530,7 @@ const Table = ({
         ) : (
           <React.Fragment>
             <div className="mt-3">
-              <label>Column Name</label>
+              <label htmlFor="name">Column Name</label>
               <input
                 className="form-control"
                 value={formData?.name}
@@ -537,13 +540,14 @@ const Table = ({
               />
             </div>
             <div className="mt-3">
-              <label>Column Type</label>
+              <label htmlFor="type">Column Type</label>
               <select
                 className="form-control"
                 value={formData?.type}
                 onChange={e =>
                   setFormData({ ...formData, type: e.target.value })
-                }>
+                }
+                onBlur={e => {}}>
                 <option value="string">String</option>
                 <option value="integer">Integer</option>
                 <option value="date">Date</option>

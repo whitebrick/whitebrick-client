@@ -23,7 +23,7 @@ const SidePanel = ({ name, show, setShow, onSave, onEdit, type, children }) => {
         <h4 className="text-center">{name}</h4>
       </div>
       <div className="modal-body">
-        <p>{children}</p>
+        {children}
       </div>
       <div className="modal-footer">
         <button onClick={() => setShow(false)} className="btn btn-danger m-2">

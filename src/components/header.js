@@ -18,17 +18,21 @@ const Header = ({ siteTitle }) => {
       <nav className="navbar">
         <span className="navbar-brand mb-0 h1">{siteTitle}</span>
         <span className="navbar-text">
-          <div className="dropdown avatar" onClick={() => setShow(!show)}>
+          <div
+            className="dropdown avatar"
+            onClick={() => setShow(!show)}
+            aria-hidden="true">
             <img
               onClick={() => setShow(!show)}
+              aria-hidden="true"
               src={user.picture}
-              alt={`${user.nickname}'s picture`}
+              alt={user.nickname}
             />
             <div className={menuClass}>
               <div className="p-4 text-center">
                 <img
                   src={user.picture}
-                  alt={`${user.nickname}'s picture`}
+                  alt={user.nickname}
                   style={{ width: '50px', height: '50px' }}
                 />
                 <div className="mt-2">
@@ -41,7 +45,8 @@ const Header = ({ siteTitle }) => {
               <div className="dropdown-divider" />
               <button
                 className="dropdown-item"
-                onClick={() => logout({ returnTo: window.location.origin })}>
+                onClick={() => logout({ returnTo: window.location.origin })}
+                aria-hidden="true">
                 Log out
               </button>
             </div>

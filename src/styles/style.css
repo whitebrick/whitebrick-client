@@ -24,9 +24,9 @@ body {
 }
 
 .avatar img {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
     border-radius: 50%;
     cursor: pointer;
 }
