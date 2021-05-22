@@ -4,7 +4,6 @@ body {
     background: #F6F6F6!important;
 }
 
-
 .ReactModal__Overlay {
     background: rgba(0, 0, 0, 0.65)!important;
     z-index: 99999;
@@ -24,9 +23,9 @@ body {
 }
 
 .avatar img {
-    width: 35px;
-    height: 35px;
-    min-width: 35px;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
     border-radius: 50%;
     cursor: pointer;
 }
@@ -36,4 +35,5 @@ body {
     bottom: 0!important;
     right: auto!important;
     left: 40px!important;
+    z-index: 99;
 }

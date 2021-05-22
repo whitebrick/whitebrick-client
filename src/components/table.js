@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as gql from 'gql-query-builder';
-
+import { FaChevronRight } from 'react-icons/fa';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions/index';
@@ -36,6 +36,7 @@ const Table = ({
   limit,
   offset,
   views,
+  schema,
   defaultView,
   actions,
 }) => {
@@ -334,6 +335,10 @@ const Table = ({
         <React.Fragment>
           <div className="my-3">
             <div style={{ padding: `1rem` }}>
+              <p>
+                Databases <FaChevronRight /> {schema} <FaChevronRight />{' '}
+                {table.split('_').pop()}
+              </p>
               <h3 style={{ margin: 0 }}>{table}</h3>
               <p className="p-1">Total {rowCount} records</p>
               <div>
@@ -571,6 +576,7 @@ const mapStateToProps = state => ({
   limit: state.limit,
   offset: state.offset,
   views: state.views,
+  schema: state.schema,
   defaultView: state.defaultView,
 });
 
