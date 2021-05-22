@@ -1,20 +1,21 @@
 #sidebar {
     background: #ffffff;
-    min-height: 94vh;
+    min-height: 100vh;
     border-right: 1px solid #DFE1EB;
 }
 
-#sidebar .list-group-item {
+.list-group-item {
     border: none!important;
     color: #5E6A7B;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .schema{
     margin-bottom: -15px!important;
 }
 
-#sidebar .list-group-item :hover {
+.list-group-item :hover {
     background: #f1f4fa !important;
     color: #1543B7!important;
 }
@@ -36,4 +37,8 @@
 
 #sidebar .create-button button {
     width: 90%!important;
+}
+
+#sidebar .sidebar-collapsed {
+    background: rgb(7, 71, 166);
 }

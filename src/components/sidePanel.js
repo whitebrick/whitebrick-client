@@ -9,6 +9,7 @@ const SidePanel = ({
   onEdit = null,
   type,
   children,
+  renderSaveButton = true,
 }) => {
   const customStyles = {
     content: {
@@ -35,11 +36,13 @@ const SidePanel = ({
         <button onClick={() => setShow(false)} className="btn btn-danger m-2">
           Cancel
         </button>
-        <button
-          onClick={type !== 'edit' ? onSave : onEdit}
-          className="btn btn-primary">
-          Save
-        </button>
+        {renderSaveButton && (
+          <button
+            onClick={type !== 'edit' ? onSave : onEdit}
+            className="btn btn-primary">
+            Save
+          </button>
+        )}
       </div>
     </Modal>
   );

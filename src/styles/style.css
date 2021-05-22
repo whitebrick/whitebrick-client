@@ -32,6 +32,8 @@ body {
 }
 
 .dropdown-menu {
-    right: 0!important;
-    left: auto!important;
+    top: auto!important;
+    bottom: 0!important;
+    right: auto!important;
+    left: 40px!important;
 }
