@@ -33,13 +33,19 @@ const Sidebar = ({
         <div
           className="px-4 pt-4"
           aria-hidden="true"
-          onClick={() => actions.setSchema('')}>
+          onClick={() => {
+            actions.setSchema('');
+            actions.setTable('');
+          }}>
           <FaHome color="white" size="24px" />
         </div>
         <div
           className="px-4 pt-4"
           aria-hidden="true"
-          onClick={() => actions.setSchema('')}>
+          onClick={() => {
+            actions.setSchema('');
+            actions.setTable('');
+          }}>
           <FaDatabase color="white" size="24px" />
         </div>
         <div className="px-4 pt-4" aria-hidden="true">

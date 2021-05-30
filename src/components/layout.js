@@ -17,6 +17,7 @@ import Table from './table';
 import { useAuth0 } from '@auth0/auth0-react';
 import SidePanel from './sidePanel';
 import Sidebar from './sidebar';
+import FormMaker from './formMaker';
 
 const GET_TABLE_FIELDS = `query ($name: String!){
   __type(name: $name) {
@@ -82,6 +83,28 @@ const Layout = ({ table, schema, fields, actions }) => {
   const [userShow, setUserShow] = useState(false);
   const menuClass = `dropdown-menu${userShow ? ' show' : ''}`;
 
+  const newTableFormFields = [
+    {
+      name: 'schema',
+      label: 'Database Name',
+      type: 'select',
+      options: schemas?.wbSchemas,
+      nested: true,
+      nestedValue: 'name'
+    },
+    { name: 'name', label: 'Name', type: 'text', required: true },
+  ];
+
+  const newDataBaseFormFields = [
+    { name: 'name', label: 'Name', type: 'text', required: true },
+    {
+      name: 'name',
+      label: 'Label',
+      type: 'text',
+      required: true,
+    },
+  ];
+
   useEffect(() => {
     actions.setTables([]);
     const fetchTables = async () => {
@@ -97,7 +120,7 @@ const Layout = ({ table, schema, fields, actions }) => {
 
   useEffect(() => {
     const fetchFields = async () => {
-      if (table !== '' && table !== undefined) {
+      if (schema !== '' && table !== '' && table !== undefined) {
         const { data } = await fetchQueryFields({
           variables: { name: schema + '_' + table.name },
         });
@@ -175,7 +198,7 @@ const Layout = ({ table, schema, fields, actions }) => {
           schemas={schemas}
         />
         <main id="main">
-          {user && table !== '' && fields.length > 0 && <Table key={table} />}
+          {user && schema !== '' && table !== '' && fields.length > 0 && <Table key={table} />}
           <SidePanel
             show={show}
             renderSaveButton={type !== ''}
@@ -184,60 +207,17 @@ const Layout = ({ table, schema, fields, actions }) => {
             type="save"
             name={`Create a new ${type}?`}>
             {type === 'database' ? (
-              <React.Fragment>
-                <div className="mt-3">
-                  <label htmlFor="name">Name</label>
-                  <input
-                    className="form-control"
-                    value={formData?.name}
-                    onChange={e =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="mt-3">
-                  <label htmlFor="label">Label</label>
-                  <input
-                    className="form-control"
-                    value={formData?.label}
-                    onChange={e =>
-                      setFormData({ ...formData, label: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-              </React.Fragment>
+              <FormMaker
+                formData={formData}
+                setFormData={setFormData}
+                fields={newDataBaseFormFields}
+              />
             ) : type === 'table' ? (
-              <React.Fragment>
-                <div className="mt-3">
-                  <label htmlFor="schema">Database Name</label>
-                  <select
-                    className="form-control"
-                    value={formData.schema}
-                    onBlur={() => {}}
-                    onChange={e =>
-                      setFormData({ ...formData, schema: e.target.value })
-                    }>
-                    {schemas.wbSchemas.map(schema => (
-                      <option key={schema.name} value={schema.name}>
-                        {schema.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mt-3">
-                  <label htmlFor="name">Name</label>
-                  <input
-                    className="form-control"
-                    value={formData?.name}
-                    onChange={e =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-              </React.Fragment>
+              <FormMaker
+                formData={formData}
+                setFormData={setFormData}
+                fields={newTableFormFields}
+              />
             ) : (
               <React.Fragment>
                 <div className="list-group w-100 rounded-0">

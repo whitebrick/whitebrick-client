@@ -343,7 +343,7 @@ const Table = ({
             <div style={{ padding: `1rem` }}>
               <p>
                 Databases <FaChevronRight /> {schema} <FaChevronRight />{' '}
-                {schema + '_' + table.name.split('_').pop()}
+                {table.name.toLowerCase()}
               </p>
               <h3 className="m-0">{table.label}</h3>
               <p className="p-1">Total {rowCount} records</p>
