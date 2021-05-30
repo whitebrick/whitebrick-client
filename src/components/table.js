@@ -57,9 +57,9 @@ const Table = ({
       if (fields.length > 0) {
         let orderByParameter = fields.includes(orderBy) ? orderBy : fields[0];
         actions.setOrderBy(orderByParameter);
-        let orderByType = table.concat('_order_by!');
+        let orderByType = schema + '_' + table.name.concat('_order_by!');
         const operation = gql.query({
-          operation: table,
+          operation: schema + '_' + table.name,
           variables: {
             limit,
             offset,
@@ -71,22 +71,24 @@ const Table = ({
           fields,
         });
         const operationAgg = gql.query({
-          operation: table.concat('_aggregate'),
+          operation: schema + '_' + table.name.concat('_aggregate'),
           fields: [{ aggregate: ['count'] }],
         });
         const fetchData = async () => await graphQLFetch(operation);
         fetchData().then(({ data }) => {
-          actions.setRows(data[table]);
-          setColumns(Object.keys(data[table][0]));
+          actions.setRows(data[schema + '_' + table.name]);
+          setColumns(Object.keys(data[schema + '_' + table.name][0]));
         });
         const fetchCount = async () => await graphQLFetch(operationAgg);
         fetchCount().then(({ data }) =>
-          actions.setRowCount(data[table + '_aggregate'].aggregate.count),
+          actions.setRowCount(
+            data[schema + '_' + table.name + '_aggregate'].aggregate.count,
+          ),
         );
       }
     };
     handleTableChange();
-  }, [table, fields, limit, offset, orderBy, actions]);
+  }, [schema, table, fields, limit, offset, orderBy, actions]);
 
   useEffect(() => {
     actions.setOffset(0);
@@ -100,14 +102,17 @@ const Table = ({
 
   const doMutation = variables => {
     const operation = gql.mutation({
-      operation: ''.concat('update_', table),
+      operation: ''.concat('update_', schema + '_' + table.name),
       variables: {
         where: {
           value: variables.where,
-          type: `${table}_bool_exp`,
+          type: `${schema + '_' + table.name}_bool_exp`,
           required: true,
         },
-        _set: { value: variables['_set'], type: `${table}_set_input` },
+        _set: {
+          value: variables['_set'],
+          type: `${schema + '_' + table.name}_set_input`,
+        },
       },
       fields: ['affected_rows'],
     });
@@ -160,13 +165,13 @@ const Table = ({
 
   let orderByParameter = fields.includes(orderBy) ? orderBy : fields[0];
   const subscription = gql.subscription({
-    operation: table,
+    operation: schema + '_' + table.name,
     variables: {
       limit,
       offset,
       order_by: {
         value: { [orderByParameter]: `asc` },
-        type: `[${table.concat('_order_by!')}]`,
+        type: `[${schema + '_' + table.name.concat('_order_by!')}]`,
       },
     },
     fields,
@@ -175,12 +180,13 @@ const Table = ({
   const saveView = (defaultView = null) => {
     if (defaultView) {
       let viewObj = views.filter(
-        view => view.table === table && view.name === defaultView,
+        view =>
+          view.table === schema + '_' + table.name && view.name === defaultView,
       )[0];
       let index = views.indexOf(viewObj);
       if (index !== -1) {
         viewObj = {
-          table,
+          table: schema + '_' + table.name,
           name: defaultView,
           state: columnAPI.getColumnState(),
           orderBy,
@@ -191,7 +197,7 @@ const Table = ({
       }
     } else {
       let viewObj = {
-        table,
+        table: schema + '_' + table.name,
         name,
         state: columnAPI.getColumnState(),
         orderBy,
@@ -248,11 +254,11 @@ const Table = ({
   const onSave = () => {
     if (type === 'newRow') {
       const operation = gql.mutation({
-        operation: ''.concat('insert_', table),
+        operation: ''.concat('insert_', schema + '_' + table.name),
         variables: {
           objects: {
             value: formData,
-            type: `[${table}_insert_input!]`,
+            type: `[${schema + '_' + table.name}_insert_input!]`,
             required: true,
           },
         },
@@ -303,11 +309,11 @@ const Table = ({
       };
     }
     const operation = gql.mutation({
-      operation: ''.concat('delete_', table),
+      operation: ''.concat('delete_', schema + '_' + table.name),
       variables: {
         where: {
           value: variables.where,
-          type: `${table}_bool_exp`,
+          type: `${schema + '_' + table.name}_bool_exp`,
           required: true,
         },
       },
@@ -326,7 +332,7 @@ const Table = ({
       console.log(errors);
       return;
     }
-    actions.setRows(data[table]);
+    actions.setRows(data[schema + '_' + table.name]);
   });
 
   return (
@@ -337,14 +343,14 @@ const Table = ({
             <div style={{ padding: `1rem` }}>
               <p>
                 Databases <FaChevronRight /> {schema} <FaChevronRight />{' '}
-                {table.split('_').pop()}
+                {schema + '_' + table.name.split('_').pop()}
               </p>
-              <h3 style={{ margin: 0 }}>{table}</h3>
+              <h3 className="m-0">{table.label}</h3>
               <p className="p-1">Total {rowCount} records</p>
               <div>
                 {views.length > 0 &&
                   views.map(view => {
-                    if (view.table === table)
+                    if (view.table === schema + '_' + table.name)
                       return (
                         <div
                           onClick={() => {
@@ -412,11 +418,13 @@ const Table = ({
               setColumnAPI(params.columnApi);
               if (
                 views.filter(
-                  view => view.name === 'Default View' && view.table === table,
+                  view =>
+                    view.name === 'Default View' &&
+                    view.table === schema + '_' + table.name,
                 ).length <= 0
               ) {
                 let viewObj = {
-                  table,
+                  table: schema + '_' + table.name,
                   name: 'Default View',
                   state: params.columnApi.getColumnState(),
                   orderBy,
@@ -507,9 +515,9 @@ const Table = ({
         type={type}
         name={
           type === 'add'
-            ? `Add column to '${table.split('_').pop()}'`
+            ? `Add column to '${schema + '_' + table.name.split('_').pop()}'`
             : type === 'newRow'
-            ? `Add new row to '${table.split('_').pop()}'`
+            ? `Add new row to '${schema + '_' + table.name.split('_').pop()}'`
             : `Edit column '${column}'`
         }>
         {type === 'newRow' ? (

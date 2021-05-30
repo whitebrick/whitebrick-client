@@ -40,7 +40,10 @@ const SCHEMAS_QUERY = `query ($userEmail: String!) {
 }`;
 
 const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
-  wbSchemaTableNames(schemaName: $schemaName)
+  wbTables(schemaName: $schemaName) {
+    name
+    label
+  }
 }`;
 
 const CREATE_SCHEMA_MUTATION = `mutation ($name: String!, $label: String!, $email: String!){
@@ -53,7 +56,7 @@ const CREATE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: Strin
   wbCreateTable(schemaName: $schemaName, tableName: $tableName)
 }`;
 
-const Layout = ({ table, schema, tables, fields, actions }) => {
+const Layout = ({ table, schema, fields, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -86,7 +89,7 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
         const { data } = await fetchSchemaTables({
           variables: { schemaName: schema },
         });
-        actions.setTables(data.wbSchemaTableNames);
+        actions.setTables(data.wbTables);
       }
     };
     fetchTables();
@@ -95,7 +98,9 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
   useEffect(() => {
     const fetchFields = async () => {
       if (table !== '' && table !== undefined) {
-        const { data } = await fetchQueryFields({ variables: { name: table } });
+        const { data } = await fetchQueryFields({
+          variables: { name: schema + '_' + table.name },
+        });
         const { fields } = data['__type'];
         let f = [];
         fields.forEach(field => {
@@ -115,7 +120,7 @@ const Layout = ({ table, schema, tables, fields, actions }) => {
       }
     };
     fetchFields();
-  }, [table, fetchQueryFields, actions]);
+  }, [schema, table, fetchQueryFields, actions]);
 
   const setTable = name => {
     actions.setTable(name);

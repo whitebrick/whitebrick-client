@@ -99,38 +99,40 @@ const Sidebar = ({
           ))}
         {schema && (
           <div className="list-group w-100 rounded-0 mt-4">
-            <div className="sidebar-heading list-group-item">All Tables</div>
+            <div className="sidebar-heading list-group-item">{schema}</div>
             {tables &&
               tables.map(tableName => (
                 <div
-                  onClick={() => setTable(schema + '_' + tableName)}
+                  onClick={() => setTable(tableName)}
                   aria-hidden="true"
                   className={`list-group-item py-1 ${
-                    table === schema + '_' + tableName && 'active'
+                    table === tableName && 'active'
                   }`}
-                  key={tableName}>
-                  {tableName}
+                  key={tableName.name}>
+                  {tableName.label}
                 </div>
               ))}
-            <div className="sidebar-heading list-group-item mt-2">
-              Database Settings
-            </div>
-            <div
-              onClick={() => {
-                setShow(true);
-                setType('table');
-                setFormData({ schema });
-              }}
-              aria-hidden="true"
-              className="list-group-item py-1 d-flex align-items-center">
-              <FaPlus size="14px" /> <span className="ml-2">New table</span>
-            </div>
-            <div className="list-group-item py-1 d-flex align-items-center">
-              <FaCog size="14px" /> <span className="ml-2">Settings</span>
-            </div>
-            <div className="list-group-item py-1 d-flex align-items-center">
-              <FaUsers size="14px" />{' '}
-              <span className="ml-2">Invite others</span>
+            <div style={{ position: 'absolute', bottom: '20px' }}>
+              <div className="sidebar-heading list-group-item">
+                Database Settings
+              </div>
+              <div
+                onClick={() => {
+                  setShow(true);
+                  setType('table');
+                  setFormData({ schema });
+                }}
+                aria-hidden="true"
+                className="list-group-item py-1 d-flex align-items-center">
+                <FaPlus size="14px" /> <span className="ml-2">New table</span>
+              </div>
+              <div className="list-group-item py-1 d-flex align-items-center">
+                <FaCog size="14px" /> <span className="ml-2">Settings</span>
+              </div>
+              <div className="list-group-item py-1 d-flex align-items-center">
+                <FaUsers size="14px" />{' '}
+                <span className="ml-2">Invite others</span>
+              </div>
             </div>
           </div>
         )}
