@@ -90,7 +90,7 @@ const Layout = ({ table, schema, fields, actions }) => {
       type: 'select',
       options: schemas?.wbSchemas,
       nested: true,
-      nestedValue: 'name'
+      nestedValue: 'name',
     },
     { name: 'name', label: 'Name', type: 'text', required: true },
   ];
@@ -198,7 +198,9 @@ const Layout = ({ table, schema, fields, actions }) => {
           schemas={schemas}
         />
         <main id="main">
-          {user && schema !== '' && table !== '' && fields.length > 0 && <Table key={table} />}
+          {user && schema !== '' && table !== '' && fields.length > 0 && (
+            <Table key={table} />
+          )}
           <SidePanel
             show={show}
             renderSaveButton={type !== ''}

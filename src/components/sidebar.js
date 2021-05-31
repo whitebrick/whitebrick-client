@@ -115,7 +115,7 @@ const Sidebar = ({
                     table === tableName && 'active'
                   }`}
                   key={tableName.name}>
-                  {tableName.label}
+                  {tableName.label.toLowerCase()}
                 </div>
               ))}
             <div style={{ position: 'absolute', bottom: '20px' }}>

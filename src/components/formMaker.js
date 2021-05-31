@@ -1,36 +1,45 @@
 import React from 'react';
 
 const FormMaker = ({ fields, formData, setFormData }) => {
-  const renderField = field => {
-    if (field.type === 'text' || field.type === 'string')
+  const renderField = ({
+    type,
+    name,
+    label,
+    required = false,
+    nested = false,
+    nestedValue,
+    options,
+    readOnly = false,
+  }) => {
+    if (type === 'text' || type === 'string')
       return (
         <>
-          <label htmlFor={field.name}>{field.label}</label>
+          <label htmlFor={name}>{label}</label>
           <input
             className="form-control"
-            value={formData[field.name]}
-            onChange={e =>
-              setFormData({ ...formData, [field.name]: e.target.value })
-            }
-            required={field.required}
+            value={formData[name]}
+            onChange={e => setFormData({ ...formData, [name]: e.target.value })}
+            required={required}
+            readOnly={readOnly}
           />
         </>
       );
-    if (field.type === 'select') {
-      if (field.nested) {
+    if (type === 'select') {
+      if (nested) {
         return (
           <>
-            <label htmlFor={field.name}>{field.label}</label>
+            <label htmlFor={name}>{label}</label>
             <select
               className="form-control"
-              value={formData[field.name]}
+              value={formData[name]}
               onBlur={() => {}}
+              disabled={readOnly}
               onChange={e =>
-                setFormData({ ...formData, [field.name]: e.target.value })
+                setFormData({ ...formData, [name]: e.target.value })
               }>
-              {field.options.map(schema => (
-                <option key={schema[field.nestedValue]} value={schema[field.nestedValue]}>
-                  {schema[field.nestedValue]}
+              {options.map(schema => (
+                <option key={schema[nestedValue]} value={schema[nestedValue]}>
+                  {schema[nestedValue]}
                 </option>
               ))}
             </select>
@@ -39,15 +48,16 @@ const FormMaker = ({ fields, formData, setFormData }) => {
       } else {
         return (
           <>
-            <label htmlFor={field.name}>{field.label}</label>
+            <label htmlFor={name}>{label}</label>
             <select
               className="form-control"
-              value={formData[field.name]}
+              value={formData[name]}
               onBlur={() => {}}
+              disabled={readOnly}
               onChange={e =>
-                setFormData({ ...formData, [field.name]: e.target.value })
+                setFormData({ ...formData, [name]: e.target.value })
               }>
-              {field.options.map(option => (
+              {options.map(option => (
                 <option key={option} value={option}>
                   {option}
                 </option>

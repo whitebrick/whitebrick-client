@@ -8,12 +8,13 @@ import { actions } from '../actions/index';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 
-import { useSubscription } from 'graphql-hooks';
+import { useMutation, useSubscription } from 'graphql-hooks';
 import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
 import Modal from 'react-modal';
 import SidePanel from './sidePanel';
+import FormMaker from './formMaker';
 
 const customStyles = {
   content: {
@@ -25,6 +26,31 @@ const customStyles = {
     transform: 'translate(-50%, -50%)',
   },
 };
+
+const newTableColumnFields = [
+  { name: 'name', label: 'Column Name', type: 'text', required: true },
+  {
+    name: 'type',
+    label: 'Column Type',
+    type: 'select',
+    options: ['string', 'integer', 'datetime', 'date', 'timestamp'],
+  },
+];
+
+const updateTableFields = [
+  {
+    name: 'name',
+    label: 'Name',
+    type: 'text',
+    required: true,
+    readOnly: true,
+  },
+  { name: 'label', label: 'Label', type: 'text', required: true },
+];
+
+const UPDATE_TABLE_DETAILS_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $newTableName: String, $newTableLabel: String){
+  wbUpdateTable(schemaName: $schemaName, tableName: $tableName, newTableName: $newTableName, newTableLabel: $newTableLabel)
+}`;
 
 const Table = ({
   table,
@@ -51,6 +77,7 @@ const Table = ({
   const [columns, setColumns] = useState(
     rows.length > 0 ? Object.keys(rows[0]) : [],
   );
+  const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
 
   useEffect(() => {
     const handleTableChange = async () => {
@@ -271,6 +298,15 @@ const Table = ({
         });
       fetchData();
       setShow(false);
+    } else if (type === 'updateTable') {
+      const { loading, error } = updateTableMutation({
+        variables: {
+          schemaName: schema,
+          tableName: table.name,
+          newTableLabel: formData.label,
+        },
+      });
+      if (!error && !loading) setShow(false);
     } else {
       let col = columns.filter(c => c === column)[0];
       let index = columns.indexOf(col);
@@ -345,7 +381,17 @@ const Table = ({
                 Databases <FaChevronRight /> {schema} <FaChevronRight />{' '}
                 {table.name.toLowerCase()}
               </p>
-              <h3 className="m-0">{table.label}</h3>
+              <h3
+                className="m-0 w-25"
+                aria-hidden={true}
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  setType('updateTable');
+                  setFormData(table);
+                  setShow(true);
+                }}>
+                {table.label}
+              </h3>
               <p className="p-1">Total {rowCount} records</p>
               <div>
                 {views.length > 0 &&
@@ -515,10 +561,12 @@ const Table = ({
         type={type}
         name={
           type === 'add'
-            ? `Add column to '${schema + '_' + table.name.split('_').pop()}'`
+            ? `Add column to '${table.name}'`
             : type === 'newRow'
-            ? `Add new row to '${schema + '_' + table.name.split('_').pop()}'`
-            : `Edit column '${column}'`
+            ? `Add new row to '${table.name}'`
+            : type === 'edit'
+            ? `Edit column '${column}'`
+            : `Update table '${table.name}'`
         }>
         {type === 'newRow' ? (
           <React.Fragment>
@@ -540,34 +588,18 @@ const Table = ({
               </div>
             ))}
           </React.Fragment>
+        ) : type === 'edit' || type === 'add' ? (
+          <FormMaker
+            formData={formData}
+            setFormData={setFormData}
+            fields={newTableColumnFields}
+          />
         ) : (
-          <React.Fragment>
-            <div className="mt-3">
-              <label htmlFor="name">Column Name</label>
-              <input
-                className="form-control"
-                value={formData?.name}
-                onChange={e =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-              />
-            </div>
-            <div className="mt-3">
-              <label htmlFor="type">Column Type</label>
-              <select
-                className="form-control"
-                value={formData?.type}
-                onChange={e =>
-                  setFormData({ ...formData, type: e.target.value })
-                }
-                onBlur={e => {}}>
-                <option value="string">String</option>
-                <option value="integer">Integer</option>
-                <option value="date">Date</option>
-                <option value="timestamp">Timestamp</option>
-              </select>
-            </div>
-          </React.Fragment>
+          <FormMaker
+            formData={formData}
+            setFormData={setFormData}
+            fields={updateTableFields}
+          />
         )}
       </SidePanel>
     </div>
