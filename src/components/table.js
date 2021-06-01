@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as gql from 'gql-query-builder';
-import { FaChevronRight } from 'react-icons/fa';
+import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions/index';
@@ -12,6 +12,7 @@ import { useMutation, useSubscription } from 'graphql-hooks';
 import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
+import { UPDATE_TABLE_DETAILS_MUTATION } from '../graphql/mutations/table';
 import Modal from 'react-modal';
 import SidePanel from './sidePanel';
 import FormMaker from './formMaker';
@@ -47,10 +48,6 @@ const updateTableFields = [
   },
   { name: 'label', label: 'Label', type: 'text', required: true },
 ];
-
-const UPDATE_TABLE_DETAILS_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $newTableName: String, $newTableLabel: String){
-  wbUpdateTable(schemaName: $schemaName, tableName: $tableName, newTableName: $newTableName, newTableLabel: $newTableLabel)
-}`;
 
 const Table = ({
   table,
@@ -390,7 +387,10 @@ const Table = ({
                   setFormData(table);
                   setShow(true);
                 }}>
-                {table.label}
+                <span>
+                  {table.label}
+                  <FaPen className="ml-1" size="15px" />
+                </span>
               </h3>
               <p className="p-1">Total {rowCount} records</p>
               <div>

@@ -18,44 +18,12 @@ import { useAuth0 } from '@auth0/auth0-react';
 import SidePanel from './sidePanel';
 import Sidebar from './sidebar';
 import FormMaker from './formMaker';
-
-const GET_TABLE_FIELDS = `query ($name: String!){
-  __type(name: $name) {
-    name
-    fields {
-      name
-      type{
-        kind
-        ofType{
-          kind
-        }
-      }
-    }
-  }
-}`;
-
-const SCHEMAS_QUERY = `query ($userEmail: String!) {
-  wbSchemas(userEmail: $userEmail) {
-    name
-  }
-}`;
-
-const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
-  wbTables(schemaName: $schemaName) {
-    name
-    label
-  }
-}`;
-
-const CREATE_SCHEMA_MUTATION = `mutation ($name: String!, $label: String!, $email: String!){
-  wbCreateSchema(name: $name, label: $label, userOwnerEmail: $email){
-    name
-  }
-}`;
-
-const CREATE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: String!){
-  wbCreateTable(schemaName: $schemaName, tableName: $tableName)
-}`;
+import { GET_TABLE_FIELDS } from '../graphql/queries/table';
+import { SCHEMAS_QUERY, SCHEMA_TABLES_QUERY } from '../graphql/queries/wb';
+import {
+  CREATE_SCHEMA_MUTATION,
+  CREATE_TABLE_MUTATION,
+} from '../graphql/mutations/wb';
 
 const Layout = ({ table, schema, fields, actions }) => {
   const data = useStaticQuery(graphql`
