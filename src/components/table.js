@@ -13,20 +13,8 @@ import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
 import { UPDATE_TABLE_DETAILS_MUTATION } from '../graphql/mutations/table';
-import Modal from 'react-modal';
 import SidePanel from './sidePanel';
 import FormMaker from './formMaker';
-
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  },
-};
 
 const newTableColumnFields = [
   { name: 'name', label: 'Column Name', type: 'text', required: true },
@@ -65,7 +53,6 @@ const Table = ({
 }) => {
   const [columnAPI, setColumnAPI] = useState(null);
   const [changedValues, setChangedValues] = useState([]);
-  const [popup, setPopup] = useState(false);
   const [name, setName] = useState('');
   const [type, setType] = useState('');
   const [formData, setFormData] = useState({});
@@ -229,7 +216,6 @@ const Table = ({
       };
       actions.setView(viewObj);
       actions.setDefaultView(name);
-      setPopup(false);
       setName('');
     }
   };
@@ -304,6 +290,9 @@ const Table = ({
         },
       });
       if (!error && !loading) setShow(false);
+    } else if (type === 'view') {
+      saveView();
+      setShow(false);
     } else {
       let col = columns.filter(c => c === column)[0];
       let index = columns.indexOf(col);
@@ -370,7 +359,7 @@ const Table = ({
 
   return (
     <div className="ag-theme-alpine">
-      {table !== '' && rows.length > 0 ? (
+      {table !== '' && rows.length > 0 && (
         <React.Fragment>
           <div className="my-3">
             <div style={{ padding: `1rem` }}>
@@ -420,7 +409,11 @@ const Table = ({
                       );
                   })}
                 <div
-                  onClick={() => setPopup(true)}
+                  onClick={() => {
+                    setType('view');
+                    setFormData({});
+                    setShow(true);
+                  }}
                   aria-hidden="true"
                   className="badge badge-pill badge-dark p-2"
                   style={{ cursor: 'pointer' }}>
@@ -483,37 +476,7 @@ const Table = ({
               <AgGridColumn field={key} key={key} />
             ))}
           </AgGridReact>
-          <Modal
-            isOpen={popup}
-            style={customStyles}
-            onRequestClose={() => setPopup(false)}
-            ariaHideApp={false}>
-            <div style={{ padding: '1rem' }}>
-              <div className="form-group">
-                <label htmlFor="name">Name of the view</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Enter Name"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                />
-              </div>
-              <button
-                onClick={() => setPopup(false)}
-                className="btn btn-danger float-left">
-                Cancel
-              </button>
-              <button
-                onClick={() => saveView()}
-                className="btn btn-primary float-right">
-                Save
-              </button>
-            </div>
-          </Modal>
         </React.Fragment>
-      ) : (
-        <p>Please select a table to render</p>
       )}
       {table !== '' && rows.length > 0 && (
         <div className="p-4">
@@ -566,6 +529,8 @@ const Table = ({
             ? `Add new row to '${table.name}'`
             : type === 'edit'
             ? `Edit column '${column}'`
+            : type === 'view'
+            ? `Create a new view`
             : `Update table '${table.name}'`
         }>
         {type === 'newRow' ? (
@@ -593,6 +558,19 @@ const Table = ({
             formData={formData}
             setFormData={setFormData}
             fields={newTableColumnFields}
+          />
+        ) : type === 'view' ? (
+          <FormMaker
+            formData={formData}
+            setFormData={setFormData}
+            fields={[
+              {
+                name: 'name',
+                label: 'Name of the view',
+                type: 'text',
+                required: true,
+              },
+            ]}
           />
         ) : (
           <FormMaker

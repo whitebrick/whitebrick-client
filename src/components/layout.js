@@ -166,8 +166,10 @@ const Layout = ({ table, schema, fields, actions }) => {
           schemas={schemas}
         />
         <main id="main">
-          {user && schema !== '' && table !== '' && fields.length > 0 && (
+          {user && schema !== '' && table !== '' && fields.length > 0 ? (
             <Table key={table} />
+          ) : (
+            <p>Please select a table to render</p>
           )}
           <SidePanel
             show={show}
