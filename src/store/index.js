@@ -6,7 +6,7 @@ const initialState = {
   schema: '',
   tables: [],
   table: '',
-  fields: [],
+  columns: [],
   rowData: [],
   rowCount: 0,
   current: 1,

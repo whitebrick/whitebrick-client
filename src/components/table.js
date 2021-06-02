@@ -32,7 +32,6 @@ const updateTableFields = [
     label: 'Name',
     type: 'text',
     required: true,
-    readOnly: true,
   },
   { name: 'label', label: 'Label', type: 'text', required: true },
 ];
@@ -40,7 +39,7 @@ const updateTableFields = [
 const Table = ({
   table,
   rows,
-  fields,
+  columns,
   rowCount,
   current,
   orderBy,
@@ -58,15 +57,19 @@ const Table = ({
   const [formData, setFormData] = useState({});
   const [show, setShow] = useState(false);
   const [column, setColumn] = useState('');
-  const [columns, setColumns] = useState(
-    rows.length > 0 ? Object.keys(rows[0]) : [],
-  );
   const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
+
+  const [fields, setFields] = useState([]);
 
   useEffect(() => {
     const handleTableChange = async () => {
-      if (fields.length > 0) {
-        let orderByParameter = fields.includes(orderBy) ? orderBy : fields[0];
+      if (columns.length > 0) {
+        let f = [];
+        columns.forEach(column => f.push(column.name));
+        setFields(f);
+        let orderByParameter = columns.includes(orderBy)
+          ? orderBy
+          : columns[0].name;
         actions.setOrderBy(orderByParameter);
         let orderByType = schema + '_' + table.name.concat('_order_by!');
         const operation = gql.query({
@@ -79,7 +82,7 @@ const Table = ({
               type: `[${orderByType}]`,
             },
           },
-          fields,
+          fields: f,
         });
         const operationAgg = gql.query({
           operation: schema + '_' + table.name.concat('_aggregate'),
@@ -88,7 +91,6 @@ const Table = ({
         const fetchData = async () => await graphQLFetch(operation);
         fetchData().then(({ data }) => {
           actions.setRows(data[schema + '_' + table.name]);
-          setColumns(Object.keys(data[schema + '_' + table.name][0]));
         });
         const fetchCount = async () => await graphQLFetch(operationAgg);
         fetchCount().then(({ data }) =>
@@ -99,7 +101,7 @@ const Table = ({
       }
     };
     handleTableChange();
-  }, [schema, table, fields, limit, offset, orderBy, actions]);
+  }, [schema, table, columns, limit, offset, orderBy, actions]);
 
   useEffect(() => {
     actions.setOffset(0);
@@ -173,20 +175,6 @@ const Table = ({
     setChangedValues(values);
     setTimeout(() => editValues(values), 500);
   };
-
-  let orderByParameter = fields.includes(orderBy) ? orderBy : fields[0];
-  const subscription = gql.subscription({
-    operation: schema + '_' + table.name,
-    variables: {
-      limit,
-      offset,
-      order_by: {
-        value: { [orderByParameter]: `asc` },
-        type: `[${schema + '_' + table.name.concat('_order_by!')}]`,
-      },
-    },
-    fields,
-  });
 
   const saveView = (defaultView = null) => {
     if (defaultView) {
@@ -282,12 +270,14 @@ const Table = ({
       fetchData();
       setShow(false);
     } else if (type === 'updateTable') {
+      let variables = {
+        schemaName: schema,
+        tableName: table.name,
+        newTableLabel: formData.label,
+      };
+      if (formData.name !== table.name) variables.newTableName = formData.name;
       const { loading, error } = updateTableMutation({
-        variables: {
-          schemaName: schema,
-          tableName: table.name,
-          newTableLabel: formData.label,
-        },
+        variables,
       });
       if (!error && !loading) setShow(false);
     } else if (type === 'view') {
@@ -297,7 +287,7 @@ const Table = ({
       let col = columns.filter(c => c === column)[0];
       let index = columns.indexOf(col);
       columns.splice(index, 0, formData.name);
-      setColumns(columns);
+      actions.setColumns(columns);
       setShow(false);
     }
   };
@@ -306,7 +296,7 @@ const Table = ({
     let col = columns.filter(c => c === column)[0];
     let index = columns.indexOf(col);
     columns.splice(index, 1, formData.name);
-    setColumns(columns);
+    actions.setColumns(columns);
     setShow(false);
   };
 
@@ -314,7 +304,7 @@ const Table = ({
     let col = columns.filter(c => c === colID)[0];
     let index = columns.indexOf(col);
     columns.splice(index, 1);
-    setColumns(columns);
+    actions.setColumns(columns);
   };
 
   const onAddRow = () => {
@@ -348,6 +338,19 @@ const Table = ({
       });
     fetchData();
   };
+
+  const subscription = gql.subscription({
+    operation: schema + '_' + table.name,
+    variables: {
+      limit,
+      offset,
+      order_by: {
+        value: { [orderBy]: `asc` },
+        type: `[${schema + '_' + table.name.concat('_order_by!')}]`,
+      },
+    },
+    fields,
+  });
 
   useSubscription(subscription, ({ data, errors }) => {
     if (errors && errors.length > 0) {
@@ -472,8 +475,12 @@ const Table = ({
                 actions.setView(viewObj);
               }
             }}>
-            {columns.map(key => (
-              <AgGridColumn field={key} key={key} />
+            {columns.map(column => (
+              <AgGridColumn
+                field={column.name}
+                key={column.name}
+                headerName={column.label}
+              />
             ))}
           </AgGridReact>
         </React.Fragment>
@@ -497,11 +504,12 @@ const Table = ({
               value={orderBy}
               onBlur={e => actions.setOrderBy(e.target.value)}
               onChange={e => actions.setOrderBy(e.target.value)}>
-              {fields.map(f => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
+              {columns.length > 0 &&
+                columns.map(f => (
+                  <option key={f.name} value={f.label}>
+                    {f.label}
+                  </option>
+                ))}
             </select>
           </div>
           <div className="float-right">
@@ -587,7 +595,7 @@ const Table = ({
 const mapStateToProps = state => ({
   rows: state.rowData,
   table: state.table,
-  fields: state.fields,
+  columns: state.columns,
   rowCount: state.rowCount,
   current: state.current,
   orderBy: state.orderBy,

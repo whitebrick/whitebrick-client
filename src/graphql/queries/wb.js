@@ -10,3 +10,12 @@ export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
     label
   }
 }`;
+
+export const TABLES_COLUMN_QUERY = `query ($schemaName: String!, $tableName: String!){
+  wbColumns(schemaName: $schemaName, tableName: $tableName) {
+    label
+    name
+    type
+  }
+}
+`;

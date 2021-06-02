@@ -13,10 +13,10 @@ export const actions = {
       payload: { rows },
     };
   },
-  setFields(fields) {
+  setColumns(columns) {
     return {
-      type: types.SET_FIELDS,
-      payload: { fields },
+      type: types.SET_COLUMNS,
+      payload: { columns },
     };
   },
   setSchema(schema) {

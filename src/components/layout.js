@@ -18,14 +18,17 @@ import { useAuth0 } from '@auth0/auth0-react';
 import SidePanel from './sidePanel';
 import Sidebar from './sidebar';
 import FormMaker from './formMaker';
-import { GET_TABLE_FIELDS } from '../graphql/queries/table';
-import { SCHEMAS_QUERY, SCHEMA_TABLES_QUERY } from '../graphql/queries/wb';
+import {
+  SCHEMAS_QUERY,
+  SCHEMA_TABLES_QUERY,
+  TABLES_COLUMN_QUERY,
+} from '../graphql/queries/wb';
 import {
   CREATE_SCHEMA_MUTATION,
   CREATE_TABLE_MUTATION,
 } from '../graphql/mutations/wb';
 
-const Layout = ({ table, schema, fields, actions }) => {
+const Layout = ({ table, schema, columns, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -44,7 +47,7 @@ const Layout = ({ table, schema, fields, actions }) => {
     variables: { userEmail: user.email },
   });
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
-  const [fetchQueryFields] = useManualQuery(GET_TABLE_FIELDS);
+  const [fetchTableColumns] = useManualQuery(TABLES_COLUMN_QUERY);
   const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
   const [createTable] = useMutation(CREATE_TABLE_MUTATION);
 
@@ -87,35 +90,20 @@ const Layout = ({ table, schema, fields, actions }) => {
   }, [schema, fetchSchemaTables, actions]);
 
   useEffect(() => {
-    const fetchFields = async () => {
+    const fetchColumns = async () => {
       if (schema !== '' && table !== '' && table !== undefined) {
-        const { data } = await fetchQueryFields({
-          variables: { name: schema + '_' + table.name },
+        const { data } = await fetchTableColumns({
+          variables: { schemaName: schema, tableName: table.name },
         });
-        const { fields } = data['__type'];
-        let f = [];
-        fields.forEach(field => {
-          let kind = field.type?.kind;
-          let type = field.type.ofType?.kind
-            ? field.type.ofType.kind
-            : 'SCALAR';
-          if (
-            kind !== 'OBJECT' &&
-            kind !== 'LIST' &&
-            type !== 'OBJECT' &&
-            type !== 'LIST'
-          )
-            f.push(field.name);
-        });
-        actions.setFields(f);
+        actions.setColumns(data.wbColumns);
       }
     };
-    fetchFields();
-  }, [schema, table, fetchQueryFields, actions]);
+    fetchColumns();
+  }, [schema, table, fetchTableColumns, actions]);
 
   const setTable = name => {
     actions.setTable(name);
-    actions.setFields([]);
+    actions.setColumns([]);
   };
 
   const onSave = async () => {
@@ -166,7 +154,7 @@ const Layout = ({ table, schema, fields, actions }) => {
           schemas={schemas}
         />
         <main id="main">
-          {user && schema !== '' && table !== '' && fields.length > 0 ? (
+          {user && schema !== '' && table !== '' && columns.length > 0 ? (
             <Table key={table} />
           ) : (
             <p>Please select a table to render</p>
@@ -225,7 +213,7 @@ const mapStateToProps = state => ({
   schema: state.schema,
   tables: state.tables,
   table: state.table,
-  fields: state.fields,
+  columns: state.columns,
 });
 
 const mapDispatchToProps = dispatch => ({

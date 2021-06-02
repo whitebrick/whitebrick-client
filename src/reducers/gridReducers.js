@@ -28,10 +28,10 @@ export default function gridReducer(state = {}, action) {
         ...state,
         table: payload.table,
       };
-    case types.SET_FIELDS:
+    case types.SET_COLUMNS:
       return {
         ...state,
-        fields: payload.fields,
+        columns: payload.columns,
       };
     case types.SET_ROW_COUNT:
       return {
