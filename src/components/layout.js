@@ -13,7 +13,7 @@ import { useManualQuery, useMutation, useQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
-import Table from './table';
+import Table from './tableLayout';
 import { useAuth0 } from '@auth0/auth0-react';
 import SidePanel from './sidePanel';
 import Sidebar from './sidebar';
@@ -154,8 +154,8 @@ const Layout = ({ table, schema, columns, actions }) => {
           schemas={schemas}
         />
         <main id="main">
-          {user && schema !== '' && table !== '' && columns.length > 0 ? (
-            <Table key={table} />
+          {user && schema !== '' && table !== '' ? (
+            <Table key={schema + table.name} />
           ) : (
             <p>Please select a table to render</p>
           )}

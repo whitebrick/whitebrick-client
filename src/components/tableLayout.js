@@ -5,9 +5,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions/index';
 
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-import 'ag-grid-enterprise';
-
 import { useMutation, useSubscription } from 'graphql-hooks';
 import Pagination from 'rc-pagination';
 
@@ -15,6 +12,7 @@ import graphQLFetch from '../utils/GraphQLFetch';
 import { UPDATE_TABLE_DETAILS_MUTATION } from '../graphql/mutations/table';
 import SidePanel from './sidePanel';
 import FormMaker from './formMaker';
+import Grid from './grid';
 
 const newTableColumnFields = [
   { name: 'name', label: 'Column Name', type: 'text', required: true },
@@ -36,7 +34,7 @@ const updateTableFields = [
   { name: 'label', label: 'Label', type: 'text', required: true },
 ];
 
-const Table = ({
+const TableLayout = ({
   table,
   rows,
   columns,
@@ -434,55 +432,11 @@ const Table = ({
               </div>
             </div>
           </div>
-          <AgGridReact
-            rowData={rows}
-            sideBar
-            enableRangeSelection
-            enableFillHandle
-            undoRedoCellEditing
-            undoRedoCellEditingLimit={20}
-            defaultColDef={{
-              flex: 1,
-              minWidth: 100,
-              editable: true,
-              resizable: true,
-              sortable: true,
-              filter: true,
-            }}
-            sortingOrder={['desc', 'asc', null]}
+          <Grid
             onCellValueChanged={onCellValueChanged}
-            domLayout={'autoHeight'}
-            animateRows={true}
-            allowContextMenuWithControlKey={true}
             getContextMenuItems={getContextMenuItems}
-            popupParent={document.querySelector('body')}
-            onGridReady={params => {
-              setColumnAPI(params.columnApi);
-              if (
-                views.filter(
-                  view =>
-                    view.name === 'Default View' &&
-                    view.table === schema + '_' + table.name,
-                ).length <= 0
-              ) {
-                let viewObj = {
-                  table: schema + '_' + table.name,
-                  name: 'Default View',
-                  state: params.columnApi.getColumnState(),
-                  orderBy,
-                  limit,
-                };
-                actions.setView(viewObj);
-              }
-            }}>
-            {columns.map(column => (
-              <AgGridColumn
-                field={column.name}
-                key={column.name}
-                headerName={column.label}
-              />
-            ))}
-          </AgGridReact>
+            setColumnAPI={setColumnAPI}
+          />
         </React.Fragment>
       )}
       {table !== '' && rows.length > 0 && (
@@ -610,4 +564,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Table);
+export default connect(mapStateToProps, mapDispatchToProps)(TableLayout);

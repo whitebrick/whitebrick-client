@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  FaHome,
-  FaDatabase,
-  FaUsers,
-  FaCog,
-  FaPlus,
-  FaSearch,
-} from 'react-icons/fa';
+import { FaHome, FaUsers, FaCog, FaPlus, FaSearch } from 'react-icons/fa';
 import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
@@ -38,15 +31,6 @@ const Sidebar = ({
             actions.setTable('');
           }}>
           <FaHome color="white" size="24px" />
-        </div>
-        <div
-          className="px-4 pt-4"
-          aria-hidden="true"
-          onClick={() => {
-            actions.setSchema('');
-            actions.setTable('');
-          }}>
-          <FaDatabase color="white" size="24px" />
         </div>
         <div className="px-4 pt-4" aria-hidden="true">
           <FaSearch color="white" size="24px" />
@@ -112,7 +96,7 @@ const Sidebar = ({
                   onClick={() => setTable(tableName)}
                   aria-hidden="true"
                   className={`list-group-item py-1 ${
-                    table === tableName && 'active'
+                    table.name === tableName.name && 'active'
                   }`}
                   key={tableName.name}>
                   {tableName.label.toLowerCase()}
