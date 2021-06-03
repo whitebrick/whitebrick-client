@@ -76,20 +76,22 @@ const Sidebar = ({
               <div className="sidebar-heading list-group-item">Databases</div>
               {schemas.wbSchemas.map(field => (
                 <div
-                  onClick={() => actions.setSchema(field.name)}
+                  onClick={() => actions.setSchema(field)}
                   aria-hidden="true"
                   className={`list-group-item py-1 ${
                     table === field.name && 'active'
                   }`}
                   key={field.name}>
-                  {field.name}
+                  {field.label}
                 </div>
               ))}
             </div>
           ))}
         {schema && (
           <div className="list-group w-100 rounded-0 mt-4">
-            <div className="sidebar-heading list-group-item">{schema}</div>
+            <div className="sidebar-heading list-group-item">
+              {schema.label}
+            </div>
             {tables &&
               tables.map(tableName => (
                 <div

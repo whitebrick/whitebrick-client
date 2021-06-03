@@ -10,6 +10,7 @@ const FormMaker = ({ fields, formData, setFormData }) => {
     nestedValue,
     options,
     readOnly = false,
+    keyValuePairs = false,
   }) => {
     if (type === 'text' || type === 'string')
       return (
@@ -40,6 +41,28 @@ const FormMaker = ({ fields, formData, setFormData }) => {
               {options.map(schema => (
                 <option key={schema[nestedValue]} value={schema[nestedValue]}>
                   {schema[nestedValue]}
+                </option>
+              ))}
+            </select>
+          </>
+        );
+      } else if (keyValuePairs) {
+        let res = [];
+        for (let key in options) res.push({ key, value: options[key] });
+        return (
+          <>
+            <label htmlFor={name}>{label}</label>
+            <select
+              className="form-control"
+              value={formData[name]}
+              onBlur={() => {}}
+              disabled={readOnly}
+              onChange={e =>
+                setFormData({ ...formData, [name]: e.target.value })
+              }>
+              {res.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.key}
                 </option>
               ))}
             </select>

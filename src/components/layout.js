@@ -28,7 +28,7 @@ import {
   CREATE_TABLE_MUTATION,
 } from '../graphql/mutations/wb';
 
-const Layout = ({ table, schema, columns, actions }) => {
+const Layout = ({ table, schema, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -79,9 +79,9 @@ const Layout = ({ table, schema, columns, actions }) => {
   useEffect(() => {
     actions.setTables([]);
     const fetchTables = async () => {
-      if (schema !== '' && schema !== undefined) {
+      if (schema.name !== '' && schema.name !== undefined) {
         const { data } = await fetchSchemaTables({
-          variables: { schemaName: schema },
+          variables: { schemaName: schema.name },
         });
         actions.setTables(data.wbTables);
       }
@@ -91,9 +91,9 @@ const Layout = ({ table, schema, columns, actions }) => {
 
   useEffect(() => {
     const fetchColumns = async () => {
-      if (schema !== '' && table !== '' && table !== undefined) {
+      if (schema.name !== '' && table !== '' && table !== undefined) {
         const { data } = await fetchTableColumns({
-          variables: { schemaName: schema, tableName: table.name },
+          variables: { schemaName: schema.name, tableName: table.name },
         });
         actions.setColumns(data.wbColumns);
       }
@@ -128,7 +128,7 @@ const Layout = ({ table, schema, columns, actions }) => {
       });
       if (!loading && !error) {
         const { data } = await fetchSchemaTables({
-          variables: { schemaName: schema },
+          variables: { schemaName: schema.name },
         });
         actions.setTables(data.wbSchemaTableNames);
         setShow(false);
@@ -154,8 +154,8 @@ const Layout = ({ table, schema, columns, actions }) => {
           schemas={schemas}
         />
         <main id="main">
-          {user && schema !== '' && table !== '' ? (
-            <Table key={schema + table.name} />
+          {user && schema.name !== '' && table !== '' ? (
+            <Table key={schema.name + table.name} />
           ) : (
             <p>Please select a table to render</p>
           )}
@@ -213,7 +213,6 @@ const mapStateToProps = state => ({
   schema: state.schema,
   tables: state.tables,
   table: state.table,
-  columns: state.columns,
 });
 
 const mapDispatchToProps = dispatch => ({

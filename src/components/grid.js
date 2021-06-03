@@ -49,11 +49,11 @@ const Grid = ({
           views.filter(
             view =>
               view.name === 'Default View' &&
-              view.table === schema + '_' + table.name,
+              view.table === schema.name + '_' + table.name,
           ).length <= 0
         ) {
           let viewObj = {
-            table: schema + '_' + table.name,
+            table: schema.name + '_' + table.name,
             name: 'Default View',
             state: params.columnApi.getColumnState(),
             orderBy,

@@ -13,26 +13,7 @@ import { UPDATE_TABLE_DETAILS_MUTATION } from '../graphql/mutations/table';
 import SidePanel from './sidePanel';
 import FormMaker from './formMaker';
 import Grid from './grid';
-
-const newTableColumnFields = [
-  { name: 'name', label: 'Column Name', type: 'text', required: true },
-  {
-    name: 'type',
-    label: 'Column Type',
-    type: 'select',
-    options: ['string', 'integer', 'datetime', 'date', 'timestamp'],
-  },
-];
-
-const updateTableFields = [
-  {
-    name: 'name',
-    label: 'Name',
-    type: 'text',
-    required: true,
-  },
-  { name: 'label', label: 'Label', type: 'text', required: true },
-];
+import { ADD_OR_CREATE_COLUMN_MUTATION } from '../graphql/mutations/wb';
 
 const TableLayout = ({
   table,
@@ -56,8 +37,33 @@ const TableLayout = ({
   const [show, setShow] = useState(false);
   const [column, setColumn] = useState('');
   const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
+  const [addOrCreateColumnMutation] = useMutation(
+    ADD_OR_CREATE_COLUMN_MUTATION,
+  );
 
   const [fields, setFields] = useState([]);
+
+  const newTableColumnFields = [
+    { name: 'name', label: 'Column Name', type: 'text', required: true },
+    { name: 'label', label: 'Column Label', type: 'text', required: true },
+    {
+      name: 'type',
+      label: 'Column Type',
+      type: 'select',
+      options: schema?.context?.defaultColumnTypes,
+      keyValuePairs: true,
+    },
+  ];
+
+  const updateTableFields = [
+    {
+      name: 'name',
+      label: 'Name',
+      type: 'text',
+      required: true,
+    },
+    { name: 'label', label: 'Label', type: 'text', required: true },
+  ];
 
   useEffect(() => {
     const handleTableChange = async () => {
@@ -69,9 +75,9 @@ const TableLayout = ({
           ? orderBy
           : columns[0].name;
         actions.setOrderBy(orderByParameter);
-        let orderByType = schema + '_' + table.name.concat('_order_by!');
+        let orderByType = schema.name + '_' + table.name.concat('_order_by!');
         const operation = gql.query({
-          operation: schema + '_' + table.name,
+          operation: schema.name + '_' + table.name,
           variables: {
             limit,
             offset,
@@ -83,17 +89,17 @@ const TableLayout = ({
           fields: f,
         });
         const operationAgg = gql.query({
-          operation: schema + '_' + table.name.concat('_aggregate'),
+          operation: schema.name + '_' + table.name.concat('_aggregate'),
           fields: [{ aggregate: ['count'] }],
         });
         const fetchData = async () => await graphQLFetch(operation);
         fetchData().then(({ data }) => {
-          actions.setRows(data[schema + '_' + table.name]);
+          actions.setRows(data[schema.name + '_' + table.name]);
         });
         const fetchCount = async () => await graphQLFetch(operationAgg);
         fetchCount().then(({ data }) =>
           actions.setRowCount(
-            data[schema + '_' + table.name + '_aggregate'].aggregate.count,
+            data[schema.name + '_' + table.name + '_aggregate'].aggregate.count,
           ),
         );
       }
@@ -113,16 +119,16 @@ const TableLayout = ({
 
   const doMutation = variables => {
     const operation = gql.mutation({
-      operation: ''.concat('update_', schema + '_' + table.name),
+      operation: ''.concat('update_', schema.name + '_' + table.name),
       variables: {
         where: {
           value: variables.where,
-          type: `${schema + '_' + table.name}_bool_exp`,
+          type: `${schema.name + '_' + table.name}_bool_exp`,
           required: true,
         },
         _set: {
           value: variables['_set'],
-          type: `${schema + '_' + table.name}_set_input`,
+          type: `${schema.name + '_' + table.name}_set_input`,
         },
       },
       fields: ['affected_rows'],
@@ -178,12 +184,13 @@ const TableLayout = ({
     if (defaultView) {
       let viewObj = views.filter(
         view =>
-          view.table === schema + '_' + table.name && view.name === defaultView,
+          view.table === schema.name + '_' + table.name &&
+          view.name === defaultView,
       )[0];
       let index = views.indexOf(viewObj);
       if (index !== -1) {
         viewObj = {
-          table: schema + '_' + table.name,
+          table: schema.name + '_' + table.name,
           name: defaultView,
           state: columnAPI.getColumnState(),
           orderBy,
@@ -194,7 +201,7 @@ const TableLayout = ({
       }
     } else {
       let viewObj = {
-        table: schema + '_' + table.name,
+        table: schema.name + '_' + table.name,
         name,
         state: columnAPI.getColumnState(),
         orderBy,
@@ -250,11 +257,11 @@ const TableLayout = ({
   const onSave = () => {
     if (type === 'newRow') {
       const operation = gql.mutation({
-        operation: ''.concat('insert_', schema + '_' + table.name),
+        operation: ''.concat('insert_', schema.name + '_' + table.name),
         variables: {
           objects: {
             value: formData,
-            type: `[${schema + '_' + table.name}_insert_input!]`,
+            type: `[${schema.name + '_' + table.name}_insert_input!]`,
             required: true,
           },
         },
@@ -269,7 +276,7 @@ const TableLayout = ({
       setShow(false);
     } else if (type === 'updateTable') {
       let variables = {
-        schemaName: schema,
+        schemaName: schema.name,
         tableName: table.name,
         newTableLabel: formData.label,
       };
@@ -282,11 +289,17 @@ const TableLayout = ({
       saveView();
       setShow(false);
     } else {
-      let col = columns.filter(c => c === column)[0];
-      let index = columns.indexOf(col);
-      columns.splice(index, 0, formData.name);
-      actions.setColumns(columns);
-      setShow(false);
+      const { loading, error } = addOrCreateColumnMutation({
+        variables: {
+          schemaName: schema.name,
+          tableName: table.name,
+          create: true,
+          columnName: formData.name,
+          columnLabel: formData.label,
+          columnType: formData.type,
+        },
+      });
+      if (!loading && !error) setShow(false);
     }
   };
 
@@ -319,11 +332,11 @@ const TableLayout = ({
       };
     }
     const operation = gql.mutation({
-      operation: ''.concat('delete_', schema + '_' + table.name),
+      operation: ''.concat('delete_', schema.name + '_' + table.name),
       variables: {
         where: {
           value: variables.where,
-          type: `${schema + '_' + table.name}_bool_exp`,
+          type: `${schema.name + '_' + table.name}_bool_exp`,
           required: true,
         },
       },
@@ -338,13 +351,13 @@ const TableLayout = ({
   };
 
   const subscription = gql.subscription({
-    operation: schema + '_' + table.name,
+    operation: schema.name + '_' + table.name,
     variables: {
       limit,
       offset,
       order_by: {
         value: { [orderBy]: `asc` },
-        type: `[${schema + '_' + table.name.concat('_order_by!')}]`,
+        type: `[${schema.name + '_' + table.name.concat('_order_by!')}]`,
       },
     },
     fields,
@@ -355,7 +368,7 @@ const TableLayout = ({
       console.log(errors);
       return;
     }
-    actions.setRows(data[schema + '_' + table.name]);
+    actions.setRows(data[schema.name + '_' + table.name]);
   });
 
   return (
@@ -365,8 +378,8 @@ const TableLayout = ({
           <div className="my-3">
             <div style={{ padding: `1rem` }}>
               <p>
-                Databases <FaChevronRight /> {schema} <FaChevronRight />{' '}
-                {table.name.toLowerCase()}
+                Databases <FaChevronRight /> {schema.label.toLowerCase()}{' '}
+                <FaChevronRight /> {table.name.toLowerCase()}
               </p>
               <h3
                 className="m-0 w-25"
@@ -385,30 +398,31 @@ const TableLayout = ({
               <p className="p-1">Total {rowCount} records</p>
               <div>
                 {views.length > 0 &&
-                  views.map(view => {
-                    if (view.table === schema + '_' + table.name)
-                      return (
-                        <div
-                          onClick={() => {
-                            columnAPI.applyColumnState({
-                              state: view.state,
-                              applyOrder: true,
-                            });
-                            actions.setLimit(view.limit);
-                            actions.setOrderBy(view.orderBy);
-                            actions.setDefaultView(view.name);
-                          }}
-                          aria-hidden="true"
-                          className={`badge badge-pill mr-1 p-2 ${
-                            defaultView === view.name
-                              ? 'badge-primary'
-                              : 'badge-secondary'
-                          }`}
-                          style={{ cursor: 'pointer' }}>
-                          {view.name}
-                        </div>
-                      );
-                  })}
+                  views
+                    .filter(
+                      view => view.table === schema.name + '_' + table.name,
+                    )
+                    .map(view => (
+                      <div
+                        onClick={() => {
+                          columnAPI.applyColumnState({
+                            state: view.state,
+                            applyOrder: true,
+                          });
+                          actions.setLimit(view.limit);
+                          actions.setOrderBy(view.orderBy);
+                          actions.setDefaultView(view.name);
+                        }}
+                        aria-hidden="true"
+                        className={`badge badge-pill mr-1 p-2 ${
+                          defaultView === view.name
+                            ? 'badge-primary'
+                            : 'badge-secondary'
+                        }`}
+                        style={{ cursor: 'pointer' }}>
+                        {view.name}
+                      </div>
+                    ))}
                 <div
                   onClick={() => {
                     setType('view');
