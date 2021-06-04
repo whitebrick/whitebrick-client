@@ -7,6 +7,7 @@ const initialState = {
   tables: [],
   table: '',
   columns: [],
+  fields: [],
   rowData: [],
   rowCount: 0,
   current: 1,

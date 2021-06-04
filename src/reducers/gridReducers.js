@@ -29,9 +29,12 @@ export default function gridReducer(state = {}, action) {
         table: payload.table,
       };
     case types.SET_COLUMNS:
+      let f = [];
+      payload.columns.forEach(column => f.push(column.name));
       return {
         ...state,
         columns: payload.columns,
+        fields: f,
       };
     case types.SET_ROW_COUNT:
       return {

@@ -19,6 +19,7 @@ const TableLayout = ({
   table,
   rows,
   columns,
+  fields,
   rowCount,
   current,
   orderBy,
@@ -40,8 +41,6 @@ const TableLayout = ({
   const [addOrCreateColumnMutation] = useMutation(
     ADD_OR_CREATE_COLUMN_MUTATION,
   );
-
-  const [fields, setFields] = useState([]);
 
   const newTableColumnFields = [
     { name: 'name', label: 'Column Name', type: 'text', required: true },
@@ -68,25 +67,17 @@ const TableLayout = ({
   useEffect(() => {
     const handleTableChange = async () => {
       if (columns.length > 0) {
-        let f = [];
-        columns.forEach(column => f.push(column.name));
-        setFields(f);
-        let orderByParameter = columns.includes(orderBy)
-          ? orderBy
-          : columns[0].name;
-        actions.setOrderBy(orderByParameter);
-        let orderByType = schema.name + '_' + table.name.concat('_order_by!');
         const operation = gql.query({
           operation: schema.name + '_' + table.name,
           variables: {
             limit,
             offset,
             order_by: {
-              value: { [orderByParameter]: `asc` },
-              type: `[${orderByType}]`,
+              value: { [orderBy]: `asc` },
+              type: `[${schema.name + '_' + table.name.concat('_order_by!')}]`,
             },
           },
-          fields: f,
+          fields,
         });
         const operationAgg = gql.query({
           operation: schema.name + '_' + table.name.concat('_aggregate'),
@@ -105,7 +96,7 @@ const TableLayout = ({
       }
     };
     handleTableChange();
-  }, [schema, table, columns, limit, offset, orderBy, actions]);
+  }, [schema, table, columns, fields, limit, offset, orderBy, actions]);
 
   useEffect(() => {
     actions.setOffset(0);
@@ -500,14 +491,15 @@ const TableLayout = ({
           <React.Fragment>
             {columns.map(c => (
               <div className="mt-3">
-                <label>{c}</label>
+                <label>{c.label}</label>
                 <input
                   className="form-control"
-                  value={formData ? formData[c] : ''}
+                  value={formData ? formData[c.name] : ''}
+                  type={c.type === 'integer' ? 'number' : c.type}
                   onChange={e =>
                     setFormData({
                       ...formData,
-                      [c]: parseInt(e.target.value)
+                      [c.name]: parseInt(e.target.value)
                         ? parseInt(e.target.value)
                         : e.target.value,
                     })
@@ -551,6 +543,7 @@ const mapStateToProps = state => ({
   rows: state.rowData,
   table: state.table,
   columns: state.columns,
+  fields: state.fields,
   rowCount: state.rowCount,
   current: state.current,
   orderBy: state.orderBy,

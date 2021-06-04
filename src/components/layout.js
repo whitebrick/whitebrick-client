@@ -28,7 +28,7 @@ import {
   CREATE_TABLE_MUTATION,
 } from '../graphql/mutations/wb';
 
-const Layout = ({ table, schema, actions }) => {
+const Layout = ({ table, schema, fields, orderBy, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -91,12 +91,14 @@ const Layout = ({ table, schema, actions }) => {
   }, [schema, fetchSchemaTables, actions]);
 
   useEffect(() => {
+    actions.setOrderBy('');
     const fetchColumns = async () => {
       if (schema.name !== '' && table !== '' && table !== undefined) {
         const { data } = await fetchTableColumns({
           variables: { schemaName: schema.name, tableName: table.name },
         });
         actions.setColumns(data.wbColumns);
+        actions.setOrderBy(data.wbColumns[0].name);
       }
     };
     fetchColumns();
@@ -163,7 +165,11 @@ const Layout = ({ table, schema, actions }) => {
           schemas={schemas}
         />
         <main id="main">
-          {user && schema.name !== '' && table !== '' ? (
+          {user &&
+          schema.name !== '' &&
+          table !== '' &&
+          fields.length > 0 &&
+          orderBy !== '' ? (
             <Table key={schema.name + table.name} />
           ) : (
             <p>Please select a table to render</p>
@@ -222,6 +228,8 @@ const mapStateToProps = state => ({
   schema: state.schema,
   tables: state.tables,
   table: state.table,
+  fields: state.fields,
+  orderBy: state.orderBy,
 });
 
 const mapDispatchToProps = dispatch => ({
