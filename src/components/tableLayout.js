@@ -395,7 +395,7 @@ const TableLayout = ({
                   <FaPen className="ml-1" size="15px" />
                 </span>
               </h3>
-              <p className="p-1">Total {rowCount} records</p>
+              <p className="py-1">Total {rowCount} records</p>
               <div>
                 {views.length > 0 &&
                   views
@@ -467,19 +467,6 @@ const TableLayout = ({
             <option>500</option>
           </select>{' '}
           records per page
-          <div className="float-right px-2">
-            <select
-              value={orderBy}
-              onBlur={e => actions.setOrderBy(e.target.value)}
-              onChange={e => actions.setOrderBy(e.target.value)}>
-              {columns.length > 0 &&
-                columns.map(f => (
-                  <option key={f.name} value={f.label}>
-                    {f.label}
-                  </option>
-                ))}
-            </select>
-          </div>
           <div className="float-right">
             <Pagination
               total={rowCount}

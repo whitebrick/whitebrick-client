@@ -4,8 +4,8 @@ export const CREATE_SCHEMA_MUTATION = `mutation ($name: String!, $label: String!
   }
 }`;
 
-export const CREATE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: String!){
-  wbCreateTable(schemaName: $schemaName, tableName: $tableName)
+export const CREATE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $tableLabel: String!, $create: Boolean){
+  wbAddOrCreateTable(schemaName: $schemaName, tableName: $tableName, tableLabel: $tableLabel, create: $create)
 }`;
 
 export const ADD_OR_CREATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $create: Boolean, $columnName: String!, $columnLabel: String!, $columnType: String){

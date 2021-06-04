@@ -64,6 +64,7 @@ const Layout = ({ table, schema, actions }) => {
       nestedValue: 'name',
     },
     { name: 'name', label: 'Name', type: 'text', required: true },
+    { name: 'label', label: 'Table Label', type: 'text', required: true },
   ];
 
   const newDataBaseFormFields = [
@@ -124,6 +125,8 @@ const Layout = ({ table, schema, actions }) => {
         variables: {
           schemaName: formData.schema,
           tableName: formData.name,
+          tableLabel: formData.label,
+          create: true,
         },
       });
       if (!loading && !error) {
@@ -141,7 +144,13 @@ const Layout = ({ table, schema, actions }) => {
 
   return (
     <>
-      <Seo title={data.site.siteMetadata?.title || `Title`} />
+      <Seo
+        title={
+          user && schema.name !== '' && table !== ''
+            ? `${table.label} | ${schema.label}`
+            : data.site.siteMetadata?.title || `Title`
+        }
+      />
       <div>
         <Sidebar
           setFormData={setFormData}
