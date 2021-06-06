@@ -15,10 +15,13 @@ import FormMaker from './formMaker';
 import Grid from './grid';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
+  CREATE_OR_ADD_FOREIGN_KEY,
   CREATE_OR_DELETE_PRIMARY_KEYS,
+  // REMOVE_OR_DELETE_FOREIGN_KEY,
 } from '../graphql/mutations/wb';
 
 const TableLayout = ({
+  tables,
   table,
   rows,
   columns,
@@ -47,6 +50,8 @@ const TableLayout = ({
   const [createOrDeletePrimaryKeys] = useMutation(
     CREATE_OR_DELETE_PRIMARY_KEYS,
   );
+  const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
+  // const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
 
   const newTableColumnFields = [
     { name: 'name', label: 'Column Name', type: 'text', required: true },
@@ -62,6 +67,39 @@ const TableLayout = ({
       name: 'isPrimaryKey',
       label: 'make it primary key?',
       type: 'checkbox',
+    },
+    {
+      name: 'foreignKey',
+      label: 'Add a foreign key relation',
+      type: 'button',
+      onClick: () => setFormData({ ...formData, displayForeignKey: true }),
+      render: formData.displayForeignKey === undefined,
+    },
+    {
+      name: 'heading',
+      label: 'Add a foreign key relation',
+      type: 'heading',
+      render: formData.displayForeignKey === true,
+    },
+    {
+      name: 'table',
+      label: 'Table',
+      type: 'select',
+      options: tables,
+      nested: true,
+      nestedValue: 'name',
+      render: formData.displayForeignKey === true,
+    },
+    {
+      name: 'column',
+      label: 'Column',
+      type: 'select',
+      options: formData.table
+        ? tables.filter(table => table.name === formData.table)[0].columns
+        : [],
+      nested: true,
+      nestedValue: 'name',
+      render: formData.displayForeignKey === true,
     },
   ];
 
@@ -322,18 +360,27 @@ const TableLayout = ({
             },
           });
           if (!deleteLoading && !deleteError) {
-            const {
-              loading: createLoading,
-              error: createError,
-            } = await createOrDeletePrimaryKeys({
+            await createOrDeletePrimaryKeys({
               variables: {
                 schemaName: schema.name,
                 tableName: table.name,
                 columnNames: [formData.name],
               },
             });
-            if (!createLoading && !createError) setShow(false);
           }
+        }
+        if (formData.table && formData.column) {
+          const { loading, error } = await createOrAddForeignKey({
+            variables: {
+              schemaName: schema.name,
+              tableName: table.name,
+              columnNames: [formData.name],
+              parentTableName: formData.table,
+              parentColumnNames: [formData.column],
+              create: true,
+            },
+          });
+          if (!loading && !error) setShow(false);
         } else setShow(false);
       }
     }
@@ -602,6 +649,7 @@ const mapStateToProps = state => ({
   views: state.views,
   schema: state.schema,
   defaultView: state.defaultView,
+  tables: state.tables,
 });
 
 const mapDispatchToProps = dispatch => ({

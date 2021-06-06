@@ -19,6 +19,8 @@ const SidePanel = ({
       height: '100vh',
       padding: '1rem',
       width: '450px',
+      overflowY: 'scroll',
+      zIndex: 1030,
     },
   };
 
@@ -32,7 +34,9 @@ const SidePanel = ({
         <h4 className="text-center">{name}</h4>
       </div>
       <div className="modal-body">{children}</div>
-      <div className="modal-footer">
+      <div
+        className="modal-footer fixed-bottom"
+        style={{ left: 'auto!important', width: '450px!important' }}>
         <button onClick={() => setShow(false)} className="btn btn-danger m-2">
           Cancel
         </button>

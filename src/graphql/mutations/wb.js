@@ -16,3 +16,12 @@ export const CREATE_OR_DELETE_PRIMARY_KEYS = `mutation ($schemaName: String!, $t
   wbCreateOrDeletePrimaryKey(schemaName: $schemaName, tableName: $tableName, del: $del, columnNames: $columnNames)
 }
 `;
+
+export const CREATE_OR_ADD_FOREIGN_KEY = `mutation ($schemaName: String!, $tableName: String!, $columnNames: [String]!, $create: Boolean, $parentTableName: String!, $parentColumnNames: [String]!){
+  wbAddOrCreateForeignKey(schemaName: $schemaName, tableName: $tableName, columnNames: $columnNames, create: $create, parentTableName: $parentTableName, parentColumnNames: $parentColumnNames)
+}`;
+
+export const REMOVE_OR_DELETE_FOREIGN_KEY = `mutation ($schemaName: String!, $tableName: String!, $columnNames: [String]!, $del: Boolean, $parentTableName: String!) {
+  wbRemoveOrDeleteForeignKey(schemaName: $schemaName, tableName: $tableName, columnNames: $columnNames, del: $del, parentTableName: $parentTableName)
+}
+`;
