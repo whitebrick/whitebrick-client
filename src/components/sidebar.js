@@ -11,7 +11,6 @@ const Sidebar = ({
   setShow,
   userShow,
   setUserShow,
-  setTable,
   schemas,
   schema,
   tables,
@@ -95,7 +94,11 @@ const Sidebar = ({
             {tables &&
               tables.map(tableName => (
                 <div
-                  onClick={() => setTable(tableName)}
+                  onClick={() => {
+                    actions.setTable(tableName);
+                    actions.setColumns(tableName.columns);
+                    actions.setOrderBy(tableName.columns[0].name);
+                  }}
                   aria-hidden="true"
                   className={`list-group-item py-1 ${
                     table.name === tableName.name && 'active'

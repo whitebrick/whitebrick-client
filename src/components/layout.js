@@ -18,11 +18,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import SidePanel from './sidePanel';
 import Sidebar from './sidebar';
 import FormMaker from './formMaker';
-import {
-  SCHEMAS_QUERY,
-  SCHEMA_TABLES_QUERY,
-  TABLES_COLUMN_QUERY,
-} from '../graphql/queries/wb';
+import { SCHEMAS_QUERY, SCHEMA_TABLES_QUERY } from '../graphql/queries/wb';
 import {
   CREATE_SCHEMA_MUTATION,
   CREATE_TABLE_MUTATION,
@@ -47,7 +43,6 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
     variables: { userEmail: user.email },
   });
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
-  const [fetchTableColumns] = useManualQuery(TABLES_COLUMN_QUERY);
   const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
   const [createTable] = useMutation(CREATE_TABLE_MUTATION);
 
@@ -89,25 +84,6 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
     };
     fetchTables();
   }, [schema, fetchSchemaTables, actions]);
-
-  useEffect(() => {
-    actions.setOrderBy('');
-    const fetchColumns = async () => {
-      if (schema.name !== '' && table !== '' && table !== undefined) {
-        const { data } = await fetchTableColumns({
-          variables: { schemaName: schema.name, tableName: table.name },
-        });
-        actions.setColumns(data.wbColumns);
-        actions.setOrderBy(data.wbColumns[0].name);
-      }
-    };
-    fetchColumns();
-  }, [schema, table, fetchTableColumns, actions]);
-
-  const setTable = name => {
-    actions.setTable(name);
-    actions.setColumns([]);
-  };
 
   const onSave = async () => {
     if (type === 'database') {
@@ -157,7 +133,6 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
         <Sidebar
           setFormData={setFormData}
           setShow={setShow}
-          setTable={setTable}
           setType={setType}
           userShow={userShow}
           menuClass={menuClass}

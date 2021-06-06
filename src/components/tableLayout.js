@@ -13,7 +13,10 @@ import { UPDATE_TABLE_DETAILS_MUTATION } from '../graphql/mutations/table';
 import SidePanel from './sidePanel';
 import FormMaker from './formMaker';
 import Grid from './grid';
-import { ADD_OR_CREATE_COLUMN_MUTATION } from '../graphql/mutations/wb';
+import {
+  ADD_OR_CREATE_COLUMN_MUTATION,
+  CREATE_OR_DELETE_PRIMARY_KEYS,
+} from '../graphql/mutations/wb';
 
 const TableLayout = ({
   table,
@@ -41,6 +44,9 @@ const TableLayout = ({
   const [addOrCreateColumnMutation] = useMutation(
     ADD_OR_CREATE_COLUMN_MUTATION,
   );
+  const [createOrDeletePrimaryKeys] = useMutation(
+    CREATE_OR_DELETE_PRIMARY_KEYS,
+  );
 
   const newTableColumnFields = [
     { name: 'name', label: 'Column Name', type: 'text', required: true },
@@ -51,6 +57,11 @@ const TableLayout = ({
       type: 'select',
       options: schema?.context?.defaultColumnTypes,
       keyValuePairs: true,
+    },
+    {
+      name: 'isPrimaryKey',
+      label: 'make it primary key?',
+      type: 'checkbox',
     },
   ];
 
@@ -220,7 +231,10 @@ const TableLayout = ({
         action: () => {
           setType('edit');
           setShow(true);
-          setFormData({ name: params.column.colId });
+          let column = columns.filter(
+            column => column.name === params.column.colId,
+          )[0];
+          setFormData(column);
           setColumn(params.column.colId);
         },
       },
@@ -245,7 +259,7 @@ const TableLayout = ({
     ];
   };
 
-  const onSave = () => {
+  const onSave = async () => {
     if (type === 'newRow') {
       const operation = gql.mutation({
         operation: ''.concat('insert_', schema.name + '_' + table.name),
@@ -280,7 +294,7 @@ const TableLayout = ({
       saveView();
       setShow(false);
     } else {
-      const { loading, error } = addOrCreateColumnMutation({
+      const { loading, error } = await addOrCreateColumnMutation({
         variables: {
           schemaName: schema.name,
           tableName: table.name,
@@ -290,14 +304,45 @@ const TableLayout = ({
           columnType: formData.type,
         },
       });
-      if (!loading && !error) setShow(false);
+      if (!loading && !error) {
+        let columnNames = [];
+        columns
+          .filter(column => column.isPrimaryKey === true)
+          .map(c => columnNames.push(c.name));
+        if (formData.isPrimaryKey) {
+          const {
+            loading: deleteLoading,
+            error: deleteError,
+          } = await createOrDeletePrimaryKeys({
+            variables: {
+              schemaName: schema.name,
+              tableName: table.name,
+              del: true,
+              columnNames,
+            },
+          });
+          if (!deleteLoading && !deleteError) {
+            const {
+              loading: createLoading,
+              error: createError,
+            } = await createOrDeletePrimaryKeys({
+              variables: {
+                schemaName: schema.name,
+                tableName: table.name,
+                columnNames: [formData.name],
+              },
+            });
+            if (!createLoading && !createError) setShow(false);
+          }
+        } else setShow(false);
+      }
     }
   };
 
   const onEdit = () => {
     let col = columns.filter(c => c === column)[0];
     let index = columns.indexOf(col);
-    columns.splice(index, 1, formData.name);
+    columns.splice(index, 1, formData);
     actions.setColumns(columns);
     setShow(false);
   };

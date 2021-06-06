@@ -10,14 +10,21 @@ export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
   wbTables(schemaName: $schemaName) {
     name
     label
+    columns {
+      name
+      label
+      type
+      isPrimaryKey
+      foreignKeys {
+        columnName
+        constraintName
+        tableName
+      }
+      referencedBy {
+        columnName
+        constraintName
+        tableName
+      }
+    }
   }
 }`;
-
-export const TABLES_COLUMN_QUERY = `query ($schemaName: String!, $tableName: String!){
-  wbColumns(schemaName: $schemaName, tableName: $tableName) {
-    label
-    name
-    type
-  }
-}
-`;
