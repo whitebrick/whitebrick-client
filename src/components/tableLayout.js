@@ -536,7 +536,9 @@ const TableLayout = ({
           <React.Fragment>
             {columns.map(c => (
               <div className="mt-3">
-                <label>{c.label}</label>
+                <label>
+                  {c.label}: <span className="text-small">{c.type}</span>
+                </label>
                 <input
                   className="form-control"
                   value={formData ? formData[c.name] : ''}
@@ -550,6 +552,9 @@ const TableLayout = ({
                     })
                   }
                 />
+                {c.isPrimaryKey && (
+                  <p className="text-small p-1">Note: This is a primary key</p>
+                )}
               </div>
             ))}
           </React.Fragment>

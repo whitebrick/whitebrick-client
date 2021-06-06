@@ -37,3 +37,8 @@ body {
     left: 40px!important;
     z-index: 99;
 }
+
+.text-small {
+    opacity: .5;
+    font-size: 13px;
+}
