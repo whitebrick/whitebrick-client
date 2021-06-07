@@ -12,6 +12,10 @@ export const ADD_OR_CREATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $t
   wbAddOrCreateColumn(schemaName: $schemaName, tableName: $tableName, create: $create, columnName: $columnName, columnLabel: $columnLabel, columnType: $columnType)
 }`;
 
+export const REMOVE_OR_DELETE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $columnName: String!, $del: Boolean){
+  wbRemoveOrDeleteColumn(schemaName: $schemaName, tableName: $tableName, columnName: $columnName, del: $del)
+}`;
+
 export const CREATE_OR_DELETE_PRIMARY_KEYS = `mutation ($schemaName: String!, $tableName: String!, $del: Boolean, $columnNames: [String]!) {
   wbCreateOrDeletePrimaryKey(schemaName: $schemaName, tableName: $tableName, del: $del, columnNames: $columnNames)
 }

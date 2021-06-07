@@ -50,7 +50,6 @@ const Sidebar = ({
           </div>
           <div
             className="dropdown avatar"
-            onMouseEnter={() => setUserShow(!userShow)}
             onClick={() => setUserShow(!userShow)}
             aria-hidden="true">
             <img src={user.picture} alt={user.nickname} />

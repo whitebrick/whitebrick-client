@@ -17,6 +17,7 @@ import {
   ADD_OR_CREATE_COLUMN_MUTATION,
   CREATE_OR_ADD_FOREIGN_KEY,
   CREATE_OR_DELETE_PRIMARY_KEYS,
+  REMOVE_OR_DELETE_COLUMN_MUTATION,
   // REMOVE_OR_DELETE_FOREIGN_KEY,
 } from '../graphql/mutations/wb';
 
@@ -46,6 +47,9 @@ const TableLayout = ({
   const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
   const [addOrCreateColumnMutation] = useMutation(
     ADD_OR_CREATE_COLUMN_MUTATION,
+  );
+  const [removeOrDeleteColumnMutation] = useMutation(
+    REMOVE_OR_DELETE_COLUMN_MUTATION,
   );
   const [createOrDeletePrimaryKeys] = useMutation(
     CREATE_OR_DELETE_PRIMARY_KEYS,
@@ -394,11 +398,21 @@ const TableLayout = ({
     setShow(false);
   };
 
-  const onRemove = colID => {
-    let col = columns.filter(c => c === colID)[0];
-    let index = columns.indexOf(col);
-    columns.splice(index, 1);
-    actions.setColumns(columns);
+  const onRemove = async colID => {
+    const { loading, error } = await removeOrDeleteColumnMutation({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+        columnName: colID,
+        del: true,
+      },
+    });
+    if (!loading && !error) {
+      let col = columns.filter(c => c.name === colID)[0];
+      let index = columns.indexOf(col);
+      columns.splice(index, 1);
+      actions.setColumns(columns);
+    }
   };
 
   const onAddRow = () => {
