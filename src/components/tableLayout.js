@@ -38,6 +38,7 @@ const TableLayout = ({
   fetchTables = () => {},
   actions,
 }) => {
+  const [gridAPI, setGridAPI] = useState(null);
   const [columnAPI, setColumnAPI] = useState(null);
   const [changedValues, setChangedValues] = useState([]);
   const [name, setName] = useState('');
@@ -74,6 +75,7 @@ const TableLayout = ({
       await fetchTables();
       let column = columns.filter(column => column.name === formData.name)[0];
       setFormData(column);
+      gridAPI.refreshCells({ force: true });
     }
   };
 
@@ -380,6 +382,22 @@ const TableLayout = ({
     } else if (type === 'view') {
       saveView();
       setShow(false);
+    } else if (type === 'edit') {
+      if (formData.table && formData.column) {
+        await createOrAddForeignKey({
+          variables: {
+            schemaName: schema.name,
+            tableName: table.name,
+            columnNames: [formData.name],
+            parentTableName: formData.table,
+            parentColumnNames: [formData.column],
+            create: true,
+          },
+        });
+      }
+      fetchTables();
+      gridAPI.refreshCells({ force: true });
+      setShow(false);
     } else {
       const { loading, error } = await addOrCreateColumnMutation({
         variables: {
@@ -429,27 +447,13 @@ const TableLayout = ({
               create: true,
             },
           });
-          if (!loading && !error) setShow(false);
+          if (!loading && !error) {
+            gridAPI.refreshCells({ force: true });
+            setShow(false);
+          }
         } else setShow(false);
       }
     }
-  };
-
-  const onEdit = async () => {
-    if (formData.table && formData.column) {
-      await createOrAddForeignKey({
-        variables: {
-          schemaName: schema.name,
-          tableName: table.name,
-          columnNames: [formData.name],
-          parentTableName: formData.table,
-          parentColumnNames: [formData.column],
-          create: true,
-        },
-      });
-    }
-    fetchTables();
-    setShow(false);
   };
 
   const onRemove = async colID => {
@@ -467,6 +471,7 @@ const TableLayout = ({
       columns.splice(index, 1);
       fields.splice(index, 1);
       actions.setColumns(columns);
+      gridAPI.refreshCells({ force: true });
     }
   };
 
@@ -609,6 +614,7 @@ const TableLayout = ({
             onCellValueChanged={onCellValueChanged}
             getContextMenuItems={getContextMenuItems}
             setColumnAPI={setColumnAPI}
+            setGridAPI={setGridAPI}
           />
         </React.Fragment>
       )}
@@ -642,8 +648,6 @@ const TableLayout = ({
         show={show}
         setShow={setShow}
         onSave={onSave}
-        onEdit={onEdit}
-        type={type}
         name={
           type === 'add'
             ? `Add column to '${table.name}'`

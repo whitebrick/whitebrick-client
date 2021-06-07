@@ -6,11 +6,13 @@ import 'ag-grid-enterprise';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../actions';
+import ForeignKeyCellRenderer from './ForeignKeyCellRenderer';
 
 const Grid = ({
   onCellValueChanged,
   getContextMenuItems,
   setColumnAPI,
+  setGridAPI,
   rows,
   table,
   schema,
@@ -19,9 +21,13 @@ const Grid = ({
   limit,
   columns,
   actions,
+  tables,
 }) => {
   return (
     <AgGridReact
+      frameworkComponents={{
+        foreignKeyRenderer: ForeignKeyCellRenderer,
+      }}
       rowData={rows}
       sideBar
       enableRangeSelection
@@ -44,6 +50,7 @@ const Grid = ({
       getContextMenuItems={getContextMenuItems}
       popupParent={document.querySelector('body')}
       onGridReady={params => {
+        setGridAPI(params.api);
         setColumnAPI(params.columnApi);
         if (
           views.filter(
@@ -62,13 +69,27 @@ const Grid = ({
           actions.setView(viewObj);
         }
       }}>
-      {columns.map(column => (
-        <AgGridColumn
-          field={column.name}
-          key={column.name}
-          headerName={column.label}
-        />
-      ))}
+      {columns.map(column => {
+        if (column.foreignKeys.length > 0) {
+          return (
+            <AgGridColumn
+              field={column.name}
+              key={column.name}
+              headerName={column.label}
+              cellRenderer="foreignKeyRenderer"
+              cellRendererParams={{ columns, tables, schema }}
+            />
+          );
+        } else {
+          return (
+            <AgGridColumn
+              field={column.name}
+              key={column.name}
+              headerName={column.label}
+            />
+          );
+        }
+      })}
     </AgGridReact>
   );
 };
@@ -76,6 +97,7 @@ const Grid = ({
 const mapStateToProps = state => ({
   rows: state.rowData,
   table: state.table,
+  tables: state.tables,
   columns: state.columns,
   orderBy: state.orderBy,
   limit: state.limit,
