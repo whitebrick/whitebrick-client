@@ -18,7 +18,7 @@ import {
   CREATE_OR_ADD_FOREIGN_KEY,
   CREATE_OR_DELETE_PRIMARY_KEYS,
   REMOVE_OR_DELETE_COLUMN_MUTATION,
-  // REMOVE_OR_DELETE_FOREIGN_KEY,
+  REMOVE_OR_DELETE_FOREIGN_KEY,
 } from '../graphql/mutations/wb';
 
 const TableLayout = ({
@@ -35,6 +35,7 @@ const TableLayout = ({
   views,
   schema,
   defaultView,
+  fetchTables = () => {},
   actions,
 }) => {
   const [columnAPI, setColumnAPI] = useState(null);
@@ -55,7 +56,25 @@ const TableLayout = ({
     CREATE_OR_DELETE_PRIMARY_KEYS,
   );
   const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
-  // const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
+  const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
+
+  const deleteForeignKey = async () => {
+    const { loading, error } = await removeOrDeleteForeignKey({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+        columnNames: [formData.name],
+        del: true,
+        parentTableName: formData.foreignKeys[0].relTableName,
+      },
+    });
+    if (!loading && !error) {
+      setShow(false);
+      await fetchTables();
+      let column = columns.filter(column => column.name === formData.name)[0];
+      setFormData(column);
+    }
+  };
 
   const newTableColumnFields = [
     { name: 'name', label: 'Column Name', type: 'text', required: true },
@@ -77,13 +96,25 @@ const TableLayout = ({
       label: 'Add a foreign key relation',
       type: 'button',
       onClick: () => setFormData({ ...formData, displayForeignKey: true }),
-      render: formData.displayForeignKey === undefined,
+      render:
+        type === 'edit'
+          ? formData.displayForeignKey === undefined &&
+            formData.foreignKeys?.length === 0
+          : true,
     },
     {
       name: 'heading',
-      label: 'Add a foreign key relation',
+      label: 'Foreign key relations',
       type: 'heading',
-      render: formData.displayForeignKey === true,
+      render:
+        formData.displayForeignKey === true ||
+        formData?.foreignKeys?.length > 0,
+    },
+    {
+      name: 'foreignKeys',
+      type: 'foreignKeys',
+      render: formData?.foreignKeys?.length > 0,
+      onClick: () => deleteForeignKey(),
     },
     {
       name: 'table',
@@ -390,11 +421,20 @@ const TableLayout = ({
     }
   };
 
-  const onEdit = () => {
-    let col = columns.filter(c => c === column)[0];
-    let index = columns.indexOf(col);
-    columns.splice(index, 1, formData);
-    actions.setColumns(columns);
+  const onEdit = async () => {
+    if (formData.table && formData.column) {
+      await createOrAddForeignKey({
+        variables: {
+          schemaName: schema.name,
+          tableName: table.name,
+          columnNames: [formData.name],
+          parentTableName: formData.table,
+          parentColumnNames: [formData.column],
+          create: true,
+        },
+      });
+    }
+    fetchTables();
     setShow(false);
   };
 
@@ -411,6 +451,7 @@ const TableLayout = ({
       let col = columns.filter(c => c.name === colID)[0];
       let index = columns.indexOf(col);
       columns.splice(index, 1);
+      fields.splice(index, 1);
       actions.setColumns(columns);
     }
   };

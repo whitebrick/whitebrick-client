@@ -85,6 +85,16 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
     fetchTables();
   }, [schema, fetchSchemaTables, actions]);
 
+  const fetchTablesAndColumns = async () => {
+    const { data } = await fetchSchemaTables({
+      variables: { schemaName: schema.name },
+    });
+    let t = data.wbTables.filter(tableName => tableName.name === table.name)[0];
+    actions.setTables(data.wbTables);
+    actions.setColumns(t.columns);
+    actions.setOrderBy(t.columns[0].name);
+  };
+
   const onSave = async () => {
     if (type === 'database') {
       const { error, loading } = createSchema({
@@ -108,10 +118,7 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
         },
       });
       if (!loading && !error) {
-        const { data } = await fetchSchemaTables({
-          variables: { schemaName: schema.name },
-        });
-        actions.setTables(data.wbSchemaTableNames);
+        await fetchTablesAndColumns();
         setShow(false);
       }
     }
@@ -145,7 +152,10 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
           table !== '' &&
           fields.length > 0 &&
           orderBy !== '' ? (
-            <Table key={schema.name + table.name} />
+            <Table
+              key={schema.name + table.name}
+              fetchTables={fetchTablesAndColumns}
+            />
           ) : (
             <p>Please select a table to render</p>
           )}

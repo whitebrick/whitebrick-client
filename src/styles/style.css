@@ -42,3 +42,9 @@ body {
     opacity: .5;
     font-size: 13px;
 }
+
+.modal-footer {
+    left: auto!important;
+    width: 450px!important;
+    background: #ffffff!important;
+}

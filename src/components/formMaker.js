@@ -23,6 +23,7 @@ const FormMaker = ({ fields, formData, setFormData }) => {
     addNewOptions = false,
     addNewOptionsValue = null,
     onClick = () => {},
+    defaultValue = null,
     render = true,
   }) => {
     if (render) {
@@ -32,7 +33,7 @@ const FormMaker = ({ fields, formData, setFormData }) => {
             <label htmlFor={name}>{label}</label>
             <input
               className="form-control"
-              value={formData[name]}
+              value={!formData[name] ? defaultValue : formData[name]}
               onChange={e =>
                 setFormData({ ...formData, [name]: e.target.value })
               }
@@ -49,7 +50,7 @@ const FormMaker = ({ fields, formData, setFormData }) => {
               <select
                 className="form-control"
                 multiple={multiple}
-                value={formData[name]}
+                value={!formData[name] ? defaultValue : formData[name]}
                 onBlur={() => {}}
                 disabled={readOnly}
                 onChange={e => handleSelectChange(multiple, name, e)}>
@@ -84,7 +85,7 @@ const FormMaker = ({ fields, formData, setFormData }) => {
               <select
                 className="form-control"
                 multiple={multiple}
-                value={formData[name]}
+                value={!formData[name] ? defaultValue : formData[name]}
                 onBlur={() => {}}
                 disabled={readOnly}
                 onChange={e => handleSelectChange(multiple, name, e)}>
@@ -114,7 +115,7 @@ const FormMaker = ({ fields, formData, setFormData }) => {
               <select
                 className="form-control"
                 multiple={multiple}
-                value={formData[name]}
+                value={!formData[name] ? defaultValue : formData[name]}
                 onBlur={() => {}}
                 disabled={readOnly}
                 onChange={e => handleSelectChange(multiple, name, e)}>
@@ -170,6 +171,23 @@ const FormMaker = ({ fields, formData, setFormData }) => {
           <div className="mt-5">
             <hr />
             <h5>{label}</h5>
+          </div>
+        );
+      } else if (type === 'foreignKeys') {
+        return (
+          <div className="card">
+            <div className="card-body">
+              <span>Table: {formData.foreignKeys[0].relTableName}</span>
+              <p>Column: {formData.foreignKeys[0].relColumnName}</p>
+              <button className="btn btn-danger btn-block" onClick={onClick}>
+                Remove Foreignkey relation
+              </button>
+            </div>
+            <div className="card-footer p-2">
+              <p className="text-small">
+                Note: You can add a foreign key only once you remove this.
+              </p>
+            </div>
           </div>
         );
       }

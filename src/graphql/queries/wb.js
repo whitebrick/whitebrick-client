@@ -19,11 +19,15 @@ export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
         columnName
         constraintName
         tableName
+        relColumnName
+        relTableName
       }
       referencedBy {
         columnName
         constraintName
         tableName
+        relColumnName
+        relTableName
       }
     }
   }
