@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as gql from 'gql-query-builder';
-import { FaChevronRight, FaPen } from 'react-icons/fa';
+import { FaChevronRight, FaPen, FaExternalLinkAlt } from 'react-icons/fa';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions/index';
@@ -45,6 +45,7 @@ const TableLayout = ({
   const [formData, setFormData] = useState({});
   const [show, setShow] = useState(false);
   const [column, setColumn] = useState('');
+  const [params, setParams] = useState({});
   const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
   const [addOrCreateColumnMutation] = useMutation(
     ADD_OR_CREATE_COLUMN_MUTATION,
@@ -213,7 +214,7 @@ const TableLayout = ({
         query: operation.query,
         variables: operation.variables,
       });
-    fetchData();
+    fetchData().finally(() => setShow(false));
   };
 
   const editValues = values => {
@@ -321,6 +322,10 @@ const TableLayout = ({
         action: () => onAddRow(),
       },
       {
+        name: 'Edit Row',
+        action: () => onEditRow(params),
+      },
+      {
         name: 'Delete Row',
         action: () => onDeleteRow(params),
       },
@@ -352,6 +357,15 @@ const TableLayout = ({
         });
       fetchData();
       setShow(false);
+    } else if (type === 'editRow') {
+      let variables = { where: {}, _set: {} };
+      for (let key in params) {
+        variables.where[key] = {
+          _eq: parseInt(params[key]) ? parseInt(params[key]) : params[key],
+        };
+      }
+      variables['_set'] = formData;
+      doMutation(variables);
     } else if (type === 'updateTable') {
       let variables = {
         schemaName: schema.name,
@@ -458,6 +472,13 @@ const TableLayout = ({
 
   const onAddRow = () => {
     setType('newRow');
+    setShow(true);
+  };
+
+  const onEditRow = params => {
+    setType('editRow');
+    setParams(params.node.data);
+    setFormData(params.node.data);
     setShow(true);
   };
 
@@ -628,34 +649,65 @@ const TableLayout = ({
             ? `Add column to '${table.name}'`
             : type === 'newRow'
             ? `Add new row to '${table.name}'`
+            : type === 'editRow'
+            ? `Edit row in '${table.name}'`
             : type === 'edit'
             ? `Edit column '${column}'`
             : type === 'view'
             ? `Create a new view`
             : `Update table '${table.name}'`
         }>
-        {type === 'newRow' ? (
+        {type === 'newRow' || type === 'editRow' ? (
           <React.Fragment>
             {columns.map(c => (
               <div className="mt-3">
                 <label>
                   {c.label}: <span className="text-small">{c.type}</span>
                 </label>
-                <input
-                  className="form-control"
-                  value={formData ? formData[c.name] : ''}
-                  type={c.type === 'integer' ? 'number' : c.type}
-                  onChange={e =>
-                    setFormData({
-                      ...formData,
-                      [c.name]: parseInt(e.target.value)
-                        ? parseInt(e.target.value)
-                        : e.target.value,
-                    })
-                  }
-                />
+                {c.foreignKeys.length > 0 ? (
+                  <div className="input-group">
+                    <div className="input-group-prepend">
+                      <span className="input-group-text bg-light">
+                        <FaExternalLinkAlt />
+                      </span>
+                    </div>
+                    <input
+                      className="form-control"
+                      value={formData ? formData[c.name] : ''}
+                      type={c.type === 'integer' ? 'number' : c.type}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          [c.name]: parseInt(e.target.value)
+                            ? parseInt(e.target.value)
+                            : e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                ) : (
+                  <input
+                    className="form-control"
+                    value={formData ? formData[c.name] : ''}
+                    type={c.type === 'integer' ? 'number' : c.type}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        [c.name]: parseInt(e.target.value)
+                          ? parseInt(e.target.value)
+                          : e.target.value,
+                      })
+                    }
+                  />
+                )}
                 {c.isPrimaryKey && (
-                  <p className="text-small p-1">Note: This is a primary key</p>
+                  <p className="text-small p-1">Note: This is a Primary Key</p>
+                )}
+                {c.foreignKeys.length > 0 && (
+                  <p className="text-small p-1">
+                    Note: This is a Foreign Key to `
+                    {c.foreignKeys[0].relTableName}`
+                  </p>
                 )}
               </div>
             ))}
