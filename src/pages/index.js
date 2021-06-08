@@ -42,7 +42,7 @@ const IndexPage = ({ accessToken, actions }) => {
     ),
     headers: {
       'x-hasura-admin-secret': process.env.GATSBY_HASURA_GRAPHQL_ADMIN_SECRET,
-      authorization: accessToken ? `Bearer ${accessToken}`: null,
+      authorization: accessToken ? `Bearer ${accessToken}` : null,
     },
   });
 

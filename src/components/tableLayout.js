@@ -6,7 +6,6 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../actions/index';
 
 import { useMutation, useSubscription } from 'graphql-hooks';
-import Pagination from 'rc-pagination';
 
 import graphQLFetch from '../utils/GraphQLFetch';
 import { UPDATE_TABLE_DETAILS_MUTATION } from '../graphql/mutations/table';
@@ -28,7 +27,6 @@ const TableLayout = ({
   columns,
   fields,
   rowCount,
-  current,
   orderBy,
   limit,
   offset,
@@ -189,11 +187,6 @@ const TableLayout = ({
     actions.setOffset(0);
     actions.setCurrent(1);
   }, [table, actions]);
-
-  const handlePagination = (current, pageSize) => {
-    actions.setOffset(Math.ceil((current - 1) * pageSize));
-    actions.setCurrent(current);
-  };
 
   const doMutation = variables => {
     const operation = gql.mutation({
@@ -618,32 +611,6 @@ const TableLayout = ({
           />
         </React.Fragment>
       )}
-      {table !== '' && rows.length > 0 && (
-        <div className="p-4">
-          <select
-            value={limit}
-            onBlur={e => actions.setLimit(parseInt(e.target.value))}
-            onChange={e => actions.setLimit(parseInt(e.target.value))}>
-            <option>5</option>
-            <option>10</option>
-            <option>20</option>
-            <option>50</option>
-            <option>100</option>
-            <option>500</option>
-          </select>{' '}
-          records per page
-          <div className="float-right">
-            <Pagination
-              total={rowCount}
-              pageSize={limit}
-              current={current}
-              onChange={(current, pageSize) =>
-                handlePagination(current, pageSize)
-              }
-            />
-          </div>
-        </div>
-      )}
       <SidePanel
         show={show}
         setShow={setShow}
@@ -753,7 +720,6 @@ const mapStateToProps = state => ({
   columns: state.columns,
   fields: state.fields,
   rowCount: state.rowCount,
-  current: state.current,
   orderBy: state.orderBy,
   limit: state.limit,
   offset: state.offset,
