@@ -1,6 +1,9 @@
 import fetch from 'isomorphic-fetch';
+import store from '../store';
 
 const GraphQLFetch = ({ query, variables }) => {
+  const state = store.getState();
+  const accessToken = state.accessToken;
   const body = {
     query,
     variables,
@@ -11,6 +14,7 @@ const GraphQLFetch = ({ query, variables }) => {
     headers: {
       'Content-Type': 'application/json',
       'x-hasura-admin-secret': process.env.GATSBY_HASURA_GRAPHQL_ADMIN_SECRET,
+      authorization: accessToken ? `Bearer ${accessToken}` : null,
     },
     body: JSON.stringify(body),
   };

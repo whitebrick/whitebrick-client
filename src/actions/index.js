@@ -1,6 +1,12 @@
 import { types } from '../types/gridTypes';
 
 export const actions = {
+  setAccessToken(accessToken) {
+    return {
+      type: types.SET_ACCESS_TOKEN,
+      payload: { accessToken },
+    };
+  },
   setUser(user) {
     return {
       type: types.SET_USER,

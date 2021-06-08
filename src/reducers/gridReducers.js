@@ -8,6 +8,11 @@ export default function gridReducer(state = {}, action) {
         ...state,
         user: payload.user,
       };
+    case types.SET_ACCESS_TOKEN:
+      return {
+        ...state,
+        accessToken: payload.accessToken,
+      };
     case types.SET_ROWS:
       return {
         ...state,

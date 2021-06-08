@@ -14,7 +14,7 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
 import Table from './tableLayout';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth0, withAuthenticationRequired } from '@auth0/auth0-react';
 import SidePanel from './sidePanel';
 import Sidebar from './sidebar';
 import FormMaker from './formMaker';
@@ -23,6 +23,7 @@ import {
   CREATE_SCHEMA_MUTATION,
   CREATE_TABLE_MUTATION,
 } from '../graphql/mutations/wb';
+import Loading from './loading';
 
 const Layout = ({ table, schema, fields, orderBy, actions }) => {
   const data = useStaticQuery(graphql`
@@ -124,7 +125,7 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
     }
   };
 
-  if (loading) return 'Loading...';
+  if (loading) return <Loading />;
   if (error) return 'Something Bad Happened';
 
   return (
@@ -221,4 +222,7 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Layout);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withAuthenticationRequired(Layout));
