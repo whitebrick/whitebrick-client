@@ -7,6 +7,12 @@ export const actions = {
       payload: { accessToken },
     };
   },
+  setFormData(formData) {
+    return {
+      type: types.SET_FORM_DATA,
+      payload: { formData },
+    };
+  },
   setUser(user) {
     return {
       type: types.SET_USER,

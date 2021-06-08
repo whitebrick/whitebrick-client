@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as gql from 'gql-query-builder';
-import { FaChevronRight, FaPen, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions/index';
@@ -9,8 +9,6 @@ import { useMutation, useSubscription } from 'graphql-hooks';
 
 import graphQLFetch from '../utils/GraphQLFetch';
 import { UPDATE_TABLE_DETAILS_MUTATION } from '../graphql/mutations/table';
-import SidePanel from './sidePanel';
-import FormMaker from './formMaker';
 import Grid from './grid';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
@@ -19,9 +17,9 @@ import {
   REMOVE_OR_DELETE_COLUMN_MUTATION,
   REMOVE_OR_DELETE_FOREIGN_KEY,
 } from '../graphql/mutations/wb';
+import TableSidePanel from './TableSidePanel';
 
 const TableLayout = ({
-  tables,
   table,
   rows,
   columns,
@@ -34,6 +32,7 @@ const TableLayout = ({
   schema,
   defaultView,
   fetchTables = () => {},
+  formData,
   actions,
 }) => {
   const [gridAPI, setGridAPI] = useState(null);
@@ -41,7 +40,6 @@ const TableLayout = ({
   const [changedValues, setChangedValues] = useState([]);
   const [name, setName] = useState('');
   const [type, setType] = useState('');
-  const [formData, setFormData] = useState({});
   const [show, setShow] = useState(false);
   const [column, setColumn] = useState('');
   const [params, setParams] = useState({});
@@ -72,82 +70,10 @@ const TableLayout = ({
       setShow(false);
       await fetchTables();
       let column = columns.filter(column => column.name === formData.name)[0];
-      setFormData(column);
+      actions.setFormData(column);
       gridAPI.refreshCells({ force: true });
     }
   };
-
-  const newTableColumnFields = [
-    { name: 'name', label: 'Column Name', type: 'text', required: true },
-    { name: 'label', label: 'Column Label', type: 'text', required: true },
-    {
-      name: 'type',
-      label: 'Column Type',
-      type: 'select',
-      options: schema?.context?.defaultColumnTypes,
-      keyValuePairs: true,
-    },
-    {
-      name: 'isPrimaryKey',
-      label: 'make it primary key?',
-      type: 'checkbox',
-    },
-    {
-      name: 'foreignKey',
-      label: 'Add a foreign key relation',
-      type: 'button',
-      onClick: () => setFormData({ ...formData, displayForeignKey: true }),
-      render:
-        type === 'edit'
-          ? formData.displayForeignKey === undefined &&
-            formData.foreignKeys?.length === 0
-          : true,
-    },
-    {
-      name: 'heading',
-      label: 'Foreign key relations',
-      type: 'heading',
-      render:
-        formData.displayForeignKey === true ||
-        formData?.foreignKeys?.length > 0,
-    },
-    {
-      name: 'foreignKeys',
-      type: 'foreignKeys',
-      render: formData?.foreignKeys?.length > 0,
-      onClick: () => deleteForeignKey(),
-    },
-    {
-      name: 'table',
-      label: 'Table',
-      type: 'select',
-      options: tables,
-      nested: true,
-      nestedValue: 'name',
-      render: formData.displayForeignKey === true,
-    },
-    {
-      name: 'column',
-      label: 'Column',
-      type: 'select',
-      options: formData.table
-        ? tables.filter(table => table.name === formData.table)[0].columns
-        : [],
-      nested: true,
-      nestedValue: 'name',
-      render: formData.displayForeignKey === true,
-    },
-  ];
-
-  const updateTableFields = [
-    {
-      name: 'name',
-      label: 'Name',
-      type: 'text',
-      required: true,
-    },
-    { name: 'label', label: 'Label', type: 'text', required: true },
-  ];
 
   useEffect(() => {
     const handleTableChange = async () => {
@@ -285,7 +211,7 @@ const TableLayout = ({
   };
 
   const getContextMenuItems = params => {
-    setFormData({});
+    actions.setFormData({});
     return [
       {
         name: 'Add Column',
@@ -303,7 +229,7 @@ const TableLayout = ({
           let column = columns.filter(
             column => column.name === params.column.colId,
           )[0];
-          setFormData(column);
+          actions.setFormData(column);
           setColumn(params.column.colId);
         },
       },
@@ -476,7 +402,7 @@ const TableLayout = ({
   const onEditRow = params => {
     setType('editRow');
     setParams(params.node.data);
-    setFormData(params.node.data);
+    actions.setFormData(params.node.data);
     setShow(true);
   };
 
@@ -544,7 +470,7 @@ const TableLayout = ({
                 style={{ cursor: 'pointer' }}
                 onClick={() => {
                   setType('updateTable');
-                  setFormData(table);
+                  actions.setFormData(table);
                   setShow(true);
                 }}>
                 <span>
@@ -583,7 +509,7 @@ const TableLayout = ({
                 <div
                   onClick={() => {
                     setType('view');
-                    setFormData({});
+                    actions.setFormData({});
                     setShow(true);
                   }}
                   aria-hidden="true"
@@ -611,105 +537,14 @@ const TableLayout = ({
           />
         </React.Fragment>
       )}
-      <SidePanel
+      <TableSidePanel
         show={show}
         setShow={setShow}
+        column={column}
         onSave={onSave}
-        name={
-          type === 'add'
-            ? `Add column to '${table.name}'`
-            : type === 'newRow'
-            ? `Add new row to '${table.name}'`
-            : type === 'editRow'
-            ? `Edit row in '${table.name}'`
-            : type === 'edit'
-            ? `Edit column '${column}'`
-            : type === 'view'
-            ? `Create a new view`
-            : `Update table '${table.name}'`
-        }>
-        {type === 'newRow' || type === 'editRow' ? (
-          <React.Fragment>
-            {columns.map(c => (
-              <div className="mt-3">
-                <label>
-                  {c.label}: <span className="text-small">{c.type}</span>
-                </label>
-                {c.foreignKeys.length > 0 ? (
-                  <div className="input-group">
-                    <div className="input-group-prepend">
-                      <span className="input-group-text bg-light">
-                        <FaExternalLinkAlt />
-                      </span>
-                    </div>
-                    <input
-                      className="form-control"
-                      value={formData ? formData[c.name] : ''}
-                      type={c.type === 'integer' ? 'number' : c.type}
-                      onChange={e =>
-                        setFormData({
-                          ...formData,
-                          [c.name]: parseInt(e.target.value)
-                            ? parseInt(e.target.value)
-                            : e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                ) : (
-                  <input
-                    className="form-control"
-                    value={formData ? formData[c.name] : ''}
-                    type={c.type === 'integer' ? 'number' : c.type}
-                    onChange={e =>
-                      setFormData({
-                        ...formData,
-                        [c.name]: parseInt(e.target.value)
-                          ? parseInt(e.target.value)
-                          : e.target.value,
-                      })
-                    }
-                  />
-                )}
-                {c.isPrimaryKey && (
-                  <p className="text-small p-1">Note: This is a Primary Key</p>
-                )}
-                {c.foreignKeys.length > 0 && (
-                  <p className="text-small p-1">
-                    Note: This is a Foreign Key to `
-                    {c.foreignKeys[0].relTableName}`
-                  </p>
-                )}
-              </div>
-            ))}
-          </React.Fragment>
-        ) : type === 'edit' || type === 'add' ? (
-          <FormMaker
-            formData={formData}
-            setFormData={setFormData}
-            fields={newTableColumnFields}
-          />
-        ) : type === 'view' ? (
-          <FormMaker
-            formData={formData}
-            setFormData={setFormData}
-            fields={[
-              {
-                name: 'name',
-                label: 'Name of the view',
-                type: 'text',
-                required: true,
-              },
-            ]}
-          />
-        ) : (
-          <FormMaker
-            formData={formData}
-            setFormData={setFormData}
-            fields={updateTableFields}
-          />
-        )}
-      </SidePanel>
+        type={type}
+        deleteForeignKey={deleteForeignKey}
+      />
     </div>
   );
 };
@@ -717,6 +552,7 @@ const TableLayout = ({
 const mapStateToProps = state => ({
   rows: state.rowData,
   table: state.table,
+  formData: state.formData,
   columns: state.columns,
   fields: state.fields,
   rowCount: state.rowCount,
@@ -726,7 +562,6 @@ const mapStateToProps = state => ({
   views: state.views,
   schema: state.schema,
   defaultView: state.defaultView,
-  tables: state.tables,
 });
 
 const mapDispatchToProps = dispatch => ({

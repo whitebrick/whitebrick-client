@@ -14,4 +14,5 @@ export const types = {
   SET_VIEWS: 'SET_VIEWS',
   SET_VIEW: 'SET_VIEW',
   SET_DEFAULT_VIEW: 'SET_DEFAULT_VIEW',
+  SET_FORM_DATA: 'SET_FORM_DATA',
 };

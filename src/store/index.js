@@ -4,6 +4,7 @@ import gridReducer from '../reducers/gridReducers';
 const initialState = {
   user: '',
   accessToken: '',
+  formData: {},
   schema: '',
   tables: [],
   table: '',
