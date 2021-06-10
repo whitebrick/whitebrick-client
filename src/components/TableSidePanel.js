@@ -20,7 +20,6 @@ const TableSidePanel = ({
   tables,
   deleteForeignKey,
 }) => {
-
   const newTableColumnFields = [
     { name: 'name', label: 'Column Name', type: 'text', required: true },
     { name: 'label', label: 'Column Label', type: 'text', required: true },
@@ -45,7 +44,7 @@ const TableSidePanel = ({
       render:
         type === 'edit'
           ? formData.displayForeignKey === undefined &&
-          formData.foreignKeys?.length === 0
+            formData.foreignKeys?.length === 0
           : true,
     },
     {

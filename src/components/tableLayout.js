@@ -16,6 +16,7 @@ import {
   CREATE_OR_DELETE_PRIMARY_KEYS,
   REMOVE_OR_DELETE_COLUMN_MUTATION,
   REMOVE_OR_DELETE_FOREIGN_KEY,
+  UPDATE_COLUMN_MUTATION,
 } from '../graphql/mutations/wb';
 import TableSidePanel from './TableSidePanel';
 
@@ -47,6 +48,7 @@ const TableLayout = ({
   const [addOrCreateColumnMutation] = useMutation(
     ADD_OR_CREATE_COLUMN_MUTATION,
   );
+  const [updateColumnMutation] = useMutation(UPDATE_COLUMN_MUTATION);
   const [removeOrDeleteColumnMutation] = useMutation(
     REMOVE_OR_DELETE_COLUMN_MUTATION,
   );
@@ -302,6 +304,19 @@ const TableLayout = ({
       saveView();
       setShow(false);
     } else if (type === 'edit') {
+      let variables = {
+        schemaName: schema.name,
+        tableName: table.name,
+        columnName: column,
+      };
+      let col = columns.filter(c => c.name === column)[0];
+      if (formData.name !== col.name) variables.newColumnName = formData.name;
+      if (formData.label !== col.label)
+        variables.newColumnLabel = formData.label;
+      if (formData.type !== col.type) variables.newType = formData.type;
+      await updateColumnMutation({
+        variables,
+      });
       if (formData.table && formData.column) {
         await createOrAddForeignKey({
           variables: {
