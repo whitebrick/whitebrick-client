@@ -1,9 +1,18 @@
 import React from 'react';
-import { FaHome, FaUsers, FaCog, FaPlus, FaSearch } from 'react-icons/fa';
+import {
+  FaHome,
+  FaUsers,
+  FaCog,
+  FaPlus,
+  FaSearch,
+  FaTrash,
+} from 'react-icons/fa';
 import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
+import { useMutation } from 'graphql-hooks';
+import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../graphql/mutations/wb';
 
 const Sidebar = ({
   setFormData,
@@ -19,6 +28,20 @@ const Sidebar = ({
   actions,
 }) => {
   const { user, logout } = useAuth0();
+  const [removeOrDeleteTableMutation] = useMutation(
+    REMOVE_OR_DELETE_TABLE_MUTATION,
+  );
+
+  const deleteTable = async () => {
+    actions.setTable('');
+    await removeOrDeleteTableMutation({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+        del: true,
+      },
+    });
+  };
 
   const handleTableClick = tableName => {
     if (tableName.columns.length > 0) {
@@ -135,6 +158,17 @@ const Sidebar = ({
                 <FaUsers size="14px" />{' '}
                 <span className="ml-2">Invite others</span>
               </div>
+              {table.name && (
+                <div
+                  className="list-group-item py-1 d-flex align-items-center"
+                  aria-hidden="true"
+                  onClick={deleteTable}>
+                  <FaTrash size="14px" />{' '}
+                  <div className="ml-2">
+                    Delete table '{table.label.toLowerCase()}'
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

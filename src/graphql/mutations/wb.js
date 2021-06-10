@@ -8,6 +8,11 @@ export const CREATE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName
   wbAddOrCreateTable(schemaName: $schemaName, tableName: $tableName, tableLabel: $tableLabel, create: $create)
 }`;
 
+export const REMOVE_OR_DELETE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $del: Boolean) {
+  wbRemoveOrDeleteTable(schemaName: $schemaName, tableName: $tableName, del: $del)
+}
+`;
+
 export const ADD_OR_CREATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $create: Boolean, $columnName: String!, $columnLabel: String!, $columnType: String){
   wbAddOrCreateColumn(schemaName: $schemaName, tableName: $tableName, create: $create, columnName: $columnName, columnLabel: $columnLabel, columnType: $columnType)
 }`;
