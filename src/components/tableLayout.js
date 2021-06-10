@@ -22,7 +22,6 @@ import TableSidePanel from './TableSidePanel';
 
 const TableLayout = ({
   table,
-  rows,
   columns,
   fields,
   rowCount,
@@ -35,6 +34,7 @@ const TableLayout = ({
   fetchTables = () => {},
   formData,
   actions,
+  isNewTable,
 }) => {
   const [gridAPI, setGridAPI] = useState(null);
   const [columnAPI, setColumnAPI] = useState(null);
@@ -79,7 +79,7 @@ const TableLayout = ({
 
   useEffect(() => {
     const handleTableChange = async () => {
-      if (columns.length > 0) {
+      if (columns.length > 0 && !isNewTable) {
         const operation = gql.query({
           operation: schema.name + '_' + table.name,
           variables: {
@@ -109,7 +109,17 @@ const TableLayout = ({
       }
     };
     handleTableChange();
-  }, [schema, table, columns, fields, limit, offset, orderBy, actions]);
+  }, [
+    schema,
+    table,
+    isNewTable,
+    columns,
+    fields,
+    limit,
+    offset,
+    orderBy,
+    actions,
+  ]);
 
   useEffect(() => {
     actions.setOffset(0);
@@ -471,7 +481,7 @@ const TableLayout = ({
 
   return (
     <div className="ag-theme-alpine">
-      {table !== '' && rows.length > 0 && (
+      {table !== '' && (
         <React.Fragment>
           <div className="my-3">
             <div style={{ padding: `1rem` }}>
@@ -565,6 +575,7 @@ const TableLayout = ({
 };
 
 const mapStateToProps = state => ({
+  isNewTable: state.isNewTable,
   rows: state.rowData,
   table: state.table,
   formData: state.formData,

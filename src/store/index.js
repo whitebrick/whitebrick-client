@@ -8,6 +8,7 @@ const initialState = {
   schema: '',
   tables: [],
   table: '',
+  isNewTable: false,
   columns: [],
   fields: [],
   rowData: [],

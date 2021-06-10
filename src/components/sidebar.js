@@ -19,6 +19,18 @@ const Sidebar = ({
   actions,
 }) => {
   const { user, logout } = useAuth0();
+
+  const handleTableClick = tableName => {
+    if (tableName.columns.length > 0) {
+      actions.setTable(tableName);
+      actions.setColumns(tableName.columns);
+      actions.setOrderBy(tableName.columns[0].name);
+    } else {
+      actions.setIsNewTable(true);
+      actions.setTable(tableName);
+      actions.setColumns([]);
+    }
+  };
   return (
     <div className="row m-0" id="sidebar">
       <aside className="col-3 p-0 sidebar-collapsed">
@@ -93,11 +105,7 @@ const Sidebar = ({
             {tables &&
               tables.map(tableName => (
                 <div
-                  onClick={() => {
-                    actions.setTable(tableName);
-                    actions.setColumns(tableName.columns);
-                    actions.setOrderBy(tableName.columns[0].name);
-                  }}
+                  onClick={() => handleTableClick(tableName)}
                   aria-hidden="true"
                   className={`list-group-item py-1 ${
                     table.name === tableName.name && 'active'

@@ -26,6 +26,7 @@ const Grid = ({
   rowCount,
   current,
 }) => {
+  console.log(columns);
   const handlePagination = (current, pageSize) => {
     actions.setOffset(Math.ceil((current - 1) * pageSize));
     actions.setCurrent(current);

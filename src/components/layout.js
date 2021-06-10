@@ -25,7 +25,7 @@ import {
 } from '../graphql/mutations/wb';
 import Loading from './loading';
 
-const Layout = ({ table, schema, fields, orderBy, actions }) => {
+const Layout = ({ table, schema, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -91,9 +91,13 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
       variables: { schemaName: schema.name },
     });
     let t = data.wbTables.filter(tableName => tableName.name === table.name)[0];
-    actions.setTables(data.wbTables);
-    actions.setColumns(t.columns);
-    actions.setOrderBy(t.columns[0].name);
+    if (t.columns.length > 0) {
+      actions.setTables(data.wbTables);
+      actions.setColumns(t.columns);
+      actions.setOrderBy(t.columns[0].name);
+    } else {
+      actions.setColumns([]);
+    }
   };
 
   const onSave = async () => {
@@ -112,7 +116,7 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
     } else {
       const { error, loading } = createTable({
         variables: {
-          schemaName: formData.schema,
+          schemaName: formData.schema.name,
           tableName: formData.name,
           tableLabel: formData.label,
           create: true,
@@ -148,11 +152,7 @@ const Layout = ({ table, schema, fields, orderBy, actions }) => {
           schemas={schemas}
         />
         <main id="main">
-          {user &&
-          schema.name !== '' &&
-          table !== '' &&
-          fields.length > 0 &&
-          orderBy !== '' ? (
+          {user && schema.name !== '' && table !== '' ? (
             <Table
               key={schema.name + table.name}
               fetchTables={fetchTablesAndColumns}
@@ -214,8 +214,6 @@ const mapStateToProps = state => ({
   schema: state.schema,
   tables: state.tables,
   table: state.table,
-  fields: state.fields,
-  orderBy: state.orderBy,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -1,6 +1,12 @@
 import { types } from '../types/gridTypes';
 
 export const actions = {
+  setIsNewTable(isNewTable) {
+    return {
+      type: types.SET_IS_NEW_TABLE,
+      payload: { isNewTable },
+    };
+  },
   setAccessToken(accessToken) {
     return {
       type: types.SET_ACCESS_TOKEN,
