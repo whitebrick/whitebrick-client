@@ -23,6 +23,7 @@ export const wrapRootElement = ({ element }) => {
         clientId={process.env.AUTH0_CLIENTID}
         responseType="token id_token"
         scope="openid profile email"
+        useRefreshTokens={true}
         redirectUri={process.env.AUTH0_CALLBACK}
         onRedirectCallback={onRedirectCallback}>
         {element}

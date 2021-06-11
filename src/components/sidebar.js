@@ -165,7 +165,7 @@ const Sidebar = ({
                   onClick={deleteTable}>
                   <FaTrash size="14px" />{' '}
                   <div className="ml-2">
-                    Delete table '{table.label.toLowerCase()}'
+                    Delete '{table.label.toLowerCase()}'
                   </div>
                 </div>
               )}

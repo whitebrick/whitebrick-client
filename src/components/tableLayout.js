@@ -65,7 +65,7 @@ const TableLayout = ({
         tableName: table.name,
         columnNames: [formData.name],
         del: true,
-        parentTableName: formData.foreignKeys[0].relTableName,
+        parentTableName: formData['foreignKeys'][0]['relTableName'],
       },
     });
     if (!loading && !error) {
@@ -108,7 +108,7 @@ const TableLayout = ({
         );
       }
     };
-    handleTableChange();
+    handleTableChange().finally(() => console.log('fetched table change'));
   }, [
     schema,
     table,
@@ -162,7 +162,7 @@ const TableLayout = ({
         data[param.colDef?.field] = param.oldValue;
       });
       let variables = { where: {}, _set: {} };
-      for (let key in data) {
+      for (let key of data) {
         variables.where[key] = {
           _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
         };
@@ -288,7 +288,7 @@ const TableLayout = ({
           query: operation.query,
           variables: operation.variables,
         });
-      fetchData();
+      await fetchData();
       setShow(false);
     } else if (type === 'editRow') {
       let variables = { where: {}, _set: {} };
@@ -356,9 +356,9 @@ const TableLayout = ({
       if (!loading && !error) {
         let columnNames = [];
         columns
-          .filter(column => column.isPrimaryKey === true)
+          .filter(column => column['isPrimaryKey'] === true)
           .map(c => columnNames.push(c.name));
-        if (formData.isPrimaryKey) {
+        if (formData['isPrimaryKey']) {
           const {
             loading: deleteLoading,
             error: deleteError,
@@ -434,7 +434,7 @@ const TableLayout = ({
   const onDeleteRow = params => {
     let variables = { where: {} };
     let data = params.node.data;
-    for (let key in data) {
+    for (let key of data) {
       variables.where[key] = {
         _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
       };
@@ -455,7 +455,7 @@ const TableLayout = ({
         query: operation.query,
         variables: operation.variables,
       });
-    fetchData();
+    fetchData().finally(() => console.log('deleted row'));
   };
 
   const subscription = gql.subscription({
