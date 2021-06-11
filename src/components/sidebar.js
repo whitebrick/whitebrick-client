@@ -6,6 +6,7 @@ import {
   FaPlus,
   FaSearch,
   FaTrash,
+  FaSync,
 } from 'react-icons/fa';
 import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
@@ -27,7 +28,7 @@ const Sidebar = ({
   menuClass,
   actions,
 }) => {
-  const { user, logout } = useAuth0();
+  const { user, logout, getIdTokenClaims, getAccessTokenSilently } = useAuth0();
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
@@ -54,6 +55,14 @@ const Sidebar = ({
       actions.setColumns([]);
     }
   };
+
+  const handleRefreshToken = async () => {
+    const token = await getAccessTokenSilently();
+    const tokenClaims = await getIdTokenClaims();
+    actions.setAccessToken(token);
+    actions.setTokenClaims(tokenClaims);
+  };
+
   return (
     <div className="row m-0" id="sidebar">
       <aside className="col-3 p-0 sidebar-collapsed">
@@ -137,8 +146,14 @@ const Sidebar = ({
                   {tableName.label.toLowerCase()}
                 </div>
               ))}
-            <div style={{ position: 'absolute', bottom: '20px' }}>
-              <div className="sidebar-heading list-group-item">
+          </div>
+        )}
+        <div
+          className="list-group"
+          style={{ position: 'absolute', bottom: '20px' }}>
+          {schema && (
+            <React.Fragment>
+              <div className="sidebar-heading mt-2 list-group-item">
                 Database Settings
               </div>
               <div
@@ -169,9 +184,16 @@ const Sidebar = ({
                   </div>
                 </div>
               )}
-            </div>
+            </React.Fragment>
+          )}
+          <div className="sidebar-heading list-group-item mt-2">Settings</div>
+          <div
+            className="list-group-item py-1 d-flex align-items-center"
+            aria-hidden="true"
+            onClick={handleRefreshToken}>
+            <FaSync size="14px" /> <span className="ml-2">Refresh Token</span>
           </div>
-        )}
+        </div>
       </aside>
     </div>
   );

@@ -21,6 +21,7 @@ const IndexPage = ({ accessToken, actions }) => {
     isAuthenticated,
     loginWithRedirect,
     getAccessTokenSilently,
+    getIdTokenClaims,
   } = useAuth0();
 
   const client = new GraphQLClient({
@@ -48,12 +49,23 @@ const IndexPage = ({ accessToken, actions }) => {
 
   useEffect(() => {
     (async () => {
-      if (!isLoading && isAuthenticated) {
-        const token = await getAccessTokenSilently();
-        actions.setAccessToken(token);
+      if (accessToken === '' || accessToken === undefined) {
+        if (!isLoading && isAuthenticated) {
+          const token = await getAccessTokenSilently();
+          const tokenClaims = await getIdTokenClaims();
+          actions.setAccessToken(token);
+          actions.setTokenClaims(tokenClaims);
+        }
       }
     })();
-  }, [isAuthenticated, actions, getAccessTokenSilently, isLoading]);
+  }, [
+    isAuthenticated,
+    actions,
+    getAccessTokenSilently,
+    isLoading,
+    accessToken,
+    getIdTokenClaims,
+  ]);
 
   if (isLoading) return <Loading />;
 

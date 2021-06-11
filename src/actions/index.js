@@ -1,6 +1,12 @@
 import { types } from '../types/gridTypes';
 
 export const actions = {
+  setTokenClaims(tokenClaims) {
+    return {
+      type: types.SET_TOKEN_CLAIMS,
+      payload: { tokenClaims },
+    };
+  },
   setIsNewTable(isNewTable) {
     return {
       type: types.SET_IS_NEW_TABLE,
