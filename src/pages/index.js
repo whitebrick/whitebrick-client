@@ -20,7 +20,6 @@ const IndexPage = ({ accessToken, actions }) => {
     isLoading,
     isAuthenticated,
     loginWithRedirect,
-    getAccessTokenSilently,
     getIdTokenClaims,
   } = useAuth0();
 
@@ -51,21 +50,13 @@ const IndexPage = ({ accessToken, actions }) => {
     (async () => {
       if (accessToken === '' || accessToken === undefined) {
         if (!isLoading && isAuthenticated) {
-          const token = await getAccessTokenSilently();
           const tokenClaims = await getIdTokenClaims();
-          actions.setAccessToken(token);
+          actions.setAccessToken(tokenClaims['__raw']);
           actions.setTokenClaims(tokenClaims);
         }
       }
     })();
-  }, [
-    isAuthenticated,
-    actions,
-    getAccessTokenSilently,
-    isLoading,
-    accessToken,
-    getIdTokenClaims,
-  ]);
+  }, [isAuthenticated, actions, isLoading, accessToken, getIdTokenClaims]);
 
   if (isLoading) return <Loading />;
 

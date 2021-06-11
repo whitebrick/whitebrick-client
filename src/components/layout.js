@@ -25,7 +25,7 @@ import {
 } from '../graphql/mutations/wb';
 import Loading from './loading';
 
-const Layout = ({ table, schema, actions }) => {
+const Layout = ({ table, schema, accessToken, actions }) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -166,7 +166,7 @@ const Layout = ({ table, schema, actions }) => {
             setShow={setShow}
             onSave={onSave}
             type="save"
-            name={`Create a new ${type}?`}>
+            name={type === 'token' ? 'Access Token' : `Create a new ${type}?`}>
             {type === 'database' ? (
               <FormMaker
                 formData={formData}
@@ -179,6 +179,17 @@ const Layout = ({ table, schema, actions }) => {
                 setFormData={setFormData}
                 fields={newTableFormFields}
               />
+            ) : type === 'token' ? (
+              <React.Fragment>
+                <code
+                  aria-hidden="true"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() =>
+                    navigator.clipboard.writeText(`Bearer ${accessToken}`)
+                  }>
+                  Bearer {accessToken}
+                </code>
+              </React.Fragment>
             ) : (
               <React.Fragment>
                 <div className="list-group w-100 rounded-0">
@@ -214,6 +225,7 @@ const mapStateToProps = state => ({
   schema: state.schema,
   tables: state.tables,
   table: state.table,
+  accessToken: state.accessToken,
 });
 
 const mapDispatchToProps = dispatch => ({

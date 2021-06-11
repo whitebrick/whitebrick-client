@@ -7,6 +7,7 @@ import {
   FaSearch,
   FaTrash,
   FaSync,
+  FaKeycdn,
 } from 'react-icons/fa';
 import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
@@ -28,7 +29,7 @@ const Sidebar = ({
   menuClass,
   actions,
 }) => {
-  const { user, logout, getIdTokenClaims, getAccessTokenSilently } = useAuth0();
+  const { user, logout, getIdTokenClaims } = useAuth0();
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
@@ -57,9 +58,8 @@ const Sidebar = ({
   };
 
   const handleRefreshToken = async () => {
-    const token = await getAccessTokenSilently();
     const tokenClaims = await getIdTokenClaims();
-    actions.setAccessToken(token);
+    actions.setAccessToken(tokenClaims['__raw']);
     actions.setTokenClaims(tokenClaims);
   };
 
@@ -187,6 +187,15 @@ const Sidebar = ({
             </React.Fragment>
           )}
           <div className="sidebar-heading list-group-item mt-2">Settings</div>
+          <div
+            className="list-group-item py-1 d-flex align-items-center"
+            aria-hidden="true"
+            onClick={() => {
+              setShow(true);
+              setType('token');
+            }}>
+            <FaKeycdn size="14px" /> <span className="ml-2">Display Token</span>
+          </div>
           <div
             className="list-group-item py-1 d-flex align-items-center"
             aria-hidden="true"

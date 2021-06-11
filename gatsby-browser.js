@@ -21,6 +21,7 @@ export const wrapRootElement = ({ element }) => {
       <Auth0Provider
         domain={process.env.AUTH0_DOMAIN}
         clientId={process.env.AUTH0_CLIENTID}
+        audience={process.env.AUTH0_AUDIENCE}
         responseType="token id_token"
         scope="openid profile email"
         useRefreshTokens={true}
