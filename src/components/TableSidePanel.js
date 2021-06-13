@@ -167,15 +167,9 @@ const TableSidePanel = ({
           ))}
         </React.Fragment>
       ) : type === 'edit' || type === 'add' ? (
-        <FormMaker
-          formData={formData}
-          setFormData={actions.setFormData}
-          fields={newTableColumnFields}
-        />
+        <FormMaker fields={newTableColumnFields} />
       ) : type === 'view' ? (
         <FormMaker
-          formData={formData}
-          setFormData={actions.setFormData}
           fields={[
             {
               name: 'name',
@@ -186,11 +180,7 @@ const TableSidePanel = ({
           ]}
         />
       ) : (
-        <FormMaker
-          formData={formData}
-          setFormData={actions.setFormData}
-          fields={updateTableFields}
-        />
+        <FormMaker fields={updateTableFields} />
       )}
     </SidePanel>
   );

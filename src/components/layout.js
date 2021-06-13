@@ -168,17 +168,9 @@ const Layout = ({ table, schema, accessToken, actions }) => {
             type="save"
             name={type === 'token' ? 'Access Token' : `Create a new ${type}?`}>
             {type === 'database' ? (
-              <FormMaker
-                formData={formData}
-                setFormData={setFormData}
-                fields={newDataBaseFormFields}
-              />
+              <FormMaker fields={newDataBaseFormFields} />
             ) : type === 'table' ? (
-              <FormMaker
-                formData={formData}
-                setFormData={setFormData}
-                fields={newTableFormFields}
-              />
+              <FormMaker fields={newTableFormFields} />
             ) : type === 'token' ? (
               <React.Fragment>
                 <code

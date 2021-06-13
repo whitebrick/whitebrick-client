@@ -1,11 +1,14 @@
 import React from 'react';
+import { bindActionCreators } from 'redux';
+import { actions } from '../actions';
+import { connect } from 'react-redux';
 
-const FormMaker = ({ fields, formData, setFormData }) => {
+const FormMaker = ({ fields, formData, actions }) => {
   const handleSelectChange = (multiple, name, e) => {
     if (multiple) {
       let values = Array.from(e.target.selectedOptions, option => option.value);
-      setFormData({ ...formData, [name]: values });
-    } else setFormData({ ...formData, [name]: e.target.value });
+      actions.setFormData({ ...formData, [name]: values });
+    } else actions.setFormData({ ...formData, [name]: e.target.value });
   };
 
   const renderField = ({
@@ -35,7 +38,7 @@ const FormMaker = ({ fields, formData, setFormData }) => {
               className="form-control"
               value={!formData[name] ? defaultValue : formData[name]}
               onChange={e =>
-                setFormData({ ...formData, [name]: e.target.value })
+                actions.setFormData({ ...formData, [name]: e.target.value })
               }
               required={required}
               readOnly={readOnly}
@@ -149,7 +152,7 @@ const FormMaker = ({ fields, formData, setFormData }) => {
                 id={name}
                 defaultChecked={formData[name]}
                 onChange={e =>
-                  setFormData({ ...formData, [name]: e.target.checked })
+                  actions.setFormData({ ...formData, [name]: e.target.checked })
                 }
               />
               <label className="form-check-label" htmlFor={name}>
@@ -203,4 +206,12 @@ const FormMaker = ({ fields, formData, setFormData }) => {
   );
 };
 
-export default FormMaker;
+const mapStateToProps = state => ({
+  formData: state.formData,
+});
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(actions, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(FormMaker);
