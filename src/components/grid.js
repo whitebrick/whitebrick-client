@@ -86,7 +86,6 @@ const Grid = ({
                 key={column.name}
                 headerName={column.label}
                 cellRenderer="foreignKeyRenderer"
-                cellRendererParams={{ columns, tables, schema }}
               />
             );
           } else {
