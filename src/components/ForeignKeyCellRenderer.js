@@ -58,11 +58,13 @@ const ForeignKeyCellRenderer = ({
     <React.Fragment>
       <span>
         <span>{cellValue}</span>
-        <div className="float-right d-flex align-items-center">
-          <button className="btn" onClick={() => renderView()}>
-            <FaExternalLinkAlt size="12px" />
-          </button>
-        </div>
+        {cellValue && (
+          <div className="float-right d-flex align-items-center">
+            <button className="btn" onClick={() => renderView()}>
+              <FaExternalLinkAlt size="12px" />
+            </button>
+          </div>
+        )}
       </span>
       {show && (
         <SidePanel

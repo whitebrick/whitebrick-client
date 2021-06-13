@@ -162,7 +162,7 @@ const TableLayout = ({
         data[param.colDef?.field] = param.oldValue;
       });
       let variables = { where: {}, _set: {} };
-      for (let key of data) {
+      for (let key in data) {
         variables.where[key] = {
           _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
         };
@@ -434,7 +434,7 @@ const TableLayout = ({
   const onDeleteRow = params => {
     let variables = { where: {} };
     let data = params.node.data;
-    for (let key of data) {
+    for (let key in data) {
       variables.where[key] = {
         _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
       };
