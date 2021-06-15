@@ -19,6 +19,7 @@ const initialState = {
   limit: 10,
   offset: 0,
   views: [],
+  cloudContext: {},
   defaultView: 'Default View',
 };
 

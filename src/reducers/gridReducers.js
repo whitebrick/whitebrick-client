@@ -3,6 +3,11 @@ import { types } from '../types/gridTypes';
 export default function gridReducer(state = {}, action) {
   const payload = action.payload;
   switch (action.type) {
+    case types.SET_CLOUD_CONTEXT:
+      return {
+        ...state,
+        cloudContext: payload.cloudContext,
+      };
     case types.SET_TOKEN_CLAIMS:
       return {
         ...state,

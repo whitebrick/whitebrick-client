@@ -43,6 +43,7 @@ const Layout = ({ table, schema, accessToken, actions }) => {
   const { loading, error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
     variables: { userEmail: user.email },
   });
+  const [fetchCloudContext] = useManualQuery(`{ wbCloudContext }`);
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
   const [createTable] = useMutation(CREATE_TABLE_MUTATION);
@@ -72,6 +73,14 @@ const Layout = ({ table, schema, accessToken, actions }) => {
       required: true,
     },
   ];
+
+  useEffect(() => {
+    const fetchContext = async () => {
+      const { data } = await fetchCloudContext();
+      actions.setCloudContext(data['wbCloudContext']);
+    };
+    fetchContext();
+  }, [actions, fetchCloudContext]);
 
   useEffect(() => {
     actions.setTables([]);

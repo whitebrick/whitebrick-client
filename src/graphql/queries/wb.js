@@ -2,7 +2,6 @@ export const SCHEMAS_QUERY = `query ($userEmail: String!) {
   wbSchemas(userEmail: $userEmail) {
     name
     label
-    context
   }
 }`;
 

@@ -14,7 +14,7 @@ const TableSidePanel = ({
   column,
   formData,
   table,
-  schema,
+  cloudContext,
   actions,
   columns,
   tables,
@@ -27,7 +27,7 @@ const TableSidePanel = ({
       name: 'type',
       label: 'Column Type',
       type: 'select',
-      options: schema?.context?.defaultColumnTypes,
+      options: cloudContext?.defaultColumnTypes,
       keyValuePairs: true,
     },
     {
@@ -190,7 +190,7 @@ const mapStateToProps = state => ({
   formData: state.formData,
   table: state.table,
   columns: state.columns,
-  schema: state.schema,
+  cloudContext: state.cloudContext,
   tables: state.tables,
 });
 

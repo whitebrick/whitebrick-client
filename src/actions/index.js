@@ -1,6 +1,12 @@
 import { types } from '../types/gridTypes';
 
 export const actions = {
+  setCloudContext(cloudContext) {
+    return {
+      type: types.SET_CLOUD_CONTEXT,
+      payload: { cloudContext },
+    };
+  },
   setTokenClaims(tokenClaims) {
     return {
       type: types.SET_TOKEN_CLAIMS,
