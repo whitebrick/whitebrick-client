@@ -20,6 +20,8 @@ const initialState = {
   offset: 0,
   views: [],
   cloudContext: {},
+  organization: {},
+  organizations: [],
   defaultView: 'Default View',
 };
 

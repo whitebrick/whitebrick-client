@@ -38,3 +38,10 @@ export const REMOVE_OR_DELETE_FOREIGN_KEY = `mutation ($schemaName: String!, $ta
 export const UPDATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $columnName: String!, $newColumnName: String, $newColumnLabel: String, $newType: String){
   wbUpdateColumn(schemaName: $schemaName, tableName: $tableName, columnName: $columnName, newColumnName: $newColumnName, newColumnLabel: $newColumnLabel, newType: $newType)
 }`;
+
+export const CREATE_ORGANIZATION_MUTATION = `mutation ($name: String!, $label: String!, $currentUserEmail: String!) {
+  wbCreateOrganization(name: $name, label: $label, currentUserEmail: $currentUserEmail) {
+    id
+  }
+}
+`;

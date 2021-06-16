@@ -186,6 +186,19 @@ const Sidebar = ({
               )}
             </React.Fragment>
           )}
+          <div className="sidebar-heading list-group-item mt-2">
+            Organization Settings
+          </div>
+          <div
+            className="list-group-item py-1 d-flex align-items-center"
+            aria-hidden="true"
+            onClick={() => {
+              setShow(true);
+              setType('organization');
+            }}>
+            <FaPlus size="14px" />
+            <span className="ml-2">Create Organization</span>
+          </div>
           <div className="sidebar-heading list-group-item mt-2">Settings</div>
           <div
             className="list-group-item py-1 d-flex align-items-center"

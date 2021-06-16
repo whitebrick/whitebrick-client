@@ -1,6 +1,18 @@
 import { types } from '../types/gridTypes';
 
 export const actions = {
+  setOrganizations(organizations) {
+    return {
+      type: types.SET_ORGANIZATIONS,
+      payload: { organizations },
+    };
+  },
+  setOrganization(organization) {
+    return {
+      type: types.SET_ORGANIZATION,
+      payload: { organization },
+    };
+  },
   setCloudContext(cloudContext) {
     return {
       type: types.SET_CLOUD_CONTEXT,

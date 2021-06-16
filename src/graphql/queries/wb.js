@@ -31,3 +31,12 @@ export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
     }
   }
 }`;
+
+export const USER_ORGS_QUERY = `query ($userEmail: String) {
+  wbOrganizations(userEmail: $userEmail) {
+    name
+    label
+    userRole
+  }
+}
+`;

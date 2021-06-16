@@ -20,12 +20,19 @@ import Sidebar from './sidebar';
 import FormMaker from './formMaker';
 import { SCHEMAS_QUERY, SCHEMA_TABLES_QUERY } from '../graphql/queries/wb';
 import {
+  CREATE_ORGANIZATION_MUTATION,
   CREATE_SCHEMA_MUTATION,
   CREATE_TABLE_MUTATION,
 } from '../graphql/mutations/wb';
 import Loading from './loading';
 
-const Layout = ({ table, schema, accessToken, actions }) => {
+const Layout = ({
+  table,
+  schema,
+  accessToken,
+  formData,
+  actions,
+}) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -36,10 +43,9 @@ const Layout = ({ table, schema, accessToken, actions }) => {
     }
   `);
 
-  const { user } = useAuth0();
+  const { isLoading, getIdTokenClaims, user } = useAuth0();
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
-  const [formData, setFormData] = useState({});
   const { loading, error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
     variables: { userEmail: user.email },
   });
@@ -47,6 +53,7 @@ const Layout = ({ table, schema, accessToken, actions }) => {
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
   const [createTable] = useMutation(CREATE_TABLE_MUTATION);
+  const [createOrganization] = useMutation(CREATE_ORGANIZATION_MUTATION);
 
   const [userShow, setUserShow] = useState(false);
   const menuClass = `dropdown-menu${userShow ? ' show' : ''}`;
@@ -67,7 +74,17 @@ const Layout = ({ table, schema, accessToken, actions }) => {
   const newDataBaseFormFields = [
     { name: 'name', label: 'Name', type: 'text', required: true },
     {
-      name: 'name',
+      name: 'label',
+      label: 'Label',
+      type: 'text',
+      required: true,
+    },
+  ];
+
+  const newOrganizationFormFields = [
+    { name: 'name', label: 'Name', type: 'text', required: true },
+    {
+      name: 'label',
       label: 'Label',
       type: 'text',
       required: true,
@@ -75,11 +92,11 @@ const Layout = ({ table, schema, accessToken, actions }) => {
   ];
 
   useEffect(() => {
-    const fetchContext = async () => {
+    const fetchData = async () => {
       const { data } = await fetchCloudContext();
       actions.setCloudContext(data['wbCloudContext']);
     };
-    fetchContext();
+    fetchData();
   }, [actions, fetchCloudContext]);
 
   useEffect(() => {
@@ -122,6 +139,15 @@ const Layout = ({ table, schema, accessToken, actions }) => {
         refetch();
         setShow(false);
       }
+    } else if (type === 'organization') {
+      const { error, loading } = createOrganization({
+        variables: {
+          name: formData.name,
+          label: formData.label,
+          currentUserEmail: user.email,
+        },
+      });
+      if (!loading && !error) setShow(false);
     } else {
       const { error, loading } = createTable({
         variables: {
@@ -138,7 +164,18 @@ const Layout = ({ table, schema, accessToken, actions }) => {
     }
   };
 
-  if (loading) return <Loading />;
+  useEffect(() => {
+    (async () => {
+      if (accessToken === '' || accessToken === undefined) {
+        const tokenClaims = await getIdTokenClaims();
+        actions.setAccessToken(tokenClaims['__raw']);
+        actions.setTokenClaims(tokenClaims);
+        actions.setUser(user);
+      }
+    })();
+  }, [actions, accessToken, getIdTokenClaims, user]);
+
+  if (loading || isLoading) return <Loading />;
   if (error) return 'Something Bad Happened';
 
   return (
@@ -152,7 +189,7 @@ const Layout = ({ table, schema, accessToken, actions }) => {
       />
       <div>
         <Sidebar
-          setFormData={setFormData}
+          setFormData={actions.setFormData}
           setShow={setShow}
           setType={setType}
           userShow={userShow}
@@ -161,61 +198,76 @@ const Layout = ({ table, schema, accessToken, actions }) => {
           schemas={schemas}
         />
         <main id="main">
-          {user && schema.name !== '' && table !== '' ? (
-            <Table
-              key={schema.name + table.name}
-              fetchTables={fetchTablesAndColumns}
-            />
-          ) : (
-            <p>Please select a table to render</p>
-          )}
-          <SidePanel
-            show={show}
-            renderSaveButton={type !== ''}
-            setShow={setShow}
-            onSave={onSave}
-            type="save"
-            name={type === 'token' ? 'Access Token' : `Create a new ${type}?`}>
-            {type === 'database' ? (
-              <FormMaker fields={newDataBaseFormFields} />
-            ) : type === 'table' ? (
-              <FormMaker fields={newTableFormFields} />
-            ) : type === 'token' ? (
-              <React.Fragment>
-                <code
-                  aria-hidden="true"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() =>
-                    navigator.clipboard.writeText(`Bearer ${accessToken}`)
-                  }>
-                  Bearer {accessToken}
-                </code>
-              </React.Fragment>
+          <React.Fragment>
+            {user && schema.name !== '' && table !== '' ? (
+              <Table
+                key={schema.name + table.name}
+                fetchTables={fetchTablesAndColumns}
+              />
             ) : (
-              <React.Fragment>
-                <div className="list-group w-100 rounded-0">
-                  <div
-                    className="list-group-item py-2"
-                    aria-hidden="true"
-                    onClick={() => {
-                      setType('database');
-                      setFormData({});
-                    }}>
-                    Database
-                  </div>
-                  <div
-                    className="list-group-item py-2"
-                    aria-hidden="true"
-                    onClick={() => {
-                      setType('table');
-                      setFormData({});
-                    }}>
-                    Table
-                  </div>
-                </div>
-              </React.Fragment>
+              <p>Please select a table to render</p>
             )}
-          </SidePanel>
+            <SidePanel
+              show={show}
+              renderSaveButton={type !== ''}
+              setShow={setShow}
+              onSave={onSave}
+              type="save"
+              name={
+                type === 'token' ? 'Access Token' : `Create a new ${type}?`
+              }>
+              {type === 'database' ? (
+                <FormMaker fields={newDataBaseFormFields} />
+              ) : type === 'table' ? (
+                <FormMaker fields={newTableFormFields} />
+              ) : type === 'organization' ? (
+                <FormMaker fields={newOrganizationFormFields} />
+              ) : type === 'token' ? (
+                <React.Fragment>
+                  <code
+                    aria-hidden="true"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() =>
+                      navigator.clipboard.writeText(`Bearer ${accessToken}`)
+                    }>
+                    Bearer {accessToken}
+                  </code>
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <div className="list-group w-100 rounded-0">
+                    <div
+                      className="list-group-item py-2"
+                      aria-hidden="true"
+                      onClick={() => {
+                        setType('database');
+                        actions.setFormData({});
+                      }}>
+                      Database
+                    </div>
+                    <div
+                      className="list-group-item py-2"
+                      aria-hidden="true"
+                      onClick={() => {
+                        setType('table');
+                        actions.setFormData({});
+                      }}>
+                      Table
+                    </div>
+                    <div
+                      className="list-group-item py-2"
+                      aria-hidden="true"
+                      onClick={() => {
+                        setType('organization');
+                        actions.setFormData({});
+                      }}>
+                      Organization
+                    </div>
+                  </div>
+                </React.Fragment>
+              )}
+            </SidePanel>
+          </React.Fragment>
         </main>
       </div>
     </>
@@ -227,6 +279,7 @@ const mapStateToProps = state => ({
   tables: state.tables,
   table: state.table,
   accessToken: state.accessToken,
+  formData: state.formData,
 });
 
 const mapDispatchToProps = dispatch => ({
