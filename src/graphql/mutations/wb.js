@@ -45,3 +45,13 @@ export const CREATE_ORGANIZATION_MUTATION = `mutation ($name: String!, $label: S
   }
 }
 `;
+
+export const SET_USERS_ROLE_MUTATION = `mutation ($organizationName: String!, $role: String!, $userEmails: [String]!) {
+  wbSetOrganizationUsersRole(organizationName: $organizationName, role: $role, userEmails: $userEmails)
+}
+`;
+
+export const REMOVE_USERS__MUTATION = `mutation ($organizationName: String!, $userEmails: [String]!) {
+  wbRemoveUsersFromOrganization(organizationName: $organizationName, userEmails: $userEmails)
+}
+`;

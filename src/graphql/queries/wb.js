@@ -32,11 +32,19 @@ export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
   }
 }`;
 
-export const USER_ORGS_QUERY = `query ($userEmail: String) {
-  wbOrganizations(userEmail: $userEmail) {
+export const ORGANIZATION_QUERY = `query ($name: String!, $currentUserEmail: String!){
+  wbOrganizationByName(name: $name, currentUserEmail: $currentUserEmail){
     name
     label
     userRole
+    createdAt
   }
-}
-`;
+  wbOrganizationUsers(name: $name){
+    firstName
+    lastName
+    email
+    role
+    createdAt
+    updatedAt
+  }
+}`;

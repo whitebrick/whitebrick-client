@@ -13,6 +13,11 @@ export default function gridReducer(state = {}, action) {
         ...state,
         organization: payload.organization,
       };
+    case types.SET_CLOUD_CONTEXT:
+      return {
+        ...state,
+        cloudContext: payload.cloudContext,
+      };
     case types.SET_TOKEN_CLAIMS:
       return {
         ...state,
