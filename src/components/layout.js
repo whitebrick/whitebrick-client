@@ -29,7 +29,9 @@ const Layout = ({
   accessToken,
   formData,
   children,
+  tables,
   actions,
+  params = {},
 }) => {
   const { isLoading, getIdTokenClaims, user } = useAuth0();
   const [show, setShow] = useState(false);
@@ -167,6 +169,33 @@ const Layout = ({
       }
     })();
   }, [actions, accessToken, getIdTokenClaims, user]);
+
+  useEffect(() => {
+    if (Object.keys(params).length > 0) {
+      if (params['databaseName'] && params['databaseName'] !== schema.name) {
+        if (
+          schemas &&
+          schemas['wbSchemas'] &&
+          schemas['wbSchemas'].length > 0
+        ) {
+          let s = schemas['wbSchemas'].filter(
+            schema => schema.name === params['databaseName'],
+          )[0];
+          if (s && Object.keys(s).length > 0) actions.setSchema(s);
+        }
+      }
+      if (params['tableName']) {
+        let table = tables.filter(
+          table => table.name === params['tableName'],
+        )[0];
+        if (table && Object.keys(table).length > 0) {
+          actions.setTable(table);
+          actions.setColumns(table.columns);
+          actions.setOrderBy(table.columns[0].name);
+        }
+      }
+    }
+  }, [params, schemas, schema, tables, actions]);
 
   if (loading || isLoading) return <Loading />;
   if (error) return 'Something Bad Happened';
