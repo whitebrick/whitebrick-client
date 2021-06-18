@@ -9,6 +9,7 @@ import {
   FaSync,
   FaKeycdn,
 } from 'react-icons/fa';
+import { navigate } from 'gatsby';
 import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
@@ -45,18 +46,6 @@ const Sidebar = ({
     });
   };
 
-  const handleTableClick = tableName => {
-    if (tableName.columns.length > 0) {
-      actions.setTable(tableName);
-      actions.setColumns(tableName.columns);
-      actions.setOrderBy(tableName.columns[0].name);
-    } else {
-      actions.setIsNewTable(true);
-      actions.setTable(tableName);
-      actions.setColumns([]);
-    }
-  };
-
   const handleRefreshToken = async () => {
     const tokenClaims = await getIdTokenClaims();
     actions.setAccessToken(tokenClaims['__raw']);
@@ -69,10 +58,7 @@ const Sidebar = ({
         <div
           className="px-4 pt-4"
           aria-hidden="true"
-          onClick={() => {
-            actions.setSchema('');
-            actions.setTable('');
-          }}>
+          onClick={() => navigate('/')}>
           <FaHome color="white" size="24px" />
         </div>
         <div className="px-4 pt-4" aria-hidden="true">
@@ -112,24 +98,7 @@ const Sidebar = ({
         </div>
       </aside>
       <aside className="col-9 p-0">
-        {schema !== '' ||
-          (schema !== undefined && (
-            <div className="list-group w-100 rounded-0 mt-4">
-              <div className="sidebar-heading list-group-item">Databases</div>
-              {schemas.wbSchemas.map(field => (
-                <div
-                  onClick={() => actions.setSchema(field)}
-                  aria-hidden="true"
-                  className={`list-group-item py-1 ${
-                    table === field.name && 'active'
-                  }`}
-                  key={field.name}>
-                  {field.label}
-                </div>
-              ))}
-            </div>
-          ))}
-        {schema && (
+        {Object.keys(schema).length > 0 ? (
           <div className="list-group w-100 rounded-0 mt-4">
             <div className="sidebar-heading list-group-item">
               {schema.label}
@@ -137,7 +106,9 @@ const Sidebar = ({
             {tables &&
               tables.map(tableName => (
                 <div
-                  onClick={() => handleTableClick(tableName)}
+                  onClick={() =>
+                    navigate(`/database/${schema.name}/table/${tableName.name}`)
+                  }
                   aria-hidden="true"
                   className={`list-group-item py-1 ${
                     table.name === tableName.name && 'active'
@@ -147,11 +118,24 @@ const Sidebar = ({
                 </div>
               ))}
           </div>
+        ) : (
+          <div className="list-group w-100 rounded-0 mt-4">
+            <div className="sidebar-heading list-group-item">Databases</div>
+            {schemas.map(field => (
+              <div
+                onClick={() => navigate(`/database/${field.name}`)}
+                aria-hidden="true"
+                className={`list-group-item py-1`}
+                key={field.name}>
+                {field.label}
+              </div>
+            ))}
+          </div>
         )}
         <div
           className="list-group"
           style={{ position: 'absolute', bottom: '20px' }}>
-          {schema && (
+          {Object.keys(schema).length > 0 && (
             <React.Fragment>
               <div className="sidebar-heading mt-2 list-group-item">
                 Database Settings
@@ -222,6 +206,7 @@ const Sidebar = ({
 };
 
 const mapStateToProps = state => ({
+  schemas: state.schemas,
   schema: state.schema,
   tables: state.tables,
   table: state.table,

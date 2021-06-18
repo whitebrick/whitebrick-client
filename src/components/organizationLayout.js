@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChevronRight, FaPen, FaPlus, FaUsers } from 'react-icons/fa';
+import { FaChevronRight, FaPen, FaPlus } from 'react-icons/fa';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';

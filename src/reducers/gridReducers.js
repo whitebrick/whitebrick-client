@@ -48,6 +48,11 @@ export default function gridReducer(state = {}, action) {
         ...state,
         rowData: payload.rows,
       };
+    case types.SET_SCHEMAS:
+      return {
+        ...state,
+        schemas: payload.schemas,
+      };
     case types.SET_SCHEMA:
       return {
         ...state,

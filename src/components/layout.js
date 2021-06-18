@@ -6,9 +6,6 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useStaticQuery, graphql } from 'gatsby';
-
-import Seo from './seo';
 import { useManualQuery, useMutation, useQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
@@ -34,16 +31,6 @@ const Layout = ({
   children,
   actions,
 }) => {
-  const data = useStaticQuery(graphql`
-    query SiteTitleQuery {
-      site {
-        siteMetadata {
-          title
-        }
-      }
-    }
-  `);
-
   const { isLoading, getIdTokenClaims, user } = useAuth0();
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
@@ -93,6 +80,11 @@ const Layout = ({
   ];
 
   useEffect(() => {
+    if (schemas && schemas['wbSchemas'] && schemas['wbSchemas'].length > 0)
+      actions.setSchemas(schemas['wbSchemas']);
+  }, [schemas, actions]);
+
+  useEffect(() => {
     const fetchData = async () => {
       const { data } = await fetchCloudContext();
       actions.setCloudContext(data['wbCloudContext']);
@@ -107,7 +99,7 @@ const Layout = ({
         const { data } = await fetchSchemaTables({
           variables: { schemaName: schema.name },
         });
-        actions.setTables(data.wbTables);
+        actions.setTables(data['wbTables']);
       }
     };
     fetchTables();
@@ -181,13 +173,6 @@ const Layout = ({
 
   return (
     <>
-      <Seo
-        title={
-          user && schema.name !== '' && table !== ''
-            ? `${table.label} | ${schema.label}`
-            : data.site.siteMetadata?.title || `Title`
-        }
-      />
       <div>
         <Sidebar
           setFormData={actions.setFormData}
@@ -196,7 +181,6 @@ const Layout = ({
           userShow={userShow}
           menuClass={menuClass}
           setUserShow={setUserShow}
-          schemas={schemas}
         />
         <main id="main">
           {!children ? (

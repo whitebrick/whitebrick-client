@@ -67,6 +67,12 @@ export const actions = {
       payload: { schema },
     };
   },
+  setSchemas(schemas) {
+    return {
+      type: types.SET_SCHEMAS,
+      payload: { schemas },
+    };
+  },
   setTables(tables) {
     return {
       type: types.SET_TABLES,
