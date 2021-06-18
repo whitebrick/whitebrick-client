@@ -129,6 +129,7 @@ const OrganizationLayout = ({
               <select
                 className="form-control"
                 value={data.role}
+                onBlur={() => {}}
                 onChange={e => setData({ ...data, role: e.target.value })}>
                 <option selected disabled>
                   Select role

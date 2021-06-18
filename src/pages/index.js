@@ -6,7 +6,7 @@ import Loading from '../components/loading';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
-import Seo from "../components/seo"
+import Seo from '../components/seo';
 
 const IndexPage = ({ actions }) => {
   useEffect(() => {

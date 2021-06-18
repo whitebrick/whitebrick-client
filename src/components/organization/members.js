@@ -44,6 +44,7 @@ const OrganizationMembers = ({
             {organization['userRole'] === 'organization_administrator' ? (
               <select
                 className="form-control-sm"
+                onBlur={() => {}}
                 value={user.role}
                 onChange={e => handleUserRoleChange(e.target.value, user)}>
                 <option value="organization_administrator">
