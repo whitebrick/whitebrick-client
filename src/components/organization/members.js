@@ -60,13 +60,14 @@ const OrganizationMembers = ({
             )}
           </div>
           <div className="col-sm-1">
-            {user.role !== 'organization_administrator' && (
-              <button
-                className="btn btn-sm btn-danger"
-                onClick={() => removeUser(user)}>
-                <FaTrash />
-              </button>
-            )}
+            {organization['userRole'] === 'organization_administrator' &&
+              user.role !== 'organization_administrator' && (
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => removeUser(user)}>
+                  <FaTrash />
+                </button>
+              )}
           </div>
         </div>
       ))}

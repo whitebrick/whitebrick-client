@@ -28,6 +28,7 @@ const Sidebar = ({
   tables,
   table,
   menuClass,
+  organizations,
   actions,
 }) => {
   const { user, logout, getIdTokenClaims } = useAuth0();
@@ -98,6 +99,20 @@ const Sidebar = ({
         </div>
       </aside>
       <aside className="col-9 p-0">
+        {organizations && organizations.length > 0 && (
+          <div className="list-group w-100 rounded-0 mt-4">
+            <div className="sidebar-heading list-group-item">Organizations</div>
+            {organizations.map(organization => (
+              <div
+                onClick={() => navigate(`/organization/${organization.name}`)}
+                aria-hidden="true"
+                className={`list-group-item py-1`}
+                key={organization.name}>
+                {organization.label.toLowerCase()}
+              </div>
+            ))}
+          </div>
+        )}
         {Object.keys(schema).length > 0 ? (
           <div className="list-group w-100 rounded-0 mt-4">
             <div className="sidebar-heading list-group-item">
@@ -120,7 +135,7 @@ const Sidebar = ({
           </div>
         ) : (
           <div className="list-group w-100 rounded-0 mt-4">
-            <div className="sidebar-heading list-group-item">Databases</div>
+            <div className="sidebar-heading list-group-item">My Databases</div>
             {schemas.map(field => (
               <div
                 onClick={() => navigate(`/database/${field.name}`)}
@@ -210,6 +225,7 @@ const mapStateToProps = state => ({
   schema: state.schema,
   tables: state.tables,
   table: state.table,
+  organizations: state.organizations,
 });
 
 const mapDispatchToProps = dispatch => ({

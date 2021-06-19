@@ -15,7 +15,11 @@ import { useAuth0, withAuthenticationRequired } from '@auth0/auth0-react';
 import SidePanel from './sidePanel';
 import Sidebar from './sidebar';
 import FormMaker from './formMaker';
-import { SCHEMAS_QUERY, SCHEMA_TABLES_QUERY } from '../graphql/queries/wb';
+import {
+  SCHEMAS_QUERY,
+  SCHEMA_TABLES_QUERY,
+  ORGANIZATIONS_QUERY,
+} from '../graphql/queries/wb';
 import {
   CREATE_ORGANIZATION_MUTATION,
   CREATE_SCHEMA_MUTATION,
@@ -37,6 +41,9 @@ const Layout = ({
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
   const { loading, error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
+    variables: { userEmail: user.email },
+  });
+  const [fetchOrganizations] = useManualQuery(ORGANIZATIONS_QUERY, {
     variables: { userEmail: user.email },
   });
   const [fetchCloudContext] = useManualQuery(`{ wbCloudContext }`);
@@ -90,9 +97,13 @@ const Layout = ({
     const fetchData = async () => {
       const { data } = await fetchCloudContext();
       actions.setCloudContext(data['wbCloudContext']);
+      if (user.email) {
+        const { data } = await fetchOrganizations();
+        actions.setOrganizations(data['wbOrganizations']);
+      }
     };
     fetchData();
-  }, [actions, fetchCloudContext]);
+  }, [actions, user, fetchCloudContext, fetchOrganizations]);
 
   useEffect(() => {
     actions.setTables([]);
