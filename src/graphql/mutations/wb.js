@@ -55,3 +55,9 @@ export const REMOVE_USERS__MUTATION = `mutation ($organizationName: String!, $us
   wbRemoveUsersFromOrganization(organizationName: $organizationName, userEmails: $userEmails)
 }
 `;
+
+export const UPDATE_ORGANIZATION_MUTATION = `mutation ($name: String!, $newName: String, $newLabel: String){
+  wbUpdateOrganization(name: $name, newName: $newName, newLabel: $newLabel) {
+    name
+  }
+}`;
