@@ -1,13 +1,12 @@
 import React from 'react';
 import {
-  FaHome,
   FaUsers,
   FaCog,
   FaPlus,
-  FaSearch,
   FaTrash,
   FaSync,
   FaKeycdn,
+  FaDatabase,
 } from 'react-icons/fa';
 import { navigate } from 'gatsby';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -21,17 +20,14 @@ const Sidebar = ({
   setFormData,
   setType,
   setShow,
-  userShow,
-  setUserShow,
   schemas,
   schema,
   tables,
   table,
-  menuClass,
   organizations,
   actions,
 }) => {
-  const { user, logout, getIdTokenClaims } = useAuth0();
+  const { getIdTokenClaims } = useAuth0();
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
@@ -55,52 +51,9 @@ const Sidebar = ({
 
   return (
     <div className="row m-0" id="sidebar">
-      <aside className="col-3 p-0 sidebar-collapsed">
-        <div
-          className="px-4 pt-4"
-          aria-hidden="true"
-          onClick={() => navigate('/')}>
-          <FaHome color="white" size="24px" />
-        </div>
-        <div className="px-4 pt-4" aria-hidden="true">
-          <FaSearch color="white" size="24px" />
-        </div>
-        <div
-          onClick={() => {
-            setFormData({});
-            setType('');
-            setShow(true);
-          }}
-          aria-hidden="true"
-          className="btn px-4 pt-4">
-          <FaPlus color="white" size="24px" />
-        </div>
-        <div className="p-4" style={{ position: 'absolute', bottom: 0 }}>
-          <div className="pb-4" aria-hidden="true">
-            <FaCog color="white" size="24px" />
-          </div>
-          <div
-            className="dropdown avatar"
-            onClick={() => setUserShow(!userShow)}
-            aria-hidden="true">
-            <img src={user.picture} alt={user.nickname} />
-            <div className={menuClass}>
-              <button className="dropdown-item" aria-hidden="true">
-                Settings
-              </button>
-              <button
-                className="dropdown-item"
-                onClick={() => logout({ returnTo: window.location.origin })}
-                aria-hidden="true">
-                Log out
-              </button>
-            </div>
-          </div>
-        </div>
-      </aside>
-      <aside className="col-9 p-0">
+      <aside className="p-0">
         {organizations && organizations.length > 0 && (
-          <div className="list-group w-100 rounded-0 mt-4">
+          <div className="list-group mt-4">
             <div className="sidebar-heading list-group-item">Organizations</div>
             {organizations.map(organization => (
               <div
@@ -108,13 +61,24 @@ const Sidebar = ({
                 aria-hidden="true"
                 className={`list-group-item py-1`}
                 key={organization.name}>
-                {organization.label.toLowerCase()}
+                <FaUsers /> {organization.label.toLowerCase()}
               </div>
             ))}
+            <div
+              className="list-group-item py-1 d-flex align-items-center"
+              aria-hidden="true"
+              style={{ color: '#5E6A7B' }}
+              onClick={() => {
+                setShow(true);
+                setType('organization');
+              }}>
+              <FaPlus size="14px" />
+              <span className="ml-2">Add an organization</span>
+            </div>
           </div>
         )}
         {Object.keys(schema).length > 0 ? (
-          <div className="list-group w-100 rounded-0 mt-4">
+          <div className="list-group rounded-0 mt-4">
             <div className="sidebar-heading list-group-item">
               {schema.label}
             </div>
@@ -134,7 +98,7 @@ const Sidebar = ({
               ))}
           </div>
         ) : (
-          <div className="list-group w-100 rounded-0 mt-4">
+          <div className="list-group rounded-0 mt-4">
             <div className="sidebar-heading list-group-item">My Databases</div>
             {schemas.map(field => (
               <div
@@ -142,9 +106,20 @@ const Sidebar = ({
                 aria-hidden="true"
                 className={`list-group-item py-1`}
                 key={field.name}>
-                {field.label}
+                <FaDatabase /> {field.label}
               </div>
             ))}
+            <div
+              className="list-group-item py-1 d-flex align-items-center"
+              aria-hidden="true"
+              style={{ color: '#5E6A7B' }}
+              onClick={() => {
+                setShow(true);
+                setType('database');
+              }}>
+              <FaPlus size="14px" />
+              <span className="ml-2">Add a database</span>
+            </div>
           </div>
         )}
         <div
@@ -185,19 +160,6 @@ const Sidebar = ({
               )}
             </React.Fragment>
           )}
-          <div className="sidebar-heading list-group-item mt-2">
-            Organization Settings
-          </div>
-          <div
-            className="list-group-item py-1 d-flex align-items-center"
-            aria-hidden="true"
-            onClick={() => {
-              setShow(true);
-              setType('organization');
-            }}>
-            <FaPlus size="14px" />
-            <span className="ml-2">Create Organization</span>
-          </div>
           <div className="sidebar-heading list-group-item mt-2">Settings</div>
           <div
             className="list-group-item py-1 d-flex align-items-center"

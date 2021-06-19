@@ -26,6 +26,7 @@ import {
   CREATE_TABLE_MUTATION,
 } from '../graphql/mutations/wb';
 import Loading from './loading';
+import Header from './header';
 
 const Layout = ({
   table,
@@ -51,9 +52,6 @@ const Layout = ({
   const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
   const [createTable] = useMutation(CREATE_TABLE_MUTATION);
   const [createOrganization] = useMutation(CREATE_ORGANIZATION_MUTATION);
-
-  const [userShow, setUserShow] = useState(false);
-  const menuClass = `dropdown-menu${userShow ? ' show' : ''}`;
 
   const newTableFormFields = [
     {
@@ -213,14 +211,17 @@ const Layout = ({
 
   return (
     <>
+      <Header
+        siteTitle="Whitebrick"
+        setFormData={actions.setFormData}
+        setShow={setShow}
+        setType={setType}
+      />
       <div>
         <Sidebar
           setFormData={actions.setFormData}
           setShow={setShow}
           setType={setType}
-          userShow={userShow}
-          menuClass={menuClass}
-          setUserShow={setUserShow}
         />
         <main id="main">
           {!children ? (

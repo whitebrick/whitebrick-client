@@ -30,14 +30,6 @@ body {
     cursor: pointer;
 }
 
-.dropdown-menu {
-    top: auto!important;
-    bottom: 0!important;
-    right: auto!important;
-    left: 40px!important;
-    z-index: 99;
-}
-
 .text-small {
     opacity: .5;
     font-size: 13px;
@@ -47,4 +39,8 @@ body {
     left: auto!important;
     width: 450px!important;
     background: #ffffff!important;
+}
+
+.nav-shadow {
+    box-shadow: rgb(0 0 0 / 3%) 0 2px 0 0;
 }
