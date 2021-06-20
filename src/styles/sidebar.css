@@ -2,7 +2,7 @@
     border-right: 1px solid #DFE1EB;
     position: fixed;
     width: 250px;
-    height: 90vh;
+    min-height: 90vh;
 }
 
 #main {

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { navigate } from 'gatsby';
@@ -7,7 +6,7 @@ import { FaPlus } from 'react-icons/fa';
 
 import WhitebrickLogo from '../images/whitebrick-logo.svg';
 
-const Header = ({ siteTitle, setType, setShow, setFormData }) => {
+const Header = ({ setType, setShow, setFormData }) => {
   const { user, logout } = useAuth0();
   const [userShow, setUserShow] = useState(false);
   const menuClass = `dropdown-menu${userShow ? ' show' : ''}`;
@@ -21,7 +20,7 @@ const Header = ({ siteTitle, setType, setShow, setFormData }) => {
             aria-hidden="true"
             onClick={() => navigate('/')}>
             <span>
-              <img src={WhitebrickLogo} alt="Logo" height="20vh" /> {siteTitle}
+              <img src={WhitebrickLogo} alt="Logo" height="20vh" /> Whitebrick
             </span>
           </div>
         </span>
@@ -61,14 +60,6 @@ const Header = ({ siteTitle, setType, setShow, setFormData }) => {
       </nav>
     </header>
   );
-};
-
-Header.propTypes = {
-  siteTitle: PropTypes.string,
-};
-
-Header.defaultProps = {
-  siteTitle: ``,
 };
 
 export default Header;

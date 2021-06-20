@@ -123,8 +123,7 @@ const Sidebar = ({
           </div>
         )}
         <div
-          className="list-group"
-          style={{ position: 'absolute', bottom: '20px' }}>
+          className="list-group">
           {Object.keys(schema).length > 0 && (
             <React.Fragment>
               <div className="sidebar-heading mt-2 list-group-item">

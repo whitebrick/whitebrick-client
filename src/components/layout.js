@@ -25,7 +25,6 @@ import {
   CREATE_SCHEMA_MUTATION,
   CREATE_TABLE_MUTATION,
 } from '../graphql/mutations/wb';
-import Loading from './loading';
 import Header from './header';
 
 const Layout = ({
@@ -38,10 +37,10 @@ const Layout = ({
   actions,
   params = {},
 }) => {
-  const { isLoading, getIdTokenClaims, user } = useAuth0();
+  const { getIdTokenClaims, user } = useAuth0();
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
-  const { loading, error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
+  const { error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
     variables: { userEmail: user.email },
   });
   const [fetchOrganizations] = useManualQuery(ORGANIZATIONS_QUERY, {
@@ -204,15 +203,14 @@ const Layout = ({
         }
       }
     }
-  }, [params, schemas, schema, tables, actions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, schemas, tables, actions]);
 
-  if (loading || isLoading) return <Loading />;
   if (error) return 'Something Bad Happened';
 
   return (
     <>
       <Header
-        siteTitle="Whitebrick"
         setFormData={actions.setFormData}
         setShow={setShow}
         setType={setType}
