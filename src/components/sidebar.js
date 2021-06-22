@@ -24,7 +24,7 @@ const Sidebar = ({
   organizations,
   actions,
 }) => {
-  const { getIdTokenClaims } = useAuth0();
+  const { getAccessTokenSilently, getIdTokenClaims } = useAuth0();
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
@@ -41,6 +41,7 @@ const Sidebar = ({
   };
 
   const handleRefreshToken = async () => {
+    await getAccessTokenSilently({ ignoreCache: true, schema_name: schema.name });
     const tokenClaims = await getIdTokenClaims();
     actions.setAccessToken(tokenClaims['__raw']);
     actions.setTokenClaims(tokenClaims);

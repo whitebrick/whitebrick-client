@@ -41,7 +41,7 @@ const Layout = ({
   organizations,
   params = {},
 }) => {
-  const { getIdTokenClaims, user } = useAuth0();
+  const { getAccessTokenSilently, getIdTokenClaims, user } = useAuth0();
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
   const { error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
@@ -173,14 +173,14 @@ const Layout = ({
 
   useEffect(() => {
     (async () => {
-      if (accessToken === '' || accessToken === undefined) {
-        const tokenClaims = await getIdTokenClaims();
-        actions.setAccessToken(tokenClaims['__raw']);
-        actions.setTokenClaims(tokenClaims);
-        actions.setUser(user);
-      }
+      await getAccessTokenSilently({ ignoreCache: true, schema_name: schema.name });
+      const tokenClaims = await getIdTokenClaims();
+      actions.setAccessToken(tokenClaims['__raw']);
+      actions.setTokenClaims(tokenClaims);
+      actions.setUser(user);
     })();
-  }, [actions, accessToken, getIdTokenClaims, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schema]);
 
   useEffect(() => {
     if (Object.keys(params).length > 0) {
