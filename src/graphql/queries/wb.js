@@ -2,11 +2,13 @@ export const SCHEMAS_QUERY = `query ($userEmail: String!) {
   wbSchemas(userEmail: $userEmail) {
     name
     label
+    userOwnerEmail
+    organizationOwnerName
   }
 }`;
 
-export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
-  wbTables(schemaName: $schemaName) {
+export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!, $withColumns: Boolean){
+  wbTables(schemaName: $schemaName, withColumns: $withColumns) {
     name
     label
     columns {

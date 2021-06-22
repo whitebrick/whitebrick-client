@@ -26,6 +26,9 @@ import {
   CREATE_TABLE_MUTATION,
 } from '../graphql/mutations/wb';
 import Header from './header';
+import Databases from './common/databases';
+import Tables from './common/tables';
+import MyDatabases from './common/MyDatabases';
 
 const Layout = ({
   table,
@@ -35,6 +38,7 @@ const Layout = ({
   children,
   tables,
   actions,
+  organizations,
   params = {},
 }) => {
   const { getIdTokenClaims, user } = useAuth0();
@@ -107,7 +111,7 @@ const Layout = ({
     const fetchTables = async () => {
       if (schema.name !== '' && schema.name !== undefined) {
         const { data } = await fetchSchemaTables({
-          variables: { schemaName: schema.name },
+          variables: { schemaName: schema.name, withColumns: true },
         });
         actions.setTables(data['wbTables']);
       }
@@ -117,7 +121,7 @@ const Layout = ({
 
   const fetchTablesAndColumns = async () => {
     const { data } = await fetchSchemaTables({
-      variables: { schemaName: schema.name },
+      variables: { schemaName: schema.name, withColumns: true },
     });
     let t = data.wbTables.filter(tableName => tableName.name === table.name)[0];
     if (t.columns.length > 0) {
@@ -215,7 +219,7 @@ const Layout = ({
         setShow={setShow}
         setType={setType}
       />
-      <div>
+      <div className="mt-5">
         <Sidebar
           setFormData={actions.setFormData}
           setShow={setShow}
@@ -230,7 +234,22 @@ const Layout = ({
                   fetchTables={fetchTablesAndColumns}
                 />
               ) : (
-                <p>Please select a table to render</p>
+                <div>
+                  {Object.keys(schema).length > 0 ? (
+                    <Tables />
+                  ) : (
+                    <React.Fragment>
+                      {organizations.map(org => (
+                        <Databases
+                          organization={org}
+                          setShow={setShow}
+                          setType={setType}
+                        />
+                      ))}
+                      <MyDatabases setShow={setShow} setType={setType} />
+                    </React.Fragment>
+                  )}
+                </div>
               )}
               <SidePanel
                 show={show}
@@ -308,6 +327,7 @@ const mapStateToProps = state => ({
   table: state.table,
   accessToken: state.accessToken,
   formData: state.formData,
+  organizations: state.organizations,
 });
 
 const mapDispatchToProps = dispatch => ({

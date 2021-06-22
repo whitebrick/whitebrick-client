@@ -6,7 +6,6 @@ import {
   FaTrash,
   FaSync,
   FaKeycdn,
-  FaDatabase,
 } from 'react-icons/fa';
 import { navigate } from 'gatsby';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -20,9 +19,7 @@ const Sidebar = ({
   setFormData,
   setType,
   setShow,
-  schemas,
   schema,
-  tables,
   table,
   organizations,
   actions,
@@ -77,53 +74,7 @@ const Sidebar = ({
             </div>
           </div>
         )}
-        {Object.keys(schema).length > 0 ? (
-          <div className="list-group rounded-0 mt-4">
-            <div className="sidebar-heading list-group-item">
-              {schema.label}
-            </div>
-            {tables &&
-              tables.map(tableName => (
-                <div
-                  onClick={() =>
-                    navigate(`/database/${schema.name}/table/${tableName.name}`)
-                  }
-                  aria-hidden="true"
-                  className={`list-group-item py-1 ${
-                    table.name === tableName.name && 'active'
-                  }`}
-                  key={tableName.name}>
-                  {tableName.label.toLowerCase()}
-                </div>
-              ))}
-          </div>
-        ) : (
-          <div className="list-group rounded-0 mt-4">
-            <div className="sidebar-heading list-group-item">My Databases</div>
-            {schemas.map(field => (
-              <div
-                onClick={() => navigate(`/database/${field.name}`)}
-                aria-hidden="true"
-                className={`list-group-item py-1`}
-                key={field.name}>
-                <FaDatabase /> {field.label}
-              </div>
-            ))}
-            <div
-              className="list-group-item py-1 d-flex align-items-center"
-              aria-hidden="true"
-              style={{ color: '#5E6A7B' }}
-              onClick={() => {
-                setShow(true);
-                setType('database');
-              }}>
-              <FaPlus size="14px" />
-              <span className="ml-2">Add a database</span>
-            </div>
-          </div>
-        )}
-        <div
-          className="list-group">
+        <div className="list-group">
           {Object.keys(schema).length > 0 && (
             <React.Fragment>
               <div className="sidebar-heading mt-2 list-group-item">
@@ -182,9 +133,7 @@ const Sidebar = ({
 };
 
 const mapStateToProps = state => ({
-  schemas: state.schemas,
   schema: state.schema,
-  tables: state.tables,
   table: state.table,
   organizations: state.organizations,
 });

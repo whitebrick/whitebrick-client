@@ -3,6 +3,7 @@
     position: fixed;
     width: 250px;
     min-height: 90vh;
+    height: 100%;
 }
 
 #main {

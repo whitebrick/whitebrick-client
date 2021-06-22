@@ -12,7 +12,7 @@ const Header = ({ setType, setShow, setFormData }) => {
   const menuClass = `dropdown-menu${userShow ? ' show' : ''}`;
 
   return (
-    <header className="bg-white nav-shadow">
+    <header className="bg-white nav-shadow fixed-top">
       <nav className="navbar navbar-light">
         <span className="navbar-brand mb-0 h1">
           <div
