@@ -2,7 +2,17 @@ import React, { useState } from 'react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import ViewForeignKeyData from './viewForeignKeyData';
 
-const ForeignKeyCellRenderer = ({ valueFormatted, value, column }) => {
+type ForeignKeyCellRendererPropsType = {
+  valueFormatted: string;
+  value: string;
+  column: any;
+};
+
+const ForeignKeyCellRenderer = ({
+  valueFormatted,
+  value,
+  column,
+}: ForeignKeyCellRendererPropsType) => {
   const cellValue = valueFormatted ? valueFormatted : value;
   const [show, setShow] = useState(false);
 

@@ -1,6 +1,10 @@
 import React from 'react';
 
-const NotFound = ({ name }) => {
+type NotFoundPropsType = {
+  name: string;
+};
+
+const NotFound = ({ name }: NotFoundPropsType) => {
   return (
     <div className="d-flex align-items-center min-vh-100">
       <div className="container text-center">

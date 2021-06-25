@@ -8,7 +8,11 @@ import { actions } from '../actions';
 import { connect } from 'react-redux';
 import Seo from '../components/seo';
 
-const IndexPage = ({ actions }) => {
+type IndexPageProps = {
+  actions: any;
+};
+
+const IndexPage = ({ actions }: IndexPageProps) => {
   useEffect(() => {
     actions.setTable('');
     actions.setSchema({});

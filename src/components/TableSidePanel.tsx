@@ -6,6 +6,21 @@ import { FaExternalLinkAlt } from 'react-icons/fa';
 import FormMaker from './formMaker';
 import SidePanel from './sidePanel';
 
+type TableSidePanelPropsType = {
+  show: boolean;
+  setShow: (value: boolean) => void;
+  onSave: () => void;
+  type: string;
+  column: any;
+  formData: any;
+  table: any;
+  cloudContext: any;
+  actions: any;
+  columns: any[];
+  tables: any[];
+  deleteForeignKey: () => void;
+};
+
 const TableSidePanel = ({
   show,
   setShow,
@@ -19,8 +34,8 @@ const TableSidePanel = ({
   columns,
   tables,
   deleteForeignKey,
-}) => {
-  const newTableColumnFields = [
+}: TableSidePanelPropsType) => {
+  const newTableColumnFields: any[] = [
     { name: 'name', label: 'Column Name', type: 'text', required: true },
     { name: 'label', label: 'Column Label', type: 'text', required: true },
     {
@@ -83,7 +98,7 @@ const TableSidePanel = ({
     },
   ];
 
-  const updateTableFields = [
+  const updateTableFields: any[] = [
     {
       name: 'name',
       label: 'Name',

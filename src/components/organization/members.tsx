@@ -1,12 +1,19 @@
 import React from 'react';
 import { FaTrash } from 'react-icons/fa';
 
+type OrganizationMembersPropsType = {
+  organization: any;
+  handleUserRoleChange: (value: string, user: any) => void;
+  getUserLevel: (value: string) => any;
+  removeUser: (user: any) => void;
+};
+
 const OrganizationMembers = ({
   organization,
   handleUserRoleChange,
   getUserLevel,
   removeUser,
-}) => {
+}: OrganizationMembersPropsType) => {
   return (
     <div style={{ overflow: 'scroll' }}>
       <div className="row p-4 d-flex align-items-center bg-white border">
@@ -56,7 +63,7 @@ const OrganizationMembers = ({
                 </option>
               </select>
             ) : (
-              <div>{getUserLevel(user.role).label}</div>
+              <div>{getUserLevel(user.role)['label']}</div>
             )}
           </div>
           <div className="col-sm-1">

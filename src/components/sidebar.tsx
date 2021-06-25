@@ -15,6 +15,16 @@ import { connect } from 'react-redux';
 import { useMutation } from 'graphql-hooks';
 import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../graphql/mutations/wb';
 
+type SidebarPropsType = {
+  setFormData: (value: any) => void;
+  setType: (value: string) => void;
+  setShow: (value: boolean) => void;
+  schema: any;
+  table: any;
+  organizations: any[];
+  actions: any;
+};
+
 const Sidebar = ({
   setFormData,
   setType,
@@ -23,7 +33,7 @@ const Sidebar = ({
   table,
   organizations,
   actions,
-}) => {
+}: SidebarPropsType) => {
   const { getAccessTokenSilently, getIdTokenClaims } = useAuth0();
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
@@ -41,7 +51,10 @@ const Sidebar = ({
   };
 
   const handleRefreshToken = async () => {
-    await getAccessTokenSilently({ ignoreCache: true, schema_name: schema.name });
+    await getAccessTokenSilently({
+      ignoreCache: true,
+      schema_name: schema.name,
+    });
     const tokenClaims = await getIdTokenClaims();
     actions.setAccessToken(tokenClaims['__raw']);
     actions.setTokenClaims(tokenClaims);

@@ -1,4 +1,4 @@
-export const SCHEMAS_QUERY = `query ($userEmail: String!) {
+export const SCHEMAS_QUERY: string = `query ($userEmail: String!) {
   wbSchemas(userEmail: $userEmail) {
     name
     label
@@ -7,7 +7,7 @@ export const SCHEMAS_QUERY = `query ($userEmail: String!) {
   }
 }`;
 
-export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!, $withColumns: Boolean){
+export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withColumns: Boolean){
   wbTables(schemaName: $schemaName, withColumns: $withColumns) {
     name
     label
@@ -34,7 +34,7 @@ export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!, $withColumns: B
   }
 }`;
 
-export const ORGANIZATIONS_QUERY = `query ($userEmail: String) {
+export const ORGANIZATIONS_QUERY: string = `query ($userEmail: String) {
   wbOrganizations(userEmail: $userEmail) {
     name
     label
@@ -43,7 +43,7 @@ export const ORGANIZATIONS_QUERY = `query ($userEmail: String) {
 }
 `;
 
-export const ORGANIZATION_QUERY = `query ($name: String!, $currentUserEmail: String!){
+export const ORGANIZATION_QUERY: string = `query ($name: String!, $currentUserEmail: String!){
   wbOrganizationByName(name: $name, currentUserEmail: $currentUserEmail){
     name
     label

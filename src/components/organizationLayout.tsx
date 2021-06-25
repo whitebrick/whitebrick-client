@@ -14,12 +14,19 @@ import {
 import OrganizationMembers from './organization/members';
 import SidePanel from './sidePanel';
 
+type OrganizationLayoutPropsType = {
+  organization: any;
+  fetchOrganization: () => any;
+  cloudContext: any;
+  actions: any;
+};
+
 const OrganizationLayout = ({
   organization,
   fetchOrganization = () => {},
   cloudContext,
   actions,
-}) => {
+}: OrganizationLayoutPropsType) => {
   const [updateUserRoleMutation] = useMutation(SET_USERS_ROLE_MUTATION);
   const [removeUserMutation] = useMutation(REMOVE_USERS__MUTATION);
   const [updateOrganizationMutation] = useMutation(
@@ -27,7 +34,7 @@ const OrganizationLayout = ({
   );
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
-  const [data, setData] = useState({});
+  const [data, setData] = useState<any>({});
 
   const getUserLevel = role => {
     return cloudContext.roles.organizations[role];
@@ -57,20 +64,25 @@ const OrganizationLayout = ({
     return { loading, error };
   };
 
-  const handleUserRoleChange = (userRole, user) => {
-    const { loading, error } = inviteUserOrUpdateRole(userRole, [user.email]);
+  const handleUserRoleChange = async (userRole, user) => {
+    const { loading, error } = await inviteUserOrUpdateRole(userRole, [
+      user.email,
+    ]);
     if (!loading && !error) fetchOrgData();
   };
 
-  const onSave = () => {
+  const onSave = async () => {
     if (type === 'invite') {
-      const { loading, error } = inviteUserOrUpdateRole(data.role, data.emails);
+      const { loading, error } = await inviteUserOrUpdateRole(
+        data.role,
+        data.emails,
+      );
       if (!loading && !error) fetchOrgData();
     } else {
-      let variables = { name: organization.name };
+      let variables: any = { name: organization.name };
       if (organization.name !== data.name) variables.newName = data.name;
       if (organization.label !== data.label) variables.newLabel = data.label;
-      const { loading, error } = updateOrganizationMutation({
+      const { loading, error } = await updateOrganizationMutation({
         variables,
       });
       if (!loading && !error) fetchOrgData();

@@ -1,6 +1,15 @@
 import React from 'react';
 import Modal from 'react-modal';
 
+type SidePanelPropsType = {
+  name: string;
+  show: boolean;
+  setShow: (value: boolean) => void;
+  onSave?: () => void;
+  children: React.ReactNode;
+  renderSaveButton?: boolean;
+};
+
 const SidePanel = ({
   name,
   show,
@@ -8,7 +17,7 @@ const SidePanel = ({
   onSave,
   children,
   renderSaveButton = true,
-}) => {
+}: SidePanelPropsType) => {
   const customStyles = {
     content: {
       top: 0,

@@ -9,7 +9,19 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import OrganizationLayout from '../../components/organizationLayout';
 import Seo from '../../components/seo';
 
-const Organization = ({ user, organization, params, actions }) => {
+type OrganizationPropsType = {
+  user: any;
+  organization: any;
+  params: any;
+  actions: any;
+};
+
+const Organization = ({
+  user,
+  organization,
+  params,
+  actions,
+}: OrganizationPropsType) => {
   const [fetchOrganization] = useManualQuery(ORGANIZATION_QUERY, {
     variables: {
       name: params.name,

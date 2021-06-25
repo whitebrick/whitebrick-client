@@ -3,10 +3,19 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
 
-const FormMaker = ({ fields, formData, actions }) => {
+type FormMakerPropsType = {
+  fields: any[];
+  formData: any;
+  actions: any;
+};
+
+const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
   const handleSelectChange = (multiple, name, e) => {
     if (multiple) {
-      let values = Array.from(e.target.selectedOptions, option => option.value);
+      let values = Array.from(
+        e.target.selectedOptions,
+        option => option['value'],
+      );
       actions.setFormData({ ...formData, [name]: values });
     } else actions.setFormData({ ...formData, [name]: e.target.value });
   };

@@ -1,15 +1,20 @@
 import fetch from 'isomorphic-fetch';
 import store from '../store';
 
-const GraphQLFetch = ({ query, variables }) => {
+type GraphQLFetchPropsType = {
+  query: string;
+  variables: any;
+};
+
+const GraphQLFetch = ({ query, variables }: GraphQLFetchPropsType) => {
   const state = store.getState();
-  const accessToken = state.accessToken;
-  const body = {
+  const accessToken: string = state.accessToken;
+  const body: any = {
     query,
     variables,
   };
 
-  const apiConfig = {
+  const apiConfig: any = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-export const types = {
+export const types: any = {
   SET_USER: 'SET_USER',
   SET_ACCESS_TOKEN: 'SET_ACCESS_TOKEN',
   SET_ROWS: 'SET_ROWS',

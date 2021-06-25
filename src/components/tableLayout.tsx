@@ -20,6 +20,23 @@ import {
 } from '../graphql/mutations/wb';
 import TableSidePanel from './TableSidePanel';
 
+type TableLayoutPropsType = {
+  table: any;
+  columns: any[];
+  fields: [];
+  rowCount: number;
+  orderBy: string;
+  limit: number;
+  offset: number;
+  views: any[];
+  schema: any;
+  defaultView: string;
+  fetchTables: () => any;
+  formData: any;
+  actions: any;
+  isNewTable: boolean;
+};
+
 const TableLayout = ({
   table,
   columns,
@@ -35,7 +52,7 @@ const TableLayout = ({
   formData,
   actions,
   isNewTable,
-}) => {
+}: TableLayoutPropsType) => {
   const [gridAPI, setGridAPI] = useState(null);
   const [columnAPI, setColumnAPI] = useState(null);
   const [changedValues, setChangedValues] = useState([]);
@@ -151,6 +168,7 @@ const TableLayout = ({
   };
 
   const editValues = values => {
+    // @ts-ignore
     values = [...new Set(values)];
     values.forEach((params, index) => {
       let filteredParams = values.filter(
@@ -300,13 +318,13 @@ const TableLayout = ({
       variables['_set'] = formData;
       doMutation(variables);
     } else if (type === 'updateTable') {
-      let variables = {
+      let variables: any = {
         schemaName: schema.name,
         tableName: table.name,
         newTableLabel: formData.label,
       };
       if (formData.name !== table.name) variables.newTableName = formData.name;
-      const { loading, error } = updateTableMutation({
+      const { loading, error } = await updateTableMutation({
         variables,
       });
       if (!error && !loading) setShow(false);
@@ -314,7 +332,7 @@ const TableLayout = ({
       saveView();
       setShow(false);
     } else if (type === 'edit') {
-      let variables = {
+      let variables: any = {
         schemaName: schema.name,
         tableName: table.name,
         columnName: column,

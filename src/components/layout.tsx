@@ -30,6 +30,18 @@ import Databases from './common/databases';
 import Tables from './common/tables';
 import MyDatabases from './common/MyDatabases';
 
+type LayoutPropsType = {
+  table: any;
+  schema: any;
+  accessToken: string;
+  formData: any;
+  children?: React.ReactNode;
+  tables: any[];
+  organizations: any[];
+  params?: any;
+  actions: any;
+};
+
 const Layout = ({
   table,
   schema,
@@ -40,7 +52,7 @@ const Layout = ({
   actions,
   organizations,
   params = {},
-}) => {
+}: LayoutPropsType) => {
   const { getAccessTokenSilently, getIdTokenClaims, user } = useAuth0();
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
@@ -56,7 +68,7 @@ const Layout = ({
   const [createTable] = useMutation(CREATE_TABLE_MUTATION);
   const [createOrganization] = useMutation(CREATE_ORGANIZATION_MUTATION);
 
-  const newTableFormFields = [
+  const newTableFormFields: any[] = [
     {
       name: 'schema',
       label: 'Database Name',
@@ -69,7 +81,7 @@ const Layout = ({
     { name: 'label', label: 'Table Label', type: 'text', required: true },
   ];
 
-  const newDataBaseFormFields = [
+  const newDataBaseFormFields: any[] = [
     { name: 'name', label: 'Name', type: 'text', required: true },
     {
       name: 'label',
@@ -79,7 +91,7 @@ const Layout = ({
     },
   ];
 
-  const newOrganizationFormFields = [
+  const newOrganizationFormFields: any[] = [
     { name: 'name', label: 'Name', type: 'text', required: true },
     {
       name: 'label',
@@ -135,7 +147,7 @@ const Layout = ({
 
   const onSave = async () => {
     if (type === 'database') {
-      const { error, loading } = createSchema({
+      const { error, loading } = await createSchema({
         variables: {
           name: formData.name,
           label: formData.label,
@@ -147,7 +159,7 @@ const Layout = ({
         setShow(false);
       }
     } else if (type === 'organization') {
-      const { error, loading } = createOrganization({
+      const { error, loading } = await createOrganization({
         variables: {
           name: formData.name,
           label: formData.label,
@@ -156,7 +168,7 @@ const Layout = ({
       });
       if (!loading && !error) setShow(false);
     } else {
-      const { error, loading } = createTable({
+      const { error, loading } = await createTable({
         variables: {
           schemaName: formData.schema.name,
           tableName: formData.name,
@@ -173,8 +185,11 @@ const Layout = ({
 
   useEffect(() => {
     (async () => {
-      await getAccessTokenSilently({ ignoreCache: true, schema_name: schema.name });
-      const tokenClaims = await getIdTokenClaims();
+      await getAccessTokenSilently({
+        ignoreCache: true,
+        schema_name: schema.name,
+      });
+      const tokenClaims: any = await getIdTokenClaims();
       actions.setAccessToken(tokenClaims['__raw']);
       actions.setTokenClaims(tokenClaims);
       actions.setUser(user);
@@ -190,14 +205,14 @@ const Layout = ({
           schemas['wbSchemas'] &&
           schemas['wbSchemas'].length > 0
         ) {
-          let s = schemas['wbSchemas'].filter(
+          let s: any = schemas['wbSchemas'].filter(
             schema => schema.name === params['databaseName'],
           )[0];
           if (s && Object.keys(s).length > 0) actions.setSchema(s);
         }
       }
       if (params['tableName']) {
-        let table = tables.filter(
+        let table: any = tables.filter(
           table => table.name === params['tableName'],
         )[0];
         if (table && Object.keys(table).length > 0) {
@@ -210,7 +225,7 @@ const Layout = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params, schemas, tables, actions]);
 
-  if (error) return 'Something Bad Happened';
+  if (error) return <p>Something Bad Happened</p>;
 
   return (
     <>
@@ -256,7 +271,6 @@ const Layout = ({
                 renderSaveButton={type !== ''}
                 setShow={setShow}
                 onSave={onSave}
-                type="save"
                 name={
                   type === 'token' ? 'Access Token' : `Create a new ${type}?`
                 }>

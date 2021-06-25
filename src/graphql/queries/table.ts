@@ -1,4 +1,4 @@
-export const GET_TABLE_FIELDS = `query ($name: String!){
+export const GET_TABLE_FIELDS: string = `query ($name: String!){
   __type(name: $name) {
     name
     fields {

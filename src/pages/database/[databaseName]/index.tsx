@@ -1,7 +1,11 @@
 import React from 'react';
 import Layout from '../../../components/layout';
 
-const DatabaseName = ({ params }) => {
+type DatabaseNamePropsType = {
+  params: any;
+};
+
+const DatabaseName = ({ params }: DatabaseNamePropsType) => {
   return <Layout params={params} />;
 };
 

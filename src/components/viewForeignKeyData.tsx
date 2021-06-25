@@ -8,6 +8,16 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import * as gql from 'gql-query-builder';
 import graphQLFetch from '../utils/GraphQLFetch';
 
+type ViewForeignKeyDataPropsType = {
+  show: boolean;
+  setShow: (value: boolean) => void;
+  tables: any[];
+  columns: any[];
+  cellValue: string;
+  column: any;
+  schema: any;
+};
+
 const ViewForeignKeyData = ({
   show,
   setShow,
@@ -16,7 +26,7 @@ const ViewForeignKeyData = ({
   cellValue,
   column,
   schema,
-}) => {
+}: ViewForeignKeyDataPropsType) => {
   const [newColumns, setNewColumns] = useState([]);
   const [data, setData] = useState({});
   const [relTable, setRelTable] = useState('');

@@ -5,25 +5,31 @@ import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
-import { FaCog } from 'react-icons/fa';
 
-const Databases = ({ organization, schemas, setType, setShow, actions }) => {
+type MyDatabasesPropsType = {
+  schemas: any[];
+  user: any;
+  setType: (value: string) => void;
+  setShow: (value: boolean) => void;
+  actions: any;
+};
+
+const MyDatabases = ({
+  schemas,
+  user,
+  setShow,
+  setType,
+  actions,
+}: MyDatabasesPropsType) => {
   return (
     <div className="card my-4">
-      <div className="card-header d-flex justify-content-between align-items-center">
-        <h4>{organization.label}</h4>
-        <button
-          className="btn btn-light"
-          onClick={() => navigate(`/organization/${organization.name}`)}>
-          <FaCog />
-        </button>
+      <div className="card-header">
+        <h4>My Databases</h4>
       </div>
       <div className="card-body">
         <div className="row">
           {schemas
-            .filter(
-              schema => schema['organizationOwnerName'] === organization.name,
-            )
+            .filter(schema => schema['userOwnerEmail'] === user.email)
             .map(schema => (
               <div
                 className="col-md-2 text-center btn"
@@ -52,6 +58,7 @@ const Databases = ({ organization, schemas, setType, setShow, actions }) => {
 
 const mapStateToProps = state => ({
   schemas: state.schemas,
+  user: state.user,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -61,4 +68,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withAuthenticationRequired(Databases));
+)(withAuthenticationRequired(MyDatabases));

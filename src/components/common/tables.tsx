@@ -7,7 +7,12 @@ import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import Skeleton from 'react-loading-skeleton';
 
-const Tables = ({ schema, tables }) => {
+type TablesPropsType = {
+  schema: any;
+  tables: any[];
+};
+
+const Tables = ({ schema, tables }: TablesPropsType) => {
   return (
     <div className="card my-4">
       <div className="card-header">

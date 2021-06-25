@@ -4,9 +4,16 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { navigate } from 'gatsby';
 import { FaPlus } from 'react-icons/fa';
 
+// @ts-ignore
 import WhitebrickLogo from '../images/whitebrick-logo.svg';
 
-const Header = ({ setType, setShow, setFormData }) => {
+type HeaderPropsType = {
+  setType: (value: string) => void;
+  setShow: (value: boolean) => void;
+  setFormData: (value: any) => void;
+};
+
+const Header = ({ setType, setShow, setFormData }: HeaderPropsType) => {
   const { user, logout } = useAuth0();
   const [userShow, setUserShow] = useState(false);
   const menuClass = `dropdown-menu${userShow ? ' show' : ''}`;

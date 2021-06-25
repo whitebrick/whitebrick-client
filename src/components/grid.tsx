@@ -9,6 +9,23 @@ import { connect } from 'react-redux';
 import { actions } from '../actions';
 import ForeignKeyCellRenderer from './ForeignKeyCellRenderer';
 
+type GridPropsType = {
+  onCellValueChanged: (params: any) => void;
+  getContextMenuItems: any;
+  setColumnAPI: (value: any) => void;
+  setGridAPI: (value: any) => void;
+  rows: any[];
+  table: any;
+  schema: any;
+  views: any[];
+  orderBy: string;
+  limit: number;
+  columns: any[];
+  actions: any;
+  rowCount: number;
+  current: number;
+};
+
 const Grid = ({
   onCellValueChanged,
   getContextMenuItems,
@@ -22,10 +39,9 @@ const Grid = ({
   limit,
   columns,
   actions,
-  tables,
   rowCount,
   current,
-}) => {
+}: GridPropsType) => {
   const handlePagination = (current, pageSize) => {
     actions.setOffset(Math.ceil((current - 1) * pageSize));
     actions.setCurrent(current);
