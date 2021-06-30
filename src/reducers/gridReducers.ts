@@ -3,6 +3,11 @@ import { types } from '../types/gridTypes';
 export default function gridReducer(state: any = {}, action) {
   const payload = action.payload;
   switch (action.type) {
+    case types.SET_SEND_ADMIN_SECRET:
+      return {
+        ...state,
+        sendAdminSecret: payload.sendAdminSecret,
+      };
     case types.SET_ORGANIZATIONS:
       return {
         ...state,

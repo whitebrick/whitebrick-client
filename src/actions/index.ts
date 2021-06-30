@@ -1,6 +1,12 @@
 import { types } from '../types/gridTypes';
 
 export const actions = {
+  setSendAdminSecret(sendAdminSecret) {
+    return {
+      type: types.SET_SEND_ADMIN_SECRET,
+      payload: { sendAdminSecret },
+    };
+  },
   setOrganizations(organizations) {
     return {
       type: types.SET_ORGANIZATIONS,

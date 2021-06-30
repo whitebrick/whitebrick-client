@@ -23,6 +23,7 @@ type SidebarPropsType = {
   table: any;
   organizations: any[];
   actions: any;
+  sendAdminSecret: boolean;
 };
 
 const Sidebar = ({
@@ -32,6 +33,7 @@ const Sidebar = ({
   schema,
   table,
   organizations,
+  sendAdminSecret,
   actions,
 }: SidebarPropsType) => {
   const { getAccessTokenSilently, getIdTokenClaims } = useAuth0();
@@ -124,22 +126,41 @@ const Sidebar = ({
               )}
             </React.Fragment>
           )}
-          <div className="sidebar-heading list-group-item mt-2">Settings</div>
-          <div
-            className="list-group-item py-1 d-flex align-items-center"
-            aria-hidden="true"
-            onClick={() => {
-              setShow(true);
-              setType('token');
-            }}>
-            <FaKeycdn size="14px" /> <span className="ml-2">Display Token</span>
-          </div>
-          <div
-            className="list-group-item py-1 d-flex align-items-center"
-            aria-hidden="true"
-            onClick={handleRefreshToken}>
-            <FaSync size="14px" /> <span className="ml-2">Refresh Token</span>
-          </div>
+          {process.env.NODE_ENV === 'development' && (
+            <React.Fragment>
+              <div className="sidebar-heading list-group-item mt-2">
+                Debug Settings
+              </div>
+              <div
+                className="list-group-item btn py-1 d-flex align-items-center"
+                aria-hidden="true"
+                onClick={() => {
+                  setShow(true);
+                  setType('token');
+                }}>
+                <FaKeycdn size="14px" />{' '}
+                <span className="ml-2">Display Token</span>
+              </div>
+              <div
+                className="list-group-item btn py-1 d-flex align-items-center"
+                aria-hidden="true"
+                onClick={handleRefreshToken}>
+                <FaSync size="14px" />{' '}
+                <span className="ml-2">Refresh Token</span>
+              </div>
+              <div
+                className="list-group-item btn py-1 d-flex align-items-center"
+                aria-hidden="true"
+                onClick={() => actions.setSendAdminSecret(!sendAdminSecret)}>
+                <input
+                  type="checkbox"
+                  checked={sendAdminSecret}
+                  onChange={e => actions.setSendAdminSecret(e.target.checked)}
+                />
+                <span className="ml-2">Send Admin Secret</span>
+              </div>
+            </React.Fragment>
+          )}
         </div>
       </aside>
     </div>
@@ -150,6 +171,7 @@ const mapStateToProps = state => ({
   schema: state.schema,
   table: state.table,
   organizations: state.organizations,
+  sendAdminSecret: state.sendAdminSecret,
 });
 
 const mapDispatchToProps = dispatch => ({

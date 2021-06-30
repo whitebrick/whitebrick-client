@@ -4,9 +4,14 @@ import store from '../store';
 type GraphQLFetchPropsType = {
   query: string;
   variables: any;
+  sendAdminSecret?: boolean;
 };
 
-const GraphQLFetch = ({ query, variables }: GraphQLFetchPropsType) => {
+const GraphQLFetch = ({
+  query,
+  variables,
+  sendAdminSecret = false,
+}: GraphQLFetchPropsType) => {
   const state = store.getState();
   const accessToken: string = state.accessToken;
   const body: any = {
@@ -18,11 +23,14 @@ const GraphQLFetch = ({ query, variables }: GraphQLFetchPropsType) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-hasura-admin-secret': process.env.GATSBY_HASURA_GRAPHQL_ADMIN_SECRET,
       authorization: accessToken ? `Bearer ${accessToken}` : null,
     },
     body: JSON.stringify(body),
   };
+
+  if (sendAdminSecret)
+    apiConfig.headers['x-hasura-admin-secret'] =
+      process.env.GATSBY_HASURA_GRAPHQL_ADMIN_SECRET;
 
   return fetch(process.env.GATSBY_HASURA_GRAPHQL_URL, apiConfig).then(function (
     response,

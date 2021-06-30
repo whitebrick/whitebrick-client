@@ -24,6 +24,7 @@ const initialState = {
   organization: {},
   organizations: [],
   defaultView: 'Default View',
+  sendAdminSecret: false,
 };
 
 export default createStore(gridReducer, initialState);
