@@ -262,6 +262,11 @@ const Layout = ({
                         />
                       ))}
                       <MyDatabases setShow={setShow} setType={setType} />
+                      <MyDatabases
+                        name="Databases shared with me"
+                        setShow={setShow}
+                        setType={setType}
+                      />
                     </React.Fragment>
                   )}
                 </div>

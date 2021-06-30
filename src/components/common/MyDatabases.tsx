@@ -12,6 +12,7 @@ type MyDatabasesPropsType = {
   setType: (value: string) => void;
   setShow: (value: boolean) => void;
   actions: any;
+  name?: string;
 };
 
 const MyDatabases = ({
@@ -20,16 +21,21 @@ const MyDatabases = ({
   setShow,
   setType,
   actions,
+  name = 'My Databases',
 }: MyDatabasesPropsType) => {
   return (
     <div className="card my-4">
       <div className="card-header">
-        <h4>My Databases</h4>
+        <h4>{name}</h4>
       </div>
       <div className="card-body">
         <div className="row">
           {schemas
-            .filter(schema => schema['userOwnerEmail'] === user.email)
+            .filter(schema =>
+              name === 'My Databases'
+                ? schema['userOwnerEmail'] === user.email
+                : schema['userOwnerEmail'] !== user.email,
+            )
             .map(schema => (
               <div
                 className="col-md-2 text-center btn"
