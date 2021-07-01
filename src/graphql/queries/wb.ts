@@ -59,3 +59,10 @@ export const ORGANIZATION_QUERY: string = `query ($name: String!, $currentUserEm
     updatedAt
   }
 }`;
+
+export const TABLE_USERS_QUERY = `query ($schemaName: String!, $tableName: String!){
+  wbTableUsers(schemaName: $schemaName, tableName: $tableName){
+    userEmail
+    role
+  }
+}`;

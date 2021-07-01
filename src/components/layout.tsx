@@ -1,10 +1,3 @@
-/**
- * Layout component that queries for data
- * with Gatsby's useStaticQuery component
- *
- * See: https://www.gatsbyjs.com/docs/use-static-query/
- */
-
 import React, { useEffect, useState } from 'react';
 import { useManualQuery, useMutation, useQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
@@ -57,6 +50,7 @@ const Layout = ({
 }: LayoutPropsType) => {
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
+  const [loaded, setLoaded] = useState(false);
   const { error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
     variables: { userEmail: user.email },
   });
@@ -108,9 +102,16 @@ const Layout = ({
   }, [schemas, actions]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCloud = async () => {
       const { data } = await fetchCloudContext();
       actions.setCloudContext(data['wbCloudContext']);
+    };
+    fetchCloud();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
       if (user.email) {
         const { data } = await fetchOrganizations();
         actions.setOrganizations(data['wbOrganizations']);
@@ -127,6 +128,7 @@ const Layout = ({
           variables: { schemaName: schema.name, withColumns: true },
         });
         actions.setTables(data['wbTables']);
+        setLoaded(true);
       }
     };
     fetchTables();
@@ -144,6 +146,7 @@ const Layout = ({
     } else {
       actions.setColumns([]);
     }
+    setLoaded(true);
   };
 
   const onSave = async () => {
@@ -238,7 +241,7 @@ const Layout = ({
               ) : (
                 <div>
                   {Object.keys(schema).length > 0 ? (
-                    <Tables />
+                    <Tables loaded={loaded} />
                   ) : (
                     <React.Fragment>
                       {organizations.map(org => (

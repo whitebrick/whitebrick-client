@@ -106,6 +106,10 @@ const TableSidePanel = ({
       required: true,
     },
     { name: 'label', label: 'Label', type: 'text', required: true },
+    { label: 'Permissions', type: 'heading' },
+    {
+      type: 'permissionGrid',
+    },
   ];
 
   return (
@@ -124,7 +128,7 @@ const TableSidePanel = ({
           ? `Edit column '${column}'`
           : type === 'view'
           ? `Create a new view`
-          : `Update table '${table.name}'`
+          : `${table.label} Table Settings`
       }>
       {type === 'newRow' || type === 'editRow' ? (
         <React.Fragment>

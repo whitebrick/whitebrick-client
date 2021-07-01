@@ -10,9 +10,10 @@ import Skeleton from 'react-loading-skeleton';
 type TablesPropsType = {
   schema: any;
   tables: any[];
+  loaded: boolean;
 };
 
-const Tables = ({ schema, tables }: TablesPropsType) => {
+const Tables = ({ schema, tables, loaded }: TablesPropsType) => {
   return (
     <div className="card my-4">
       <div className="card-header">
@@ -20,7 +21,7 @@ const Tables = ({ schema, tables }: TablesPropsType) => {
       </div>
       <div className="card-body">
         <div className="row">
-          {tables.length > 0
+          {loaded ?? tables.length > 0
             ? tables.map(table => (
                 <div
                   className="col-md-2 text-center btn"
@@ -37,7 +38,7 @@ const Tables = ({ schema, tables }: TablesPropsType) => {
                   <Skeleton height="100px" />
                 </div>
               ))}
-          {tables.length > 0 && (
+          {loaded && (
             <div className="col-md-2 text-center btn">
               <Avatar name="+" size="75" round="12px" />
               <p className="mt-2">Add table</p>

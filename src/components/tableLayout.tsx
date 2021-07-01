@@ -19,6 +19,7 @@ import {
   UPDATE_COLUMN_MUTATION,
 } from '../graphql/mutations/wb';
 import TableSidePanel from './TableSidePanel';
+import { query } from 'gql-query-builder';
 
 type TableLayoutPropsType = {
   table: any;

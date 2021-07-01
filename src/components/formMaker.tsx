@@ -1,15 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
+import { useManualQuery } from 'graphql-hooks';
+import { TABLE_USERS_QUERY } from '../graphql/queries/wb';
+import PermissionGrid from '../components/common/permissionGrid';
 
 type FormMakerPropsType = {
   fields: any[];
   formData: any;
+  schema: any;
+  table: any;
   actions: any;
 };
 
-const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
+const FormMaker = ({
+  fields,
+  formData,
+  schema,
+  table,
+  actions,
+}: FormMakerPropsType) => {
+  const [data, setData] = useState([]);
+  const [isLoading, setLoading] = useState(true);
+  const [fetchTableUsers] = useManualQuery(TABLE_USERS_QUERY, {
+    variables: {
+      schemaName: schema.name,
+      tableName: table.name,
+    },
+  });
+
   const handleSelectChange = (multiple, name, e) => {
     if (multiple) {
       let values = Array.from(
@@ -19,6 +39,16 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
       actions.setFormData({ ...formData, [name]: values });
     } else actions.setFormData({ ...formData, [name]: e.target.value });
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await fetchTableUsers();
+      return data;
+    };
+    fetchData()
+      .then(r => setData(r['wbTableUsers']))
+      .finally(() => setLoading(false));
+  }, [schema, table]);
 
   const renderField = ({
     type,
@@ -202,6 +232,8 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
             </div>
           </div>
         );
+      } else if (type === 'permissionGrid') {
+        return !isLoading && <PermissionGrid data={data} />;
       }
     }
   };
@@ -217,6 +249,8 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
 
 const mapStateToProps = state => ({
   formData: state.formData,
+  schema: state.schema,
+  table: state.table,
 });
 
 const mapDispatchToProps = dispatch => ({
