@@ -11,7 +11,7 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
 import Table from './tableLayout';
-import { useAuth0, withAuthenticationRequired } from '@auth0/auth0-react';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
 import SidePanel from './sidePanel';
 import Sidebar from './sidebar';
 import FormMaker from './formMaker';
@@ -37,6 +37,7 @@ type LayoutPropsType = {
   formData: any;
   children?: React.ReactNode;
   tables: any[];
+  user: any;
   organizations: any[];
   params?: any;
   actions: any;
@@ -49,11 +50,11 @@ const Layout = ({
   formData,
   children,
   tables,
+  user,
   actions,
   organizations,
   params = {},
 }: LayoutPropsType) => {
-  const { user } = useAuth0();
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
   const { error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
@@ -332,6 +333,7 @@ const mapStateToProps = state => ({
   table: state.table,
   accessToken: state.accessToken,
   formData: state.formData,
+  user: state.user,
   organizations: state.organizations,
 });
 

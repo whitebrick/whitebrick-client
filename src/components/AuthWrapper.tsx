@@ -2,16 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { actions } from '../actions';
 import { connect } from 'react-redux';
-import { useAuth0, withAuthenticationRequired } from '@auth0/auth0-react';
 import Loading from './loading';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
 
 type AuthWrapper = {
   schema: any;
   actions: any;
   sendAdminSecret: boolean;
   accessToken: string;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  getAccessTokenSilently: any;
+  getIdTokenClaims: any;
+  user: any;
   children: React.ReactElement;
 };
 
@@ -19,23 +24,18 @@ const AuthWrapper = ({
   schema,
   sendAdminSecret,
   accessToken,
+  isLoading: authLoading,
+  isAuthenticated,
+  getAccessTokenSilently,
+  getIdTokenClaims,
+  user,
   actions,
   children,
 }: AuthWrapper) => {
-  const {
-    isLoading: authLoading,
-    getAccessTokenSilently,
-    getIdTokenClaims,
-    user,
-  } = useAuth0();
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    actions.setUser(user);
-  }, [authLoading]);
-
-  useEffect(() => {
-    if (authLoading) {
+    if (!authLoading && isAuthenticated) {
       (async () => {
         await getAccessTokenSilently({
           ignoreCache: true,
@@ -44,10 +44,11 @@ const AuthWrapper = ({
         const tokenClaims = await getIdTokenClaims();
         actions.setAccessToken(tokenClaims['__raw']);
         actions.setTokenClaims(tokenClaims);
+        actions.setUser(user);
         client.setHeader('Authorization', `Bearer ${tokenClaims['__raw']}`);
         setLoading(false);
       })();
-    }
+    } else setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schema, authLoading]);
 

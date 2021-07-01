@@ -34,7 +34,8 @@ const MyDatabases = ({
             .filter(schema =>
               name === 'My Databases'
                 ? schema['userOwnerEmail'] === user.email
-                : schema['userOwnerEmail'] !== user.email,
+                : schema['userOwnerEmail'] !== user.email &&
+                  schema['organizationOwnerName'] === null,
             )
             .map(schema => (
               <div
