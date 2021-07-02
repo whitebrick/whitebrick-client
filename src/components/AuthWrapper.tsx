@@ -6,9 +6,10 @@ import Loading from './loading';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
+import { SchemaItemType } from '../types';
 
 type AuthWrapper = {
-  schema: any;
+  schema: SchemaItemType;
   actions: any;
   sendAdminSecret: boolean;
   accessToken: string;

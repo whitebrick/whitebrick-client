@@ -14,14 +14,15 @@ import { actions } from '../state/actions';
 import { connect } from 'react-redux';
 import { useMutation } from 'graphql-hooks';
 import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../graphql/mutations/wb';
+import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
 
 type SidebarPropsType = {
   setFormData: (value: any) => void;
   setType: (value: string) => void;
   setShow: (value: boolean) => void;
-  schema: any;
-  table: any;
-  organizations: any[];
+  schema: SchemaItemType;
+  table: TableItemType;
+  organizations: Array<OrganizationItemType>;
   actions: any;
   sendAdminSecret: boolean;
 };

@@ -13,9 +13,10 @@ import {
 } from '../graphql/mutations/wb';
 import OrganizationMembers from './organization/members';
 import SidePanel from './sidePanel';
+import { OrganizationItemType } from '../types';
 
 type OrganizationLayoutPropsType = {
-  organization: any;
+  organization: OrganizationItemType;
   fetchOrganization: () => any;
   cloudContext: any;
   actions: any;

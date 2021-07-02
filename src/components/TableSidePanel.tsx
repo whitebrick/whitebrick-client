@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import FormMaker from './formMaker';
 import SidePanel from './sidePanel';
+import { ColumnItemType, TableItemType } from '../types';
 
 type TableSidePanelPropsType = {
   show: boolean;
@@ -13,11 +14,11 @@ type TableSidePanelPropsType = {
   type: string;
   column: any;
   formData: any;
-  table: any;
+  table: TableItemType;
   cloudContext: any;
   actions: any;
-  columns: any[];
-  tables: any[];
+  columns: Array<ColumnItemType>;
+  tables: Array<TableItemType>;
   deleteForeignKey: () => void;
 };
 

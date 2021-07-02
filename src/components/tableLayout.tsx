@@ -19,18 +19,18 @@ import {
   UPDATE_COLUMN_MUTATION,
 } from '../graphql/mutations/wb';
 import TableSidePanel from './TableSidePanel';
-import { query } from 'gql-query-builder';
+import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
 
 type TableLayoutPropsType = {
-  table: any;
-  columns: any[];
+  table: TableItemType;
+  columns: Array<ColumnItemType>;
   fields: [];
   rowCount: number;
   orderBy: string;
   limit: number;
   offset: number;
   views: any[];
-  schema: any;
+  schema: SchemaItemType;
   defaultView: string;
   fetchTables: () => any;
   formData: any;
@@ -500,7 +500,7 @@ const TableLayout = ({
 
   return (
     <div className="ag-theme-alpine">
-      {table !== '' && (
+      {table.name !== '' && (
         <React.Fragment>
           <div className="my-3">
             <div style={{ padding: `1rem` }}>

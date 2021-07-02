@@ -48,7 +48,6 @@ export const ORGANIZATION_QUERY: string = `query ($name: String!, $currentUserEm
     name
     label
     userRole
-    createdAt
   }
   wbOrganizationUsers(name: $name){
     firstName

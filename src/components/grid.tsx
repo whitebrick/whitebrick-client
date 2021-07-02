@@ -8,6 +8,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../state/actions';
 import ForeignKeyCellRenderer from './ForeignKeyCellRenderer';
+import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
 
 type GridPropsType = {
   onCellValueChanged: (params: any) => void;
@@ -15,12 +16,12 @@ type GridPropsType = {
   setColumnAPI: (value: any) => void;
   setGridAPI: (value: any) => void;
   rows: any[];
-  table: any;
-  schema: any;
+  table: TableItemType;
+  schema: SchemaItemType;
   views: any[];
   orderBy: string;
   limit: number;
-  columns: any[];
+  columns: Array<ColumnItemType>;
   actions: any;
   rowCount: number;
   current: number;
@@ -115,7 +116,7 @@ const Grid = ({
           }
         })}
       </AgGridReact>
-      {table !== '' && rows.length > 0 && (
+      {table.name !== '' && rows.length > 0 && (
         <div className="p-4">
           <select
             value={limit}

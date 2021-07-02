@@ -8,10 +8,11 @@ import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import OrganizationLayout from '../../components/organizationLayout';
 import Seo from '../../components/seo';
+import { OrganizationItemType } from '../../types';
 
 type OrganizationPropsType = {
   user: any;
-  organization: any;
+  organization: OrganizationItemType;
   params: any;
   actions: any;
 };

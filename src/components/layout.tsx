@@ -22,16 +22,17 @@ import Header from './header';
 import Databases from './common/databases';
 import Tables from './common/tables';
 import MyDatabases from './common/MyDatabases';
+import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
 
 type LayoutPropsType = {
-  table: any;
-  schema: any;
+  table: TableItemType;
+  schema: SchemaItemType;
   accessToken: string;
   formData: any;
   children?: React.ReactNode;
-  tables: any[];
+  tables: Array<TableItemType>;
   user: any;
-  organizations: any[];
+  organizations: Array<OrganizationItemType>;
   params?: any;
   actions: any;
 };
@@ -92,7 +93,7 @@ const Layout = ({
       type: 'text',
       required: true,
     },
-    { type: 'heading', label: 'Permissions'},
+    { type: 'heading', label: 'Permissions' },
     { type: 'permissionGrid', label: 'schema' },
   ];
 
@@ -245,7 +246,7 @@ const Layout = ({
         <main id="main">
           {!children ? (
             <React.Fragment>
-              {user && schema.name !== '' && table !== '' ? (
+              {user && schema.name !== '' && table.name !== '' ? (
                 <Table
                   key={schema.name + table.name}
                   fetchTables={fetchTablesAndColumns}

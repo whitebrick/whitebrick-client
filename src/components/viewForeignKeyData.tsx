@@ -7,15 +7,16 @@ import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import * as gql from 'gql-query-builder';
 import graphQLFetch from '../utils/GraphQLFetch';
+import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
 
 type ViewForeignKeyDataPropsType = {
   show: boolean;
   setShow: (value: boolean) => void;
-  tables: any[];
-  columns: any[];
+  tables: Array<TableItemType>;
+  columns: Array<ColumnItemType>;
   cellValue: string;
   column: any;
-  schema: any;
+  schema: SchemaItemType;
 };
 
 const ViewForeignKeyData = ({
