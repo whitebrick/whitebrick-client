@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaChevronRight, FaPen, FaPlus } from 'react-icons/fa';
 import { bindActionCreators } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import NotFound from './notFound';

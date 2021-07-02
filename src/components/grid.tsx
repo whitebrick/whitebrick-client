@@ -6,7 +6,7 @@ import Pagination from 'rc-pagination';
 import { bindActionCreators } from 'redux';
 
 import { connect } from 'react-redux';
-import { actions } from '../actions';
+import { actions } from '../state/actions';
 import ForeignKeyCellRenderer from './ForeignKeyCellRenderer';
 
 type GridPropsType = {

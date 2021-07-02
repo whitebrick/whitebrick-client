@@ -1,5 +1,5 @@
-export const SCHEMAS_QUERY: string = `query ($userEmail: String!) {
-  wbSchemas(userEmail: $userEmail) {
+export const SCHEMAS_QUERY: string = `query {
+  wbSchemas {
     name
     label
     userOwnerEmail
@@ -62,6 +62,13 @@ export const ORGANIZATION_QUERY: string = `query ($name: String!, $currentUserEm
 
 export const TABLE_USERS_QUERY = `query ($schemaName: String!, $tableName: String!){
   wbTableUsers(schemaName: $schemaName, tableName: $tableName){
+    userEmail
+    role
+  }
+}`;
+
+export const SCHEMA_USERS_QUERY = `query ($schemaName: String!){
+  wbSchemaUsers(schemaName: $schemaName){
     userEmail
     role
   }

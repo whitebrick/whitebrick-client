@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import store from '../store';
+import store from '../state/store';
 
 type GraphQLFetchPropsType = {
   query: string;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../state/actions';
 import { connect } from 'react-redux';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import FormMaker from './formMaker';
@@ -107,9 +107,7 @@ const TableSidePanel = ({
     },
     { name: 'label', label: 'Label', type: 'text', required: true },
     { label: 'Permissions', type: 'heading' },
-    {
-      type: 'permissionGrid',
-    },
+    { type: 'permissionGrid', label: 'table' },
   ];
 
   return (

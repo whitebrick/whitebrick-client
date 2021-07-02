@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../state/actions';
 import { connect } from 'react-redux';
 import Loading from './loading';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';

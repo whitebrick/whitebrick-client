@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useManualQuery, useMutation, useQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../state/actions';
 import { connect } from 'react-redux';
 import Table from './tableLayout';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
@@ -51,9 +51,7 @@ const Layout = ({
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
   const [loaded, setLoaded] = useState(false);
-  const { error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY, {
-    variables: { userEmail: user.email },
-  });
+  const { error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY);
   const [fetchOrganizations] = useManualQuery(ORGANIZATIONS_QUERY, {
     variables: { userEmail: user.email },
   });
@@ -86,6 +84,18 @@ const Layout = ({
     },
   ];
 
+  const editDataBaseFormFields: any[] = [
+    { name: 'name', label: 'Name', type: 'text', required: true },
+    {
+      name: 'label',
+      label: 'Label',
+      type: 'text',
+      required: true,
+    },
+    { type: 'heading', label: 'Permissions'},
+    { type: 'permissionGrid', label: 'schema' },
+  ];
+
   const newOrganizationFormFields: any[] = [
     { name: 'name', label: 'Name', type: 'text', required: true },
     {
@@ -114,11 +124,11 @@ const Layout = ({
     const fetchData = async () => {
       if (user.email) {
         const { data } = await fetchOrganizations();
-        actions.setOrganizations(data['wbOrganizations']);
+        actions.setOrganizations(data?.wbOrganizations);
       }
     };
     fetchData();
-  }, [actions, user, fetchCloudContext, fetchOrganizations]);
+  }, [actions, user, fetchOrganizations]);
 
   useEffect(() => {
     actions.setTables([]);
@@ -171,6 +181,8 @@ const Layout = ({
         },
       });
       if (!loading && !error) setShow(false);
+    } else if (type === 'editSchema') {
+      // implement the edit schema once we have API
     } else {
       const { error, loading } = await createTable({
         variables: {
@@ -241,16 +253,22 @@ const Layout = ({
               ) : (
                 <div>
                   {Object.keys(schema).length > 0 ? (
-                    <Tables loaded={loaded} />
+                    <Tables
+                      loaded={loaded}
+                      setShow={setShow}
+                      setType={setType}
+                    />
                   ) : (
                     <React.Fragment>
-                      {organizations.map(org => (
-                        <Databases
-                          organization={org}
-                          setShow={setShow}
-                          setType={setType}
-                        />
-                      ))}
+                      {organizations &&
+                        organizations.length > 0 &&
+                        organizations.map(org => (
+                          <Databases
+                            organization={org}
+                            setShow={setShow}
+                            setType={setType}
+                          />
+                        ))}
                       <MyDatabases setShow={setShow} setType={setType} />
                       <MyDatabases
                         name="Databases shared with me"
@@ -267,7 +285,11 @@ const Layout = ({
                 setShow={setShow}
                 onSave={onSave}
                 name={
-                  type === 'token' ? 'Access Token' : `Create a new ${type}?`
+                  type === 'token'
+                    ? 'Access Token'
+                    : type === 'editSchema'
+                    ? `${schema.label} settings`
+                    : `Create a new ${type}?`
                 }>
                 {type === 'database' ? (
                   <FormMaker fields={newDataBaseFormFields} />
@@ -286,6 +308,8 @@ const Layout = ({
                       Bearer {accessToken}
                     </code>
                   </React.Fragment>
+                ) : type === 'editSchema' ? (
+                  <FormMaker fields={editDataBaseFormFields} />
                 ) : (
                   <React.Fragment>
                     <div className="list-group w-100 rounded-0">

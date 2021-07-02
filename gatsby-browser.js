@@ -11,7 +11,7 @@ import { Provider } from 'react-redux';
 import { Auth0Context, Auth0Provider } from '@auth0/auth0-react';
 import { navigate } from 'gatsby';
 
-import store from './src/store';
+import store from './src/state/store';
 import AuthWrapper from './src/components/AuthWrapper';
 
 import './src/styles/style.css';

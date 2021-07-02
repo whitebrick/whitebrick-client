@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../actions';
+import { actions } from '../state/actions';
 import { connect } from 'react-redux';
 import { useManualQuery } from 'graphql-hooks';
-import { TABLE_USERS_QUERY } from '../graphql/queries/wb';
+import { SCHEMA_USERS_QUERY, TABLE_USERS_QUERY } from '../graphql/queries/wb';
 import PermissionGrid from '../components/common/permissionGrid';
 
 type FormMakerPropsType = {
@@ -21,12 +21,16 @@ const FormMaker = ({
   table,
   actions,
 }: FormMakerPropsType) => {
-  const [data, setData] = useState([]);
-  const [isLoading, setLoading] = useState(true);
   const [fetchTableUsers] = useManualQuery(TABLE_USERS_QUERY, {
     variables: {
       schemaName: schema.name,
       tableName: table.name,
+    },
+  });
+
+  const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
+    variables: {
+      schemaName: schema.name,
     },
   });
 
@@ -40,15 +44,15 @@ const FormMaker = ({
     } else actions.setFormData({ ...formData, [name]: e.target.value });
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await fetchTableUsers();
-      return data;
-    };
-    fetchData()
-      .then(r => setData(r['wbTableUsers']))
-      .finally(() => setLoading(false));
-  }, [schema, table]);
+  const fetchTableUsersData = async () => {
+    const { data } = await fetchTableUsers();
+    return data['wbTableUsers'];
+  };
+
+  const fetchSchemaUsersData = async () => {
+    const { data } = await fetchSchemaUsers();
+    return data['wbSchemaUsers'];
+  };
 
   const renderField = ({
     type,
@@ -233,7 +237,14 @@ const FormMaker = ({
           </div>
         );
       } else if (type === 'permissionGrid') {
-        return !isLoading && <PermissionGrid data={data} />;
+        return (
+          <PermissionGrid
+            label={label}
+            fetchData={
+              label === 'table' ? fetchTableUsersData : fetchSchemaUsersData
+            }
+          />
+        );
       }
     }
   };

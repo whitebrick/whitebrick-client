@@ -3,7 +3,7 @@ import * as gql from 'gql-query-builder';
 import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { actions } from '../actions/index';
+import { actions } from '../state/actions/index';
 
 import { useMutation, useSubscription } from 'graphql-hooks';
 
