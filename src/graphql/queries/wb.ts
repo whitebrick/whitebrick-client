@@ -34,8 +34,8 @@ export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withCo
   }
 }`;
 
-export const ORGANIZATIONS_QUERY: string = `query ($userEmail: String) {
-  wbOrganizations(userEmail: $userEmail) {
+export const ORGANIZATIONS_QUERY: string = `query {
+  wbOrganizations {
     name
     label
     userRole
@@ -49,10 +49,8 @@ export const ORGANIZATION_QUERY: string = `query ($name: String!, $currentUserEm
     label
     userRole
   }
-  wbOrganizationUsers(name: $name){
-    firstName
-    lastName
-    email
+  wbOrganizationUsers(organizationName: $name){
+    userEmail
     role
     createdAt
     updatedAt
@@ -63,6 +61,7 @@ export const TABLE_USERS_QUERY = `query ($schemaName: String!, $tableName: Strin
   wbTableUsers(schemaName: $schemaName, tableName: $tableName){
     userEmail
     role
+    roleImpliedFrom
   }
 }`;
 
@@ -70,5 +69,6 @@ export const SCHEMA_USERS_QUERY = `query ($schemaName: String!){
   wbSchemaUsers(schemaName: $schemaName){
     userEmail
     role
+    roleImpliedFrom
   }
 }`;

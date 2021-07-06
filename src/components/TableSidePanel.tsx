@@ -107,7 +107,7 @@ const TableSidePanel = ({
       required: true,
     },
     { name: 'label', label: 'Label', type: 'text', required: true },
-    { label: 'Permissions', type: 'heading' },
+    { label: 'User Roles', type: 'heading' },
     { type: 'permissionGrid', label: 'table' },
   ];
 

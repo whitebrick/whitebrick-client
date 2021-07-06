@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaCheck } from 'react-icons/fa';
+import ReactTooltip from 'react-tooltip';
 
 type PermissionGridType = {
   fetchData: any;
@@ -19,6 +20,7 @@ const PermissionGrid = ({ fetchData, label }: PermissionGridType) => {
   return (
     !loading && (
       <div className="table-responsive">
+        <ReactTooltip />
         <table className="table">
           <thead>
             <tr>
@@ -35,29 +37,64 @@ const PermissionGrid = ({ fetchData, label }: PermissionGridType) => {
               <tr>
                 <td>{user.userEmail}</td>
                 <td className="text-center">
-                  {user.role === `${label}_reader` && (
-                    <FaCheck className="text-success" />
+                  {user.role.split('_').pop() === `reader` && (
+                    <p
+                      data-tip={
+                        user.roleImpliedFrom
+                          ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                          : 'Explicitly Assigned'
+                      }>
+                      <FaCheck className="text-success" />
+                    </p>
                   )}
                 </td>
                 <td className="text-center">
-                  {user.role === `${label}_editor` && (
-                    <FaCheck className="text-success" />
+                  {user.role.split('_').pop() === `editor` && (
+                    <p
+                      data-tip={
+                        user.roleImpliedFrom
+                          ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                          : 'Explicitly Assigned'
+                      }>
+                      <FaCheck className="text-success" />
+                    </p>
                   )}
                 </td>
                 <td className="text-center">
-                  {user.role === `${label}_manager` && (
-                    <FaCheck className="text-success" />
+                  {user.role.split('_').pop() === `manager` && (
+                    <p
+                      data-tip={
+                        user.roleImpliedFrom
+                          ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                          : 'Explicitly Assigned'
+                      }>
+                      <FaCheck className="text-success" />
+                    </p>
                   )}
                 </td>
                 <td className="text-center">
-                  {user.role === `${label}_administrator` && (
-                    <FaCheck className="text-success" />
+                  {user.role.split('_').pop() === `administrator` && (
+                    <p
+                      data-tip={
+                        user.roleImpliedFrom
+                          ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                          : 'Explicitly Assigned'
+                      }>
+                      <FaCheck className="text-success" />
+                    </p>
                   )}
                 </td>
                 {label === 'schema' && (
                   <td className="text-center">
-                    {user.role === `${label}_owner` && (
-                      <FaCheck className="text-success" />
+                    {user.role.split('_').pop() === `owner` && (
+                      <p
+                        data-tip={
+                          user.roleImpliedFrom
+                            ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                            : 'Explicitly Assigned'
+                        }>
+                        <FaCheck className="text-success" />
+                      </p>
                     )}
                   </td>
                 )}

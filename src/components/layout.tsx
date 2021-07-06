@@ -23,6 +23,7 @@ import Databases from './common/databases';
 import Tables from './common/tables';
 import MyDatabases from './common/MyDatabases';
 import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
+import { isObjectEmpty } from '../utils/objectEmpty';
 
 type LayoutPropsType = {
   table: TableItemType;
@@ -53,9 +54,7 @@ const Layout = ({
   const [type, setType] = useState('');
   const [loaded, setLoaded] = useState(false);
   const { error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY);
-  const [fetchOrganizations] = useManualQuery(ORGANIZATIONS_QUERY, {
-    variables: { userEmail: user.email },
-  });
+  const [fetchOrganizations] = useManualQuery(ORGANIZATIONS_QUERY);
   const [fetchCloudContext] = useManualQuery(`{ wbCloudContext }`);
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
@@ -93,7 +92,7 @@ const Layout = ({
       type: 'text',
       required: true,
     },
-    { type: 'heading', label: 'Permissions' },
+    { type: 'heading', label: 'User Roles' },
     { type: 'permissionGrid', label: 'schema' },
   ];
 
@@ -246,7 +245,7 @@ const Layout = ({
         <main id="main">
           {!children ? (
             <React.Fragment>
-              {user && schema.name !== '' && table.name !== '' ? (
+              {user && schema.name !== '' && isObjectEmpty(table) ? (
                 <Table
                   key={schema.name + table.name}
                   fetchTables={fetchTablesAndColumns}

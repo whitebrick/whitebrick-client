@@ -38,10 +38,7 @@ const AuthWrapper = ({
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       (async () => {
-        await getAccessTokenSilently({
-          ignoreCache: true,
-          schema_name: schema.name,
-        });
+        await getAccessTokenSilently({ ignoreCache: true });
         const tokenClaims = await getIdTokenClaims();
         actions.setAccessToken(tokenClaims['__raw']);
         actions.setTokenClaims(tokenClaims);
