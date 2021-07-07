@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../state/actions';
+import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
-import Loading from './loading';
+import Loading from '../loading';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import { SchemaItemType } from '../types';
+import { SchemaItemType } from '../../types';
 
 type AuthWrapper = {
   schema: SchemaItemType;

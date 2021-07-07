@@ -17,7 +17,7 @@ type DatabasesPropsType = {
   renderTitle?: boolean;
 };
 
-const Databases = ({
+const OrganizationDatabasesList = ({
   organization,
   schemas,
   setType,
@@ -80,4 +80,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withAuthenticationRequired(Databases));
+)(withAuthenticationRequired(OrganizationDatabasesList));

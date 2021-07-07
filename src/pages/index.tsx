@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 
-import Layout from '../components/layout';
+import Layout from '../components/layouts/layout';
 import Loading from '../components/loading';
 import { bindActionCreators } from 'redux';
 import { actions } from '../state/actions';

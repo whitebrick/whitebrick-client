@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
-import ViewForeignKeyData from './viewForeignKeyData';
+import ViewForeignKeyData from './common/viewForeignKeyData';
 
 type ForeignKeyCellRendererPropsType = {
   valueFormatted: string;

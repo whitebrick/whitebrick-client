@@ -1,11 +1,14 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../state/actions';
+import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { useManualQuery } from 'graphql-hooks';
-import { SCHEMA_USERS_QUERY, TABLE_USERS_QUERY } from '../graphql/queries/wb';
-import PermissionGrid from '../components/common/permissionGrid';
-import { SchemaItemType, TableItemType } from '../types';
+import {
+  SCHEMA_USERS_QUERY,
+  TABLE_USERS_QUERY,
+} from '../../graphql/queries/wb';
+import PermissionGrid from './permissionGrid';
+import { SchemaItemType, TableItemType } from '../../types';
 
 type FormMakerPropsType = {
   fields: any[];

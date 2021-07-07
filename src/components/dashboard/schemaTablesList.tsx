@@ -18,7 +18,7 @@ type TablesPropsType = {
   actions: any;
 };
 
-const Tables = ({
+const SchemaTablesList = ({
   schema,
   tables,
   setShow,
@@ -83,4 +83,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withAuthenticationRequired(Tables));
+)(withAuthenticationRequired(SchemaTablesList));

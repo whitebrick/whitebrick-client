@@ -1,29 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useManualQuery, useMutation, useQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
-import { actions } from '../state/actions';
+import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import Table from './tableLayout';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import SidePanel from './sidePanel';
-import Sidebar from './sidebar';
-import FormMaker from './formMaker';
+import SidePanel from '../common/sidePanel';
+import Sidebar from '../sidebar';
+import FormMaker from '../common/formMaker';
 import {
   SCHEMAS_QUERY,
   SCHEMA_TABLES_QUERY,
   ORGANIZATIONS_QUERY,
-} from '../graphql/queries/wb';
+} from '../../graphql/queries/wb';
 import {
   CREATE_ORGANIZATION_MUTATION,
   CREATE_SCHEMA_MUTATION,
   CREATE_TABLE_MUTATION,
-} from '../graphql/mutations/wb';
-import Header from './header';
-import Databases from './common/databases';
-import Tables from './common/tables';
-import MyDatabases from './common/MyDatabases';
-import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
-import { isObjectEmpty } from '../utils/objectEmpty';
+} from '../../graphql/mutations/wb';
+import Header from '../header';
+import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
+import SchemaTablesList from '../dashboard/schemaTablesList';
+import MyDatabases from '../dashboard/MyDatabases';
+import { OrganizationItemType, SchemaItemType, TableItemType } from '../../types';
+import { isObjectEmpty } from '../../utils/objectEmpty';
 
 type LayoutPropsType = {
   table: TableItemType;
@@ -254,7 +254,7 @@ const Layout = ({
               ) : (
                 <div>
                   {Object.keys(schema).length > 0 ? (
-                    <Tables
+                    <SchemaTablesList
                       loaded={loaded}
                       setShow={setShow}
                       setType={setType}
@@ -264,7 +264,7 @@ const Layout = ({
                       {organizations &&
                         organizations.length > 0 &&
                         organizations.map(org => (
-                          <Databases
+                          <OrganizationDatabasesList
                             organization={org}
                             setShow={setShow}
                             setType={setType}

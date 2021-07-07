@@ -1,11 +1,11 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../state/actions';
+import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import FormMaker from './formMaker';
 import SidePanel from './sidePanel';
-import { ColumnItemType, TableItemType } from '../types';
+import { ColumnItemType, TableItemType } from '../../types';
 
 type TableSidePanelPropsType = {
   show: boolean;
@@ -127,7 +127,7 @@ const TableSidePanel = ({
           ? `Edit column '${column}'`
           : type === 'view'
           ? `Create a new view`
-          : `${table.label} Table Settings`
+          : type === 'updateTable' && `${table.label} Table Settings`
       }>
       {type === 'newRow' || type === 'editRow' ? (
         <React.Fragment>
@@ -198,7 +198,7 @@ const TableSidePanel = ({
           ]}
         />
       ) : (
-        <FormMaker fields={updateTableFields} />
+        type === 'updateTable' && <FormMaker fields={updateTableFields} />
       )}
     </SidePanel>
   );

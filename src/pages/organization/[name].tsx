@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import Layout from '../../components/layout';
+import Layout from '../../components/layouts/layout';
 import { useManualQuery } from 'graphql-hooks';
 import { ORGANIZATION_QUERY } from '../../graphql/queries/wb';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import OrganizationLayout from '../../components/organizationLayout';
+import OrganizationLayout from '../../components/layouts/organizationLayout';
 import Seo from '../../components/seo';
 import { OrganizationItemType } from '../../types';
 

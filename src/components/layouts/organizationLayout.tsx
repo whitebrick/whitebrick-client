@@ -1,28 +1,22 @@
 import React, { useState } from 'react';
-import {
-  FaChevronRight,
-  FaDatabase,
-  FaPen,
-  FaPlus,
-  FaUsers,
-} from 'react-icons/fa';
+import { FaChevronRight, FaDatabase, FaPen, FaUsers } from 'react-icons/fa';
 import { bindActionCreators } from 'redux';
-import { actions } from '../state/actions';
+import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import NotFound from './notFound';
+import NotFound from '../notFound';
 import { useMutation } from 'graphql-hooks';
 import {
   REMOVE_USERS__MUTATION,
   SET_USERS_ROLE_MUTATION,
   UPDATE_ORGANIZATION_MUTATION,
-} from '../graphql/mutations/wb';
-import OrganizationMembers from './organization/members';
-import SidePanel from './sidePanel';
-import { OrganizationItemType } from '../types';
-import UserSearchInput from './common/userInput';
-import Tabs from './elements/tabs';
-import Databases from './common/databases';
+} from '../../graphql/mutations/wb';
+import OrganizationMembers from '../organization/members';
+import SidePanel from '../common/sidePanel';
+import { OrganizationItemType } from '../../types';
+import UserSearchInput from '../common/userInput';
+import Tabs from '../elements/tabs';
+import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
 
 type OrganizationLayoutPropsType = {
   organization: OrganizationItemType;
@@ -145,7 +139,7 @@ const OrganizationLayout = ({
                     </div>
                   ),
                   element: (
-                    <Databases
+                    <OrganizationDatabasesList
                       organization={organization}
                       setShow={setShow}
                       setType={setType}

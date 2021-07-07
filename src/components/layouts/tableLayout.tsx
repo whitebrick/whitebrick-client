@@ -3,13 +3,13 @@ import * as gql from 'gql-query-builder';
 import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { actions } from '../state/actions/index';
+import { actions } from '../../state/actions';
 
 import { useMutation, useSubscription } from 'graphql-hooks';
 
-import graphQLFetch from '../utils/GraphQLFetch';
-import { UPDATE_TABLE_DETAILS_MUTATION } from '../graphql/mutations/table';
-import Grid from './grid';
+import graphQLFetch from '../../utils/GraphQLFetch';
+import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
+import Grid from '../grid';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
   CREATE_OR_ADD_FOREIGN_KEY,
@@ -17,9 +17,9 @@ import {
   REMOVE_OR_DELETE_COLUMN_MUTATION,
   REMOVE_OR_DELETE_FOREIGN_KEY,
   UPDATE_COLUMN_MUTATION,
-} from '../graphql/mutations/wb';
-import TableSidePanel from './TableSidePanel';
-import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
+} from '../../graphql/mutations/wb';
+import TableSidePanel from '../common/tableSidePanel';
+import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 
 type TableLayoutPropsType = {
   table: TableItemType;

@@ -12,7 +12,7 @@ import { Auth0Context, Auth0Provider } from '@auth0/auth0-react';
 import { navigate } from 'gatsby';
 
 import store from './src/state/store';
-import AuthWrapper from './src/components/AuthWrapper';
+import AuthWrapper from './src/components/common/AuthWrapper';
 
 import './src/styles/style.css';
 import 'rc-pagination/assets/index.css';
