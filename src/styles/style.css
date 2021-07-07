@@ -44,3 +44,18 @@ body {
 .nav-shadow {
     box-shadow: rgb(0 0 0 / 3%) 0 2px 0 0;
 }
+
+
+.table-head {
+    background-color: rgba(249,250,251, 1);
+    color: rgba(107,114,128, 1);
+    text-transform: uppercase;
+}
+
+.whitespace-nowrap {
+    white-space: nowrap;
+}
+
+.rounded-circle {
+    width: 3vw;
+}

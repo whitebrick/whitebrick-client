@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { FaChevronRight, FaPen, FaPlus } from 'react-icons/fa';
+import {
+  FaChevronRight,
+  FaDatabase,
+  FaPen,
+  FaPlus,
+  FaUsers,
+} from 'react-icons/fa';
 import { bindActionCreators } from 'redux';
 import { actions } from '../state/actions';
 import { connect } from 'react-redux';
@@ -15,6 +21,8 @@ import OrganizationMembers from './organization/members';
 import SidePanel from './sidePanel';
 import { OrganizationItemType } from '../types';
 import UserSearchInput from './common/userInput';
+import Tabs from './elements/tabs';
+import Databases from './common/databases';
 
 type OrganizationLayoutPropsType = {
   organization: OrganizationItemType;
@@ -76,7 +84,7 @@ const OrganizationLayout = ({
   const onSave = async () => {
     if (type === 'invite') {
       const { loading, error } = await inviteUserOrUpdateRole(data.role, [
-        data.user.email,
+        data.user[0].email,
       ]);
       if (!loading && !error) fetchOrgData();
     } else {
@@ -128,24 +136,42 @@ const OrganizationLayout = ({
             </span>
           </h3>
           <div className="mt-4">
-            {organization['userRole'] === 'organization_administrator' && (
-              <div>
-                <button
-                  className="btn btn-sm btn-primary mb-2"
-                  onClick={() => {
-                    setData({});
-                    setShow(true);
-                    setType('invite');
-                  }}>
-                  <FaPlus /> Invite User
-                </button>
-              </div>
-            )}
-            <OrganizationMembers
-              organization={organization}
-              getUserLevel={getUserLevel}
-              handleUserRoleChange={handleUserRoleChange}
-              removeUser={removeUser}
+            <Tabs
+              items={[
+                {
+                  title: (
+                    <div>
+                      <FaDatabase /> Databases
+                    </div>
+                  ),
+                  element: (
+                    <Databases
+                      organization={organization}
+                      setShow={setShow}
+                      setType={setType}
+                      renderTitle={false}
+                    />
+                  ),
+                },
+                {
+                  title: (
+                    <div>
+                      <FaUsers /> People
+                    </div>
+                  ),
+                  element: (
+                    <OrganizationMembers
+                      setData={setData}
+                      setShow={setShow}
+                      setType={setType}
+                      organization={organization}
+                      getUserLevel={getUserLevel}
+                      handleUserRoleChange={handleUserRoleChange}
+                      removeUser={removeUser}
+                    />
+                  ),
+                },
+              ]}
             />
           </div>
         </div>

@@ -1,11 +1,14 @@
 import React from 'react';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 
 type OrganizationMembersPropsType = {
   organization: any;
   handleUserRoleChange: (value: string, user: any) => void;
   getUserLevel: (value: string) => any;
   removeUser: (user: any) => void;
+  setData: (value: any) => void;
+  setType: (value: string) => void;
+  setShow: (value: boolean) => void;
 };
 
 const OrganizationMembers = ({
@@ -13,27 +16,73 @@ const OrganizationMembers = ({
   handleUserRoleChange,
   getUserLevel,
   removeUser,
+  setData,
+  setShow,
+  setType,
 }: OrganizationMembersPropsType) => {
   return (
     <div className="table-responsive mt-3">
-      <table className="table table-striped">
-        <thead>
+      {organization['userRole'] === 'organization_administrator' && (
+        <div className="row m-0 py-2">
+          <div className="col-sm-3">
+            <div className="input-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search users"
+              />
+              <div className="input-group-append">
+                <span className="input-group-text">
+                  <FaSearch />
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-2 offset-sm-7">
+            <button
+              className="btn btn-sm btn-primary mb-2 float-right"
+              onClick={() => {
+                setData({});
+                setShow(true);
+                setType('invite');
+              }}>
+              <FaPlus /> Invite User
+            </button>
+          </div>
+        </div>
+      )}
+      <table className="mx-3 shadow-sm table">
+        <thead className="table-head font-weight-bold">
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Email</th>
+            <th scope="col">User</th>
             <th scope="col">Source</th>
             <th scope="col">Role</th>
           </tr>
         </thead>
-        <tbody>
-          {organization.users.map((user, index) => (
+        <tbody className="bg-white whitespace-nowrap">
+          {organization.users.map(user => (
             <tr>
-              <th scope="row">{index + 1}</th>
-              <td>{user.userEmail}</td>
               <td>
-                {user.roleImpliedFrom ? user.roleImpliedFrom : 'Direct Member'}
+                <div className="d-flex align-items-center items-center">
+                  <img
+                    src="https://www.gravatar.com/avatar/HASH"
+                    className="rounded-circle"
+                    alt="image"
+                  />
+                  <div className="ml-3">
+                    <h6>Name</h6>
+                    <div className="text-black-50">{user.userEmail}</div>
+                  </div>
+                </div>
               </td>
-              <td>
+              <td className="align-bottom">
+                <p>
+                  {user.roleImpliedFrom
+                    ? user.roleImpliedFrom
+                    : 'Direct Member'}
+                </p>
+              </td>
+              <td className="align-middle">
                 {organization['userRole'] === 'organization_administrator' ? (
                   <React.Fragment>
                     <select
