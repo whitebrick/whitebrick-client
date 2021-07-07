@@ -14,17 +14,19 @@ const OrganizationMembers = ({
   getUserLevel,
   removeUser,
 }: OrganizationMembersPropsType) => {
-  console.log(organization);
   return (
     <div style={{ overflow: 'scroll' }}>
       <div className="row p-4 d-flex align-items-center bg-white border">
         <div className="col-sm-1">
           <b>S.No</b>
         </div>
-        <div className="col-sm-5">
+        <div className="col-sm-4">
           <b>Email</b>
         </div>
-        <div className="col-sm-5">
+        <div className="col-sm-3">
+          <b>Source</b>
+        </div>
+        <div className="col-sm-3">
           <b>Role</b>
         </div>
       </div>
@@ -37,10 +39,15 @@ const OrganizationMembers = ({
           <div className="col-sm-1">
             <b>{index + 1}</b>
           </div>
-          <div className="col-sm-5">
+          <div className="col-sm-4">
             <div>{user.userEmail}</div>
           </div>
-          <div className="col-sm-5">
+          <div className="col-sm-3">
+            <div>
+              {user.roleImpliedFrom ? user.roleImpliedFrom : 'Direct Member'}
+            </div>
+          </div>
+          <div className="col-sm-3">
             {organization['userRole'] === 'organization_administrator' ? (
               <select
                 className="form-control-sm"

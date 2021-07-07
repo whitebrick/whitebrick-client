@@ -26,7 +26,6 @@ const Organization = ({
   const [fetchOrganization] = useManualQuery(ORGANIZATION_QUERY, {
     variables: {
       name: params.name,
-      currentUserEmail: user.email,
     },
   });
 
@@ -36,7 +35,7 @@ const Organization = ({
         if (user.email !== '' || user.email !== undefined) {
           const { loading, error, data } = await fetchOrganization();
           if (!loading && !error) {
-            let org = data['wbOrganizationByName'];
+            let org = data['wbMyOrganizationByName'];
             if (org !== null) {
               org.users = [];
               org.users = data['wbOrganizationUsers'];

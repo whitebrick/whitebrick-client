@@ -44,7 +44,7 @@ const OrganizationLayout = ({
   const fetchOrgData = async () => {
     const { loading: l, error: e, data } = await fetchOrganization();
     if (!l && !e) {
-      let org = data['wbOrganizationByName'];
+      let org = data['wbMyOrganizationByName'];
       if (org !== null) {
         org.users = [];
         org.users = data['wbOrganizationUsers'];

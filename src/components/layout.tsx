@@ -66,7 +66,7 @@ const Layout = ({
       name: 'schema',
       label: 'Database Name',
       type: 'select',
-      options: schemas?.wbSchemas,
+      options: schemas?.wbMySchemas,
       nested: true,
       nestedValue: 'name',
     },
@@ -107,8 +107,8 @@ const Layout = ({
   ];
 
   useEffect(() => {
-    if (schemas && schemas['wbSchemas'] && schemas['wbSchemas'].length > 0)
-      actions.setSchemas(schemas['wbSchemas']);
+    if (schemas && schemas['wbMySchemas'] && schemas['wbMySchemas'].length > 0)
+      actions.setSchemas(schemas['wbMySchemas']);
   }, [schemas, actions]);
 
   useEffect(() => {
@@ -124,7 +124,7 @@ const Layout = ({
     const fetchData = async () => {
       if (user.email) {
         const { data } = await fetchOrganizations();
-        actions.setOrganizations(data?.wbOrganizations);
+        actions.setOrganizations(data?.wbMyOrganizations);
       }
     };
     fetchData();
@@ -137,7 +137,7 @@ const Layout = ({
         const { data } = await fetchSchemaTables({
           variables: { schemaName: schema.name, withColumns: true },
         });
-        actions.setTables(data['wbTables']);
+        actions.setTables(data['wbMyTables']);
         setLoaded(true);
       }
     };
@@ -148,9 +148,11 @@ const Layout = ({
     const { data } = await fetchSchemaTables({
       variables: { schemaName: schema.name, withColumns: true },
     });
-    let t = data.wbTables.filter(tableName => tableName.name === table.name)[0];
+    let t = data.wbMyTables.filter(
+      tableName => tableName.name === table.name,
+    )[0];
     if (t.columns.length > 0) {
-      actions.setTables(data.wbTables);
+      actions.setTables(data.wbMyTables);
       actions.setColumns(t.columns);
       actions.setOrderBy(t.columns[0].name);
     } else {
@@ -204,10 +206,10 @@ const Layout = ({
       if (params['databaseName'] && params['databaseName'] !== schema.name) {
         if (
           schemas &&
-          schemas['wbSchemas'] &&
-          schemas['wbSchemas'].length > 0
+          schemas['wbMySchemas'] &&
+          schemas['wbMySchemas'].length > 0
         ) {
-          let s: any = schemas['wbSchemas'].filter(
+          let s: any = schemas['wbMySchemas'].filter(
             schema => schema.name === params['databaseName'],
           )[0];
           if (s && Object.keys(s).length > 0) actions.setSchema(s);

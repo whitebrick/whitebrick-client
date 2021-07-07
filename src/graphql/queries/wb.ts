@@ -1,5 +1,5 @@
 export const SCHEMAS_QUERY: string = `query {
-  wbSchemas {
+  wbMySchemas {
     name
     label
     userOwnerEmail
@@ -8,7 +8,7 @@ export const SCHEMAS_QUERY: string = `query {
 }`;
 
 export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withColumns: Boolean){
-  wbTables(schemaName: $schemaName, withColumns: $withColumns) {
+  wbMyTables(schemaName: $schemaName, withColumns: $withColumns) {
     name
     label
     columns {
@@ -35,7 +35,7 @@ export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withCo
 }`;
 
 export const ORGANIZATIONS_QUERY: string = `query {
-  wbOrganizations {
+  wbMyOrganizations {
     name
     label
     userRole
@@ -43,8 +43,8 @@ export const ORGANIZATIONS_QUERY: string = `query {
 }
 `;
 
-export const ORGANIZATION_QUERY: string = `query ($name: String!, $currentUserEmail: String!){
-  wbOrganizationByName(name: $name, currentUserEmail: $currentUserEmail){
+export const ORGANIZATION_QUERY: string = `query ($name: String!){
+  wbMyOrganizationByName(name: $name){
     name
     label
     userRole
@@ -54,6 +54,7 @@ export const ORGANIZATION_QUERY: string = `query ($name: String!, $currentUserEm
     role
     createdAt
     updatedAt
+    roleImpliedFrom
   }
 }`;
 
