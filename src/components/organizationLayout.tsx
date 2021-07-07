@@ -14,6 +14,7 @@ import {
 import OrganizationMembers from './organization/members';
 import SidePanel from './sidePanel';
 import { OrganizationItemType } from '../types';
+import UserSearchInput from './common/userInput';
 
 type OrganizationLayoutPropsType = {
   organization: OrganizationItemType;
@@ -74,10 +75,9 @@ const OrganizationLayout = ({
 
   const onSave = async () => {
     if (type === 'invite') {
-      const { loading, error } = await inviteUserOrUpdateRole(
-        data.role,
-        data.emails,
-      );
+      const { loading, error } = await inviteUserOrUpdateRole(data.role, [
+        data.user.email,
+      ]);
       if (!loading && !error) fetchOrgData();
     } else {
       let variables: any = { name: organization.name };
@@ -131,7 +131,7 @@ const OrganizationLayout = ({
             {organization['userRole'] === 'organization_administrator' && (
               <div>
                 <button
-                  className="btn btn-outline-primary mb-2"
+                  className="btn btn-sm btn-primary mb-2"
                   onClick={() => {
                     setData({});
                     setShow(true);
@@ -161,17 +161,7 @@ const OrganizationLayout = ({
           {type === 'invite' ? (
             <div className="form-group">
               <div className="mt-3">
-                <label htmlFor="emails">User Email</label>
-                <textarea
-                  className="form-control"
-                  value={data.emails && data?.emails.join(',')}
-                  onChange={e =>
-                    setData({ ...data, emails: e.target.value.split(',') })
-                  }
-                />
-                <p className="text-small p-1">
-                  You can pass multiple emails with comma seperated
-                </p>
+                <UserSearchInput data={data} setData={setData} />
               </div>
               <div className="mt-3">
                 <label htmlFor="role">Role</label>

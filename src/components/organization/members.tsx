@@ -15,69 +15,60 @@ const OrganizationMembers = ({
   removeUser,
 }: OrganizationMembersPropsType) => {
   return (
-    <div style={{ overflow: 'scroll' }}>
-      <div className="row p-4 d-flex align-items-center bg-white border">
-        <div className="col-sm-1">
-          <b>S.No</b>
-        </div>
-        <div className="col-sm-4">
-          <b>Email</b>
-        </div>
-        <div className="col-sm-3">
-          <b>Source</b>
-        </div>
-        <div className="col-sm-3">
-          <b>Role</b>
-        </div>
-      </div>
-      {organization.users.map((user, index) => (
-        <div
-          className="row p-3 d-flex align-items-center border"
-          style={{
-            background: index % 2 === 0 ? 'rgba(0, 0, 0, 0.05)' : 'white',
-          }}>
-          <div className="col-sm-1">
-            <b>{index + 1}</b>
-          </div>
-          <div className="col-sm-4">
-            <div>{user.userEmail}</div>
-          </div>
-          <div className="col-sm-3">
-            <div>
-              {user.roleImpliedFrom ? user.roleImpliedFrom : 'Direct Member'}
-            </div>
-          </div>
-          <div className="col-sm-3">
-            {organization['userRole'] === 'organization_administrator' ? (
-              <select
-                className="form-control-sm"
-                onBlur={() => {}}
-                value={user.role}
-                onChange={e => handleUserRoleChange(e.target.value, user)}>
-                <option value="organization_administrator">
-                  Organization Administrator
-                </option>
-                <option value="organization_user">Organization User</option>
-                <option value="organization_external_user">
-                  Organization External User
-                </option>
-              </select>
-            ) : (
-              <div>{getUserLevel(user.role)['label']}</div>
-            )}
-          </div>
-          <div className="col-sm-1">
-            {organization['userRole'] === 'organization_administrator' &&
-              user.role !== 'organization_administrator' && (
-                <button
-                  className="btn btn-sm btn-danger"
-                  onClick={() => removeUser(user)}>
-                  <FaTrash />
-                </button>
-              )}
-          </div>
-        </div>
-      ))}
+    <div className="table-responsive mt-3">
+      <table className="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Email</th>
+            <th scope="col">Source</th>
+            <th scope="col">Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {organization.users.map((user, index) => (
+            <tr>
+              <th scope="row">{index + 1}</th>
+              <td>{user.userEmail}</td>
+              <td>
+                {user.roleImpliedFrom ? user.roleImpliedFrom : 'Direct Member'}
+              </td>
+              <td>
+                {organization['userRole'] === 'organization_administrator' ? (
+                  <React.Fragment>
+                    <select
+                      className="form-control-sm"
+                      onBlur={() => {}}
+                      value={user.role}
+                      onChange={e =>
+                        handleUserRoleChange(e.target.value, user)
+                      }>
+                      <option value="organization_administrator">
+                        Organization Administrator
+                      </option>
+                      <option value="organization_user">
+                        Organization User
+                      </option>
+                      <option value="organization_external_user">
+                        Organization External User
+                      </option>
+                    </select>
+                    {user.role !== 'organization_administrator' && (
+                      <button
+                        className="btn ml-3 btn-sm btn-danger"
+                        onClick={() => removeUser(user)}>
+                        <FaTrash />
+                      </button>
+                    )}
+                  </React.Fragment>
+                ) : (
+                  <div>{getUserLevel(user.role)['label']}</div>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

@@ -39,8 +39,8 @@ export const UPDATE_COLUMN_MUTATION: string = `mutation ($schemaName: String!, $
   wbUpdateColumn(schemaName: $schemaName, tableName: $tableName, columnName: $columnName, newColumnName: $newColumnName, newColumnLabel: $newColumnLabel, newType: $newType)
 }`;
 
-export const CREATE_ORGANIZATION_MUTATION: string = `mutation ($name: String!, $label: String!, $currentUserEmail: String!) {
-  wbCreateOrganization(name: $name, label: $label, currentUserEmail: $currentUserEmail) {
+export const CREATE_ORGANIZATION_MUTATION: string = `mutation ($name: String!, $label: String!) {
+  wbCreateOrganization(name: $name, label: $label) {
     id
   }
 }

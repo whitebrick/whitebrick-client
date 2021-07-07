@@ -73,3 +73,11 @@ export const SCHEMA_USERS_QUERY = `query ($schemaName: String!){
     roleImpliedFrom
   }
 }`;
+
+export const USERS_SEARCH_PATTERN = `query ($searchPattern: String!){
+  wbUsersBySearchPattern(searchPattern: $searchPattern){
+    firstName
+    lastName
+    email
+  }
+}`;

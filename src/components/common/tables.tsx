@@ -7,13 +7,14 @@ import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import Skeleton from 'react-loading-skeleton';
 import { FaCog } from 'react-icons/fa';
+import { SchemaItemType, TableItemType } from '@/types';
 
 type TablesPropsType = {
-  schema: any;
-  tables: any[];
+  schema: SchemaItemType;
+  tables: Array<TableItemType>;
   loaded: boolean;
-  setShow: any;
-  setType: any;
+  setShow: (value: boolean) => void;
+  setType: (value: string) => void;
   actions: any;
 };
 

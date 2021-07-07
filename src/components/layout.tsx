@@ -179,7 +179,6 @@ const Layout = ({
         variables: {
           name: formData.name,
           label: formData.label,
-          currentUserEmail: user.email,
         },
       });
       if (!loading && !error) setShow(false);
