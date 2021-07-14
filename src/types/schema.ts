@@ -3,4 +3,7 @@ export type SchemaItemType = {
   label: string;
   userOwnerEmail: string;
   organizationOwnerName: string;
+  role: {
+    name: string;
+  };
 };

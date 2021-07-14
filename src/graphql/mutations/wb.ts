@@ -61,3 +61,13 @@ export const UPDATE_ORGANIZATION_MUTATION: string = `mutation ($name: String!, $
     name
   }
 }`;
+
+export const SCHEMA_SET_USER_ROLE_MUTATION: string = `mutation ($schemaName: String!, $roleName: String!, $userEmails: [String]!) {
+  wbSetSchemaUsersRole(schemaName: $schemaName, roleName: $roleName, userEmails: $userEmails)
+}
+`;
+
+export const TABLE_SET_USER_ROLE_MUTATION: string = `mutation ($schemaName: String!, $tableName: String!, $roleName: String!, $userEmails: [String]!) {
+  wbSetTableUsersRole(schemaName: $schemaName, tableName: $tableName, roleName: $roleName, userEmails: $userEmails)
+}
+`;

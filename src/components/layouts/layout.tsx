@@ -20,10 +20,14 @@ import {
 } from '../../graphql/mutations/wb';
 import Header from '../header';
 import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
-import SchemaTablesList from '../dashboard/schemaTablesList';
 import MyDatabases from '../dashboard/MyDatabases';
-import { OrganizationItemType, SchemaItemType, TableItemType } from '../../types';
+import {
+  OrganizationItemType,
+  SchemaItemType,
+  TableItemType,
+} from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
+import SchemaLayout from '../layouts/schemaLayout';
 
 type LayoutPropsType = {
   table: TableItemType;
@@ -254,7 +258,7 @@ const Layout = ({
               ) : (
                 <div>
                   {Object.keys(schema).length > 0 ? (
-                    <SchemaTablesList
+                    <SchemaLayout
                       loaded={loaded}
                       setShow={setShow}
                       setType={setType}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChevronRight, FaDatabase, FaPen, FaUsers } from 'react-icons/fa';
+import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
@@ -133,11 +133,7 @@ const OrganizationLayout = ({
             <Tabs
               items={[
                 {
-                  title: (
-                    <div>
-                      <FaDatabase /> Databases
-                    </div>
-                  ),
+                  title: 'Databases',
                   element: (
                     <OrganizationDatabasesList
                       organization={organization}
@@ -148,11 +144,7 @@ const OrganizationLayout = ({
                   ),
                 },
                 {
-                  title: (
-                    <div>
-                      <FaUsers /> People
-                    </div>
-                  ),
+                  title: 'People',
                   element: (
                     <OrganizationMembers
                       setData={setData}

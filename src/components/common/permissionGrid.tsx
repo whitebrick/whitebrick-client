@@ -35,13 +35,15 @@ const PermissionGrid = ({ fetchData, label }: PermissionGridType) => {
           <tbody>
             {data.map(user => (
               <tr>
-                <td>{user.userEmail}</td>
+                <td>
+                  {user.userFirstName} {user.userLastName}
+                </td>
                 <td className="text-center">
-                  {user.role.split('_').pop() === `reader` && (
+                  {user.role.name.split('_').pop() === `reader` && (
                     <p
                       data-tip={
-                        user.roleImpliedFrom
-                          ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                        user.role.impliedFrom
+                          ? `Implicitly Assigned from ${user.role.impliedFrom}`
                           : 'Explicitly Assigned'
                       }>
                       <FaCheck className="text-success" />
@@ -49,11 +51,11 @@ const PermissionGrid = ({ fetchData, label }: PermissionGridType) => {
                   )}
                 </td>
                 <td className="text-center">
-                  {user.role.split('_').pop() === `editor` && (
+                  {user.role.name.split('_').pop() === `editor` && (
                     <p
                       data-tip={
-                        user.roleImpliedFrom
-                          ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                        user.role.impliedFrom
+                          ? `Implicitly Assigned from ${user.role.impliedFrom}`
                           : 'Explicitly Assigned'
                       }>
                       <FaCheck className="text-success" />
@@ -61,11 +63,11 @@ const PermissionGrid = ({ fetchData, label }: PermissionGridType) => {
                   )}
                 </td>
                 <td className="text-center">
-                  {user.role.split('_').pop() === `manager` && (
+                  {user.role.name.split('_').pop() === `manager` && (
                     <p
                       data-tip={
-                        user.roleImpliedFrom
-                          ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                        user.role.impliedFrom
+                          ? `Implicitly Assigned from ${user.role.impliedFrom}`
                           : 'Explicitly Assigned'
                       }>
                       <FaCheck className="text-success" />
@@ -73,11 +75,11 @@ const PermissionGrid = ({ fetchData, label }: PermissionGridType) => {
                   )}
                 </td>
                 <td className="text-center">
-                  {user.role.split('_').pop() === `administrator` && (
+                  {user.role.name.split('_').pop() === `administrator` && (
                     <p
                       data-tip={
-                        user.roleImpliedFrom
-                          ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                        user.role.impliedFrom
+                          ? `Implicitly Assigned from ${user.role.impliedFrom}`
                           : 'Explicitly Assigned'
                       }>
                       <FaCheck className="text-success" />
@@ -86,11 +88,11 @@ const PermissionGrid = ({ fetchData, label }: PermissionGridType) => {
                 </td>
                 {label === 'schema' && (
                   <td className="text-center">
-                    {user.role.split('_').pop() === `owner` && (
+                    {user.role.name.split('_').pop() === `owner` && (
                       <p
                         data-tip={
-                          user.roleImpliedFrom
-                            ? `Implicitly Assigned from ${user.roleImpliedFrom}`
+                          user.role.impliedFrom
+                            ? `Implicitly Assigned from ${user.role.impliedFrom}`
                             : 'Explicitly Assigned'
                         }>
                         <FaCheck className="text-success" />

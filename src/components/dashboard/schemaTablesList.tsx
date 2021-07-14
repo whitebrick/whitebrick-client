@@ -6,68 +6,44 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import Skeleton from 'react-loading-skeleton';
-import { FaCog } from 'react-icons/fa';
-import { SchemaItemType, TableItemType } from '@/types';
+import { SchemaItemType, TableItemType } from '../../types';
+import { Pane } from 'evergreen-ui';
 
 type TablesPropsType = {
   schema: SchemaItemType;
   tables: Array<TableItemType>;
   loaded: boolean;
-  setShow: (value: boolean) => void;
-  setType: (value: string) => void;
-  actions: any;
 };
 
-const SchemaTablesList = ({
-  schema,
-  tables,
-  setShow,
-  setType,
-  loaded,
-  actions,
-}: TablesPropsType) => {
+const SchemaTablesList = ({ schema, tables, loaded }: TablesPropsType) => {
   return (
-    <div className="card my-4">
-      <div className="card-header d-flex justify-content-between align-items-center">
-        <h4>{schema.label}</h4>
-        <button
-          className="btn btn-light"
-          onClick={() => {
-            actions.setFormData(schema);
-            setType('editSchema');
-            setShow(true);
-          }}>
-          <FaCog />
-        </button>
+    <Pane padding={16} flex={1} background="tint1">
+      <div className="row">
+        {loaded ?? tables.length > 0
+          ? tables.map(table => (
+              <div
+                className="col-md-2 text-center btn"
+                aria-hidden="true"
+                onClick={() =>
+                  navigate(`/database/${schema.name}/table/${table.name}`)
+                }>
+                <Avatar name={table.label} size="75" round="12px" />
+                <p className="mt-2">{table.label}</p>
+              </div>
+            ))
+          : [...Array(12)].map((e, i) => (
+              <div className="col-md-2 text-center btn" key={i}>
+                <Skeleton height="100px" />
+              </div>
+            ))}
+        {loaded && (
+          <div className="col-md-2 text-center btn">
+            <Avatar name="+" size="75" round="12px" />
+            <p className="mt-2">Add table</p>
+          </div>
+        )}
       </div>
-      <div className="card-body">
-        <div className="row">
-          {loaded ?? tables.length > 0
-            ? tables.map(table => (
-                <div
-                  className="col-md-2 text-center btn"
-                  aria-hidden="true"
-                  onClick={() =>
-                    navigate(`/database/${schema.name}/table/${table.name}`)
-                  }>
-                  <Avatar name={table.label} size="75" round="12px" />
-                  <p className="mt-2">{table.label}</p>
-                </div>
-              ))
-            : [...Array(12)].map((e, i) => (
-                <div className="col-md-2 text-center btn" key={i}>
-                  <Skeleton height="100px" />
-                </div>
-              ))}
-          {loaded && (
-            <div className="col-md-2 text-center btn">
-              <Avatar name="+" size="75" round="12px" />
-              <p className="mt-2">Add table</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    </Pane>
   );
 };
 

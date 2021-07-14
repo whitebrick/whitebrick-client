@@ -4,6 +4,9 @@ export const SCHEMAS_QUERY: string = `query {
     label
     userOwnerEmail
     organizationOwnerName
+    role{
+      name
+    }
   }
 }`;
 
@@ -68,9 +71,15 @@ export const TABLE_USERS_QUERY = `query ($schemaName: String!, $tableName: Strin
 
 export const SCHEMA_USERS_QUERY = `query ($schemaName: String!){
   wbSchemaUsers(schemaName: $schemaName){
+    userId
+    userFirstName
+    userLastName
     userEmail
-    role
-    roleImpliedFrom
+    role{
+      name
+      impliedFrom
+      permissions
+    }
   }
 }`;
 
