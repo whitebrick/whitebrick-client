@@ -18,7 +18,7 @@ import {
   CREATE_SCHEMA_MUTATION,
   CREATE_TABLE_MUTATION,
 } from '../../graphql/mutations/wb';
-import Header from '../header';
+import Header from '../common/header';
 import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
 import MyDatabases from '../dashboard/MyDatabases';
 import {
