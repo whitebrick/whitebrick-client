@@ -33,7 +33,7 @@ const SchemaLayout = ({
   });
 
   const fetchData = () => {
-    fetchSchemaUsers().then(r => setUsers(r.data.wbSchemaUsers));
+    fetchSchemaUsers().then(r => setUsers(r?.data?.wbSchemaUsers));
   };
   useEffect(fetchData, []);
 
@@ -53,7 +53,7 @@ const SchemaLayout = ({
     <div className="mt-3">
       <div style={{ padding: `1rem` }}>
         <h3
-          className="m-0 w-25"
+          className="m-0"
           aria-hidden={true}
           style={{ cursor: 'pointer' }}
           onClick={() => {

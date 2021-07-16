@@ -47,7 +47,9 @@ const OrganizationDatabasesList = ({
               <div
                 className="col-md-2 text-center btn"
                 aria-hidden="true"
-                onClick={() => navigate(`/db/${schema.name}`)}>
+                onClick={() =>
+                  navigate(`/${organization.name}/${schema.name}`)
+                }>
                 <Avatar name={schema.label} size="75" round="12px" />
                 <p className="mt-2">{schema.label}</p>
               </div>

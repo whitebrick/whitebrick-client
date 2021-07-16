@@ -137,13 +137,11 @@ const Layout = ({
   useEffect(() => {
     const fetchTables = async () => {
       if (schema.name !== '' && schema.name !== undefined) {
-        const { loading, data } = await fetchSchemaTables({
+        const { data } = await fetchSchemaTables({
           variables: { schemaName: schema.name, withColumns: true },
         });
-        if (loading) {
-          actions.setTables(data.wbMyTables);
-          setLoaded(true);
-        }
+        actions.setTables(data?.wbMyTables ?? data.wbMyTables);
+        setLoaded(true);
       }
     };
     actions.setTables([]);
@@ -252,7 +250,7 @@ const Layout = ({
         <main id="main">
           {!children ? (
             <React.Fragment>
-              {user && schema.name !== '' && isObjectEmpty(table) ? (
+              {user && schema.name !== '' && !isObjectEmpty(table) ? (
                 <Table
                   key={schema.name + table.name}
                   fetchTables={fetchTablesAndColumns}

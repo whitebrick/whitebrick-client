@@ -24,6 +24,7 @@ import {
   SchemaItemType,
   TableItemType,
 } from '../../types';
+import { isObjectEmpty } from '../../utils/objectEmpty';
 
 type MembersType = {
   user: any;
@@ -50,7 +51,7 @@ const Members = ({
     if (role) return role.split('_').pop();
   };
 
-  const roles = cloudContext?.roles[name];
+  const roles = !isObjectEmpty(cloudContext) && cloudContext?.roles[name];
   const userRole =
     name === 'organization'
       ? getRole(organization?.role?.name)

@@ -11,7 +11,7 @@ import { Pane } from 'evergreen-ui';
 
 type TablesPropsType = {
   schema: SchemaItemType;
-  tables: Array<TableItemType>;
+  tables: TableItemType[];
   loaded: boolean;
 };
 
