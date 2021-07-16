@@ -30,7 +30,7 @@ const Members = ({
   table,
 }: MembersType) => {
   const roles = cloudContext?.roles[name];
-  const userRole = schema?.role.name.split('_').pop();
+  const userRole = schema?.role?.name.split('_').pop();
   const [updateSchemaUserRole] = useMutation(SCHEMA_SET_USER_ROLE_MUTATION);
   const [updateTableUserRole] = useMutation(TABLE_SET_USER_ROLE_MUTATION);
 

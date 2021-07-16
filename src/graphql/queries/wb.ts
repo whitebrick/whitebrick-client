@@ -37,11 +37,13 @@ export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withCo
   }
 }`;
 
-export const ORGANIZATIONS_QUERY: string = `query {
+export const ORGANIZATIONS_QUERY: string = `{
   wbMyOrganizations {
     name
     label
-    userRole
+    role{
+      name
+    }
   }
 }
 `;

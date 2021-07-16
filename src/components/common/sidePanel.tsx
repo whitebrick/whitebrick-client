@@ -1,8 +1,16 @@
 import React from 'react';
-import Modal from 'react-modal';
+import {
+  SideSheet,
+  Heading,
+  Pane,
+  Card,
+  Button,
+  Paragraph,
+} from 'evergreen-ui';
 
 type SidePanelPropsType = {
   name: string;
+  description?: string;
   show: boolean;
   setShow: (value: boolean) => void;
   onSave?: () => void;
@@ -12,46 +20,67 @@ type SidePanelPropsType = {
 
 const SidePanel = ({
   name,
+  description = null,
   show,
   setShow,
   onSave,
   children,
   renderSaveButton = true,
 }: SidePanelPropsType) => {
-  const customStyles = {
-    content: {
-      top: 0,
-      right: 0,
-      left: 'auto',
-      height: '100vh',
-      padding: '1rem',
-      width: '450px',
-      overflowY: 'scroll',
-      zIndex: 1030,
-    },
-  };
-
   return (
-    <Modal
-      onRequestClose={() => setShow(false)}
-      isOpen={show}
-      style={customStyles}
-      ariaHideApp={false}>
-      <div className="modal-header">
-        <h4 className="text-center">{name}</h4>
-      </div>
-      <div className="modal-body">{children}</div>
-      <div className="modal-footer fixed-bottom">
-        <button onClick={() => setShow(false)} className="btn btn-danger m-2">
-          Cancel
-        </button>
-        {renderSaveButton && (
-          <button onClick={onSave} className="btn btn-primary">
-            Save
-          </button>
-        )}
-      </div>
-    </Modal>
+    <React.Fragment>
+      <SideSheet
+        isShown={show}
+        onCloseComplete={() => setShow(false)}
+        containerProps={{
+          display: 'flex',
+          flex: '1',
+          flexDirection: 'column',
+        }}>
+        <Pane
+          display="flex"
+          zIndex={1}
+          flexShrink={0}
+          elevation={0}
+          backgroundColor="white">
+          <Pane
+            padding={16}
+            flex={1}
+            alignItems="center"
+            display="flex"
+            borderBottom="muted">
+            <Heading size={600}>{name}</Heading>
+            {description && (
+              <Paragraph size={400} color="muted">
+                {description}
+              </Paragraph>
+            )}
+          </Pane>
+          {renderSaveButton && (
+            <Pane
+              padding={16}
+              alignItems="center"
+              display="flex"
+              borderBottom="muted">
+              <Button appearance="primary" onClick={onSave}>
+                Save
+              </Button>
+            </Pane>
+          )}
+        </Pane>
+        <Pane flex="1" overflowY="scroll" background="tint1" padding={16}>
+          <Card
+            backgroundColor="white"
+            elevation={0}
+            display="flex"
+            alignItems="center"
+            paddingY={50}
+            justifyContent="center">
+            {children}
+          </Card>
+        </Pane>
+      </SideSheet>
+    </React.Fragment>
   );
 };
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
+import { TextInputField, SelectField } from 'evergreen-ui';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { useManualQuery } from 'graphql-hooks';
@@ -79,84 +80,72 @@ const FormMaker = ({
     if (render) {
       if (type === 'text' || type === 'string')
         return (
-          <>
-            <label htmlFor={name}>{label}</label>
-            <input
-              className="form-control"
-              value={!formData[name] ? defaultValue : formData[name]}
-              onChange={e =>
-                actions.setFormData({ ...formData, [name]: e.target.value })
-              }
-              required={required}
-              readOnly={readOnly}
-            />
-          </>
+          <TextInputField
+            label={label}
+            placeholder={`Enter ${label}`}
+            value={!formData[name] ? defaultValue : formData[name]}
+            onChange={e =>
+              actions.setFormData({ ...formData, [name]: e.target.value })
+            }
+            required={required}
+            disabled={readOnly}
+          />
         );
       else if (type === 'select') {
         if (nested) {
           return (
-            <>
-              <label htmlFor={name}>{label}</label>
-              <select
-                className="form-control"
-                multiple={multiple}
-                value={!formData[name] ? defaultValue : formData[name]}
-                onBlur={() => {}}
-                disabled={readOnly}
-                onChange={e => handleSelectChange(multiple, name, e)}>
-                {!multiple && (
-                  <option disabled selected={!selected}>
-                    Select {name}
-                  </option>
-                )}
-                {options.map(option => (
-                  <option
-                    key={option[nestedValue]}
-                    value={option[nestedValue]}
-                    selected={selected && option[selected] === true}>
-                    {option[nestedValue]}
+            <SelectField
+              label={label}
+              value={!formData[name] ? defaultValue : formData[name]}
+              required={required}
+              onChange={e => handleSelectChange(multiple, name, e)}>
+              {!multiple && (
+                <option disabled selected={!selected}>
+                  Select {label}
+                </option>
+              )}
+              {options.map(option => (
+                <option
+                  key={option[nestedValue]}
+                  value={option[nestedValue]}
+                  selected={selected && option[selected] === true}>
+                  {option[nestedValue]}
+                </option>
+              ))}
+              {addNewOptions &&
+                addNewOptionsValue.map(option => (
+                  <option key={option} value={option}>
+                    {option}
                   </option>
                 ))}
-                {addNewOptions &&
-                  addNewOptionsValue.map(option => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-              </select>
-            </>
+            </SelectField>
           );
         } else if (keyValuePairs) {
           let res = [];
           for (let key in options) res.push({ key, value: options[key] });
           return (
-            <>
-              <label htmlFor={name}>{label}</label>
-              <select
-                className="form-control"
-                multiple={multiple}
-                value={!formData[name] ? defaultValue : formData[name]}
-                onBlur={() => {}}
-                disabled={readOnly}
-                onChange={e => handleSelectChange(multiple, name, e)}>
-                {!multiple && (
-                  <option disabled selected>
-                    Select {name}
-                  </option>
-                )}
-                {res.map(option => (
-                  <option key={option.key} value={option.key}>
-                    {option.value}
+            <SelectField
+              label={label}
+              value={!formData[name] ? defaultValue : formData[name]}
+              required={required}
+              onChange={e => handleSelectChange(multiple, name, e)}>
+              {!multiple && (
+                <option disabled selected={!selected}>
+                  Select {label}
+                </option>
+              )}
+              {res.map(option => (
+                <option key={option.key} value={option.key}>
+                  {option.value}
+                </option>
+              ))}
+              {addNewOptions &&
+                addNewOptionsValue.map(option => (
+                  <option key={option} value={option}>
+                    {option}
                   </option>
                 ))}
-                {addNewOptions &&
-                  addNewOptionsValue.map(option => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-              </select>
-            </>
+            </SelectField>
           );
         } else {
           return (
@@ -253,13 +242,7 @@ const FormMaker = ({
     }
   };
 
-  return (
-    <div>
-      {fields.map(field => (
-        <div className="mt-4">{renderField(field)}</div>
-      ))}
-    </div>
-  );
+  return <div className="w-75">{fields.map(field => renderField(field))}</div>;
 };
 
 const mapStateToProps = state => ({

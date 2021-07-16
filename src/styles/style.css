@@ -45,6 +45,9 @@ body {
     box-shadow: rgb(0 0 0 / 3%) 0 2px 0 0;
 }
 
+.fixed-top {
+    z-index: 0!important;
+}
 
 .table-head {
     background-color: rgba(249,250,251, 1);

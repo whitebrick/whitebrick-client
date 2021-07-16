@@ -286,7 +286,7 @@ const Layout = ({
               )}
               <SidePanel
                 show={show}
-                renderSaveButton={type !== ''}
+                renderSaveButton={type !== 'token'}
                 setShow={setShow}
                 onSave={onSave}
                 name={
@@ -305,6 +305,7 @@ const Layout = ({
                 ) : type === 'token' ? (
                   <React.Fragment>
                     <code
+                      className="w-100 p-4"
                       aria-hidden="true"
                       style={{ cursor: 'pointer' }}
                       onClick={() =>
@@ -319,7 +320,7 @@ const Layout = ({
                   <React.Fragment>
                     <div className="list-group w-100 rounded-0">
                       <div
-                        className="list-group-item py-2"
+                        className="list-group-item"
                         aria-hidden="true"
                         onClick={() => {
                           setType('database');
@@ -328,7 +329,7 @@ const Layout = ({
                         Database
                       </div>
                       <div
-                        className="list-group-item py-2"
+                        className="list-group-item"
                         aria-hidden="true"
                         onClick={() => {
                           setType('table');
@@ -337,7 +338,7 @@ const Layout = ({
                         Table
                       </div>
                       <div
-                        className="list-group-item py-2"
+                        className="list-group-item"
                         aria-hidden="true"
                         onClick={() => {
                           setType('organization');
