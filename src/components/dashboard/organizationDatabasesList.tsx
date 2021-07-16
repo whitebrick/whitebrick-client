@@ -32,7 +32,7 @@ const OrganizationDatabasesList = ({
           <h4>{organization.label}</h4>
           <button
             className="btn btn-light"
-            onClick={() => navigate(`/organization/${organization.name}`)}>
+            onClick={() => navigate(`/${organization.name}`)}>
             <FaCog />
           </button>
         </div>
@@ -47,7 +47,7 @@ const OrganizationDatabasesList = ({
               <div
                 className="col-md-2 text-center btn"
                 aria-hidden="true"
-                onClick={() => navigate(`/database/${schema.name}`)}>
+                onClick={() => navigate(`/db/${schema.name}`)}>
                 <Avatar name={schema.label} size="75" round="12px" />
                 <p className="mt-2">{schema.label}</p>
               </div>

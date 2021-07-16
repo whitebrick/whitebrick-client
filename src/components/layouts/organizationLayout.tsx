@@ -7,42 +7,33 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import NotFound from '../notFound';
 import { useMutation } from 'graphql-hooks';
 import {
-  REMOVE_USERS__MUTATION,
   SET_USERS_ROLE_MUTATION,
   UPDATE_ORGANIZATION_MUTATION,
 } from '../../graphql/mutations/wb';
-import OrganizationMembers from '../organization/members';
 import SidePanel from '../common/sidePanel';
-import { OrganizationItemType } from '../../types';
 import UserSearchInput from '../common/userInput';
 import Tabs from '../elements/tabs';
 import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
+import Members from '../common/members';
 
 type OrganizationLayoutPropsType = {
-  organization: OrganizationItemType;
+  organization: any;
   fetchOrganization: () => any;
-  cloudContext: any;
   actions: any;
 };
 
 const OrganizationLayout = ({
   organization,
   fetchOrganization = () => {},
-  cloudContext,
   actions,
 }: OrganizationLayoutPropsType) => {
   const [updateUserRoleMutation] = useMutation(SET_USERS_ROLE_MUTATION);
-  const [removeUserMutation] = useMutation(REMOVE_USERS__MUTATION);
   const [updateOrganizationMutation] = useMutation(
     UPDATE_ORGANIZATION_MUTATION,
   );
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
   const [data, setData] = useState<any>({});
-
-  const getUserLevel = role => {
-    return cloudContext.roles.organizations[role];
-  };
 
   const fetchOrgData = async () => {
     const { loading: l, error: e, data } = await fetchOrganization();
@@ -68,13 +59,6 @@ const OrganizationLayout = ({
     return { loading, error };
   };
 
-  const handleUserRoleChange = async (userRole, user) => {
-    const { loading, error } = await inviteUserOrUpdateRole(userRole, [
-      user.email,
-    ]);
-    if (!loading && !error) fetchOrgData();
-  };
-
   const onSave = async () => {
     if (type === 'invite') {
       const { loading, error } = await inviteUserOrUpdateRole(data.role, [
@@ -92,16 +76,6 @@ const OrganizationLayout = ({
     }
   };
 
-  const removeUser = async user => {
-    const { loading, error } = await removeUserMutation({
-      variables: {
-        organizationName: organization.name,
-        userEmails: [user.email],
-      },
-    });
-    if (!loading && !error) fetchOrgData();
-  };
-
   return Object.keys(organization).length !== 0 ? (
     <div className="ag-theme-alpine">
       <div className="my-3">
@@ -115,7 +89,7 @@ const OrganizationLayout = ({
             style={{ cursor: 'pointer' }}>
             <span>
               {organization.label}
-              {organization['userRole'] === 'organization_administrator' && (
+              {organization.role.name === 'organization_administrator' && (
                 <FaPen
                   className="ml-1"
                   size="14px"
@@ -144,16 +118,12 @@ const OrganizationLayout = ({
                   ),
                 },
                 {
-                  title: 'People',
+                  title: 'Members',
                   element: (
-                    <OrganizationMembers
-                      setData={setData}
-                      setShow={setShow}
-                      setType={setType}
-                      organization={organization}
-                      getUserLevel={getUserLevel}
-                      handleUserRoleChange={handleUserRoleChange}
-                      removeUser={removeUser}
+                    <Members
+                      name="organization"
+                      refetch={fetchOrganization}
+                      users={organization?.users}
                     />
                   ),
                 },
@@ -225,7 +195,6 @@ const OrganizationLayout = ({
 
 const mapStateToProps = state => ({
   organization: state.organization,
-  cloudContext: state.cloudContext,
 });
 
 const mapDispatchToProps = dispatch => ({

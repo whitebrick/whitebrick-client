@@ -48,20 +48,26 @@ export const ORGANIZATIONS_QUERY: string = `{
 }
 `;
 
-export const ORGANIZATION_QUERY: string = `query ($name: String!){
-  wbMyOrganizationByName(name: $name){
+export const ORGANIZATION_QUERY: string = `query ($name: String!) {
+  wbMyOrganizationByName(name: $name) {
     name
     label
-    userRole
+    role {
+      name
+    }
   }
-  wbOrganizationUsers(organizationName: $name){
+  wbOrganizationUsers(organizationName: $name) {
+    userFirstName
+    userLastName
     userEmail
-    role
-    createdAt
-    updatedAt
-    roleImpliedFrom
+    role {
+      name
+      impliedFrom
+      permissions
+    }
   }
-}`;
+}
+`;
 
 export const TABLE_USERS_QUERY = `query ($schemaName: String!, $tableName: String!){
   wbTableUsers(schemaName: $schemaName, tableName: $tableName){

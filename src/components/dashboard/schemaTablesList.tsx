@@ -25,7 +25,7 @@ const SchemaTablesList = ({ schema, tables, loaded }: TablesPropsType) => {
                 className="col-md-2 text-center btn"
                 aria-hidden="true"
                 onClick={() =>
-                  navigate(`/database/${schema.name}/table/${table.name}`)
+                  navigate(`/db/${schema.name}/table/${table.name}`)
                 }>
                 <Avatar name={table.label} size="75" round="12px" />
                 <p className="mt-2">{table.label}</p>

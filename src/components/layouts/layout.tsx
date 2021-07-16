@@ -35,9 +35,9 @@ type LayoutPropsType = {
   accessToken: string;
   formData: any;
   children?: React.ReactNode;
-  tables: Array<TableItemType>;
+  tables: TableItemType[];
   user: any;
-  organizations: Array<OrganizationItemType>;
+  organizations: OrganizationItemType[];
   params?: any;
   actions: any;
 };
@@ -135,16 +135,18 @@ const Layout = ({
   }, [actions, user, fetchOrganizations]);
 
   useEffect(() => {
-    actions.setTables([]);
     const fetchTables = async () => {
       if (schema.name !== '' && schema.name !== undefined) {
-        const { data } = await fetchSchemaTables({
+        const { loading, data } = await fetchSchemaTables({
           variables: { schemaName: schema.name, withColumns: true },
         });
-        actions.setTables(data['wbMyTables']);
-        setLoaded(true);
+        if (loading) {
+          actions.setTables(data.wbMyTables);
+          setLoaded(true);
+        }
       }
     };
+    actions.setTables([]);
     fetchTables();
   }, [schema, fetchSchemaTables, actions]);
 

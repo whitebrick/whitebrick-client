@@ -11,42 +11,38 @@ import Seo from '../../components/seo';
 import { OrganizationItemType } from '../../types';
 
 type OrganizationPropsType = {
-  user: any;
   organization: OrganizationItemType;
   params: any;
   actions: any;
 };
 
 const Organization = ({
-  user,
   organization,
   params,
   actions,
 }: OrganizationPropsType) => {
   const [fetchOrganization] = useManualQuery(ORGANIZATION_QUERY, {
     variables: {
-      name: params.name,
+      name: params.organization,
     },
   });
 
   useEffect(() => {
     const fetchData = async () => {
-      if (params.name !== '' || params.name !== undefined) {
-        if (user.email !== '' || user.email !== undefined) {
-          const { loading, error, data } = await fetchOrganization();
-          if (!loading && !error) {
-            let org = data['wbMyOrganizationByName'];
-            if (org !== null) {
-              org.users = [];
-              org.users = data['wbOrganizationUsers'];
-              actions.setOrganization(org);
-            }
+      if (params.organization !== '' || params.organization !== undefined) {
+        const { loading, error, data } = await fetchOrganization();
+        if (!loading && !error) {
+          let org = data['wbMyOrganizationByName'];
+          if (org !== null) {
+            org.users = [];
+            org.users = data['wbOrganizationUsers'];
+            actions.setOrganization(org);
           }
         }
       }
     };
     fetchData();
-  }, [params, fetchOrganization, user, actions]);
+  }, [params, fetchOrganization, actions]);
 
   return (
     <Layout>
@@ -57,7 +53,6 @@ const Organization = ({
 };
 
 const mapStateToProps = state => ({
-  user: state.user,
   organization: state.organization,
 });
 

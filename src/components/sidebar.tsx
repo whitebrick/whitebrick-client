@@ -68,7 +68,7 @@ const Sidebar = ({
             <div className="sidebar-heading list-group-item">Organizations</div>
             {organizations.map(organization => (
               <div
-                onClick={() => navigate(`/organization/${organization.name}`)}
+                onClick={() => navigate(`/${organization.name}`)}
                 aria-hidden="true"
                 className={`list-group-item py-1`}
                 key={organization.name}>

@@ -27,4 +27,7 @@ export type TableItemType = {
   name: string;
   label: string;
   columns: Array<ColumnItemType>;
+  role: {
+    name: string;
+  };
 };
