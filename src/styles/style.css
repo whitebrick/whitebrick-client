@@ -46,7 +46,7 @@ body {
 }
 
 .fixed-top {
-    z-index: 0!important;
+    z-index: 10!important;
 }
 
 .table-head {

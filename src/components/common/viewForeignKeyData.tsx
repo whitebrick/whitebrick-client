@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { FaExternalLinkAlt } from 'react-icons/fa';
 import SidePanel from './sidePanel';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
@@ -8,6 +7,7 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import * as gql from 'gql-query-builder';
 import graphQLFetch from '../../utils/GraphQLFetch';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
+import { TextInputField } from 'evergreen-ui';
 
 type ViewForeignKeyDataPropsType = {
   show: boolean;
@@ -73,40 +73,31 @@ const ViewForeignKeyData = ({
       show={show}
       setShow={setShow}
       renderSaveButton={false}>
-      <React.Fragment>
+      <div className="w-75">
         {newColumns.map(c => (
-          <div className="mt-3">
-            <label>
-              {c.label}: <span className="text-small">{c.type}</span>
-            </label>
+          <React.Fragment>
             {c.foreignKeys.length > 0 ? (
-              <div className="input-group">
-                <div className="input-group-prepend">
-                  <span className="input-group-text bg-light">
-                    <FaExternalLinkAlt />
-                  </span>
-                </div>
-                <input className="form-control" value={data[c.name]} disabled />
-              </div>
-            ) : (
-              <input
-                className="form-control"
+              <TextInputField
+                label={`${c.label}: ${c.type}`}
                 value={data[c.name]}
                 contentEditable={false}
-                disabled
+                hint={
+                  c.foreignKeys.length > 0
+                    ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
+                    : null
+                }
+              />
+            ) : (
+              <TextInputField
+                label={`${c.label}: ${c.type}`}
+                value={data[c.name]}
+                contentEditable={false}
+                hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
               />
             )}
-            {c.isPrimaryKey && (
-              <p className="text-small p-1">Note: This is a Primary Key</p>
-            )}
-            {c.foreignKeys.length > 0 && (
-              <p className="text-small p-1">
-                Note: This is a Foreign Key to `{c.foreignKeys[0].relTableName}`
-              </p>
-            )}
-          </div>
+          </React.Fragment>
         ))}
-      </React.Fragment>
+      </div>
     </SidePanel>
   );
 };

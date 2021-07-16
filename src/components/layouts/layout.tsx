@@ -140,7 +140,7 @@ const Layout = ({
         const { data } = await fetchSchemaTables({
           variables: { schemaName: schema.name, withColumns: true },
         });
-        actions.setTables(data?.wbMyTables ?? data.wbMyTables);
+        actions.setTables(data?.wbMyTables && data.wbMyTables);
         setLoaded(true);
       }
     };

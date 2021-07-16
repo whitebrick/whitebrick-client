@@ -28,7 +28,7 @@ const SidePanel = ({
   renderSaveButton = true,
 }: SidePanelPropsType) => {
   return (
-    <React.Fragment>
+    <div>
       <SideSheet
         isShown={show}
         onCloseComplete={() => setShow(false)}
@@ -80,7 +80,7 @@ const SidePanel = ({
           </Card>
         </Pane>
       </SideSheet>
-    </React.Fragment>
+    </div>
   );
 };
 

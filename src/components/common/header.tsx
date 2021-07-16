@@ -6,6 +6,7 @@ import {
   Menu,
   Position,
   IconButton,
+  Avatar,
   LogOutIcon,
   SettingsIcon,
   PlusIcon,
@@ -92,9 +93,11 @@ const Header = ({ setType, setShow, setFormData }: HeaderPropsType) => {
                 </Menu.Group>
               </Menu>
             }>
-            <div className="avatar">
-              <img src={user.picture} alt={user.nickname} />
-            </div>
+            <Avatar
+              src={user.picture}
+              name={user.nickname}
+              size={30}
+            />
           </Popover>
         </div>
       </nav>
