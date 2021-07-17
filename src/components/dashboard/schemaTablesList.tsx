@@ -19,14 +19,18 @@ const SchemaTablesList = ({ schema, tables, loaded }: TablesPropsType) => {
   return (
     <Pane padding={16} flex={1} background="tint1">
       <div className="row">
-        {loaded ?? tables.length > 0
+        {loaded && tables && tables.length > 0
           ? tables.map(table => (
               <div
                 className="col-md-2 text-center btn"
                 aria-hidden="true"
-                onClick={() =>
-                  navigate(`/db/${schema.name}/table/${table.name}`)
-                }>
+                onClick={() => {
+                  if (schema.organizationOwnerName)
+                    navigate(
+                      `/${schema.organizationOwnerName}/${schema.name}/${table.name}`,
+                    );
+                  else navigate(`/db/${schema.name}/table/${table.name}`);
+                }}>
                 <Avatar name={table.label} size="75" round="12px" />
                 <p className="mt-2">{table.label}</p>
               </div>

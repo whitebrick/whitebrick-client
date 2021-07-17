@@ -29,15 +29,13 @@ const Organization = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      if (params.organization !== '' || params.organization !== undefined) {
-        const { loading, error, data } = await fetchOrganization();
-        if (!loading && !error) {
-          let org = data['wbMyOrganizationByName'];
-          if (org !== null) {
-            org.users = [];
-            org.users = data['wbOrganizationUsers'];
-            actions.setOrganization(org);
-          }
+      const { loading, error, data } = await fetchOrganization();
+      if (!loading && !error) {
+        let org = data['wbMyOrganizationByName'];
+        if (org !== null) {
+          org.users = [];
+          org.users = data['wbOrganizationUsers'];
+          actions.setOrganization(org);
         }
       }
     };

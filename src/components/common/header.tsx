@@ -93,11 +93,7 @@ const Header = ({ setType, setShow, setFormData }: HeaderPropsType) => {
                 </Menu.Group>
               </Menu>
             }>
-            <Avatar
-              src={user.picture}
-              name={user.nickname}
-              size={30}
-            />
+            <Avatar src={user.picture} name={user.nickname} size={30} />
           </Popover>
         </div>
       </nav>

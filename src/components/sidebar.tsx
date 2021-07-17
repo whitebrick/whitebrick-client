@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   FaUsers,
   FaCog,
@@ -12,9 +12,10 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
 import { actions } from '../state/actions';
 import { connect } from 'react-redux';
-import { useMutation } from 'graphql-hooks';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../graphql/mutations/wb';
 import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
+import { ORGANIZATIONS_QUERY } from '../graphql/queries/wb';
 
 type SidebarPropsType = {
   setFormData: (value: any) => void;
@@ -41,6 +42,15 @@ const Sidebar = ({
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
+  const [fetchOrganizations] = useManualQuery(ORGANIZATIONS_QUERY);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await fetchOrganizations();
+      actions.setOrganizations(data?.wbMyOrganizations);
+    };
+    fetchData();
+  }, [actions, fetchOrganizations]);
 
   const deleteTable = async () => {
     actions.setTable('');
