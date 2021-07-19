@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { AsyncTypeahead } from 'react-bootstrap-typeahead';
+import React from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { USERS_SEARCH_PATTERN } from '../../graphql/queries/wb';
-import 'react-bootstrap-typeahead/css/Typeahead.css';
+import AsyncSelect from 'react-select/async';
+import { components } from 'react-select';
+import { debounce } from 'lodash';
 
 type UserSearchInputType = {
   data: any;
@@ -10,39 +11,50 @@ type UserSearchInputType = {
 };
 
 const UserSearchInput = ({ data, setData }: UserSearchInputType) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [options, setOptions] = useState([]);
   const [fetchUserSearchPattern] = useManualQuery(USERS_SEARCH_PATTERN);
 
-  const handleSearch = async query => {
-    setIsLoading(true);
-    const { data } = await fetchUserSearchPattern({
-      variables: { searchPattern: query + '*' },
-    });
-    setOptions(data?.wbUsersBySearchPattern);
-    setIsLoading(false);
+  const mapOptionsToValues = options => {
+    return options.map(option => ({
+      value: option.email,
+      label: option.firstName + ' ' + option.lastName,
+      ...option,
+    }));
   };
-  const filterBy = () => true;
 
-  return (
-    <AsyncTypeahead
-      id="search-users"
-      filterBy={filterBy}
-      isLoading={isLoading}
-      labelKey="email"
-      onSearch={handleSearch}
-      options={options}
-      onChange={selected => setData({ ...data, user: selected })}
-      placeholder="Search by User E-mail or name"
-      renderMenuItemChildren={option => (
+  const promiseOptions = debounce((inputValue, callback) => {
+    if (!inputValue) {
+      return callback([]);
+    }
+    fetchUserSearchPattern({
+      variables: { searchPattern: inputValue + '*' },
+    }).then(({ data }) =>
+      callback(mapOptionsToValues(data.wbUsersBySearchPattern)),
+    );
+  }, 400);
+
+  const CustomOption = props => {
+    return (
+      <components.Option {...props}>
         <React.Fragment>
           <div>
-            {option.firstName} {option.lastName}
+            {props.data.firstName} {props.data.lastName}
           </div>
-          <small>{option.email}</small>
+          <small>{props.data.email}</small>
         </React.Fragment>
-      )}
-    />
+      </components.Option>
+    );
+  };
+
+  return (
+    <React.Fragment>
+      <label htmlFor="search-user">Search by User E-mail or name</label>
+      <AsyncSelect
+        placeholder="Search"
+        loadOptions={promiseOptions}
+        onChange={({ value }) => setData({ ...data, user: value })}
+        components={{ Option: CustomOption }}
+      />
+    </React.Fragment>
   );
 };
 
