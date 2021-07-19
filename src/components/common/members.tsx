@@ -180,38 +180,40 @@ const Members = ({
         <Table.TextHeaderCell>Role</Table.TextHeaderCell>
       </Table.Head>
       <Table.Body height={240}>
-        {users.map(user => (
-          <Table.Row key={user.userId}>
-            <Table.TextCell>
-              <div className="d-flex align-items-center items-center">
-                <img
-                  src="https://www.gravatar.com/avatar/HASH"
-                  className="rounded-circle"
-                  alt="image"
-                />
-                <div className="ml-3">
-                  <h6>
-                    {user.userFirstName} {user.userLastName}
-                    {user.userEmail === u.email && (
-                      <Pill display="inline-flex" marginLeft={8}>
-                        it's you
-                      </Pill>
-                    )}
-                  </h6>
-                  <div className="text-black-50">{user.userEmail}</div>
+        {users &&
+          users.length > 0 &&
+          users.map(user => (
+            <Table.Row key={user.userId}>
+              <Table.TextCell>
+                <div className="d-flex align-items-center items-center">
+                  <img
+                    src="https://www.gravatar.com/avatar/HASH"
+                    className="rounded-circle"
+                    alt="image"
+                  />
+                  <div className="ml-3">
+                    <h6>
+                      {user.userFirstName} {user.userLastName}
+                      {user.userEmail === u.email && (
+                        <Pill display="inline-flex" marginLeft={8}>
+                          it's you
+                        </Pill>
+                      )}
+                    </h6>
+                    <div className="text-black-50">{user.userEmail}</div>
+                  </div>
                 </div>
-              </div>
-            </Table.TextCell>
-            <Table.TextCell>
-              {user.role.impliedFrom
-                ? cloudContext.roles[user.role.impliedFrom.split('_')[0]][
-                    user.role.impliedFrom
-                  ].label
-                : 'Direct Member'}
-            </Table.TextCell>
-            <Table.TextCell>{renderRoleColumn(user)}</Table.TextCell>
-          </Table.Row>
-        ))}
+              </Table.TextCell>
+              <Table.TextCell>
+                {user.role.impliedFrom
+                  ? cloudContext.roles[user.role.impliedFrom.split('_')[0]][
+                      user.role.impliedFrom
+                    ].label
+                  : 'Direct Member'}
+              </Table.TextCell>
+              <Table.TextCell>{renderRoleColumn(user)}</Table.TextCell>
+            </Table.Row>
+          ))}
       </Table.Body>
     </Table>
   );

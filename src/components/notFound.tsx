@@ -8,7 +8,7 @@ const NotFound = ({ name }: NotFoundPropsType) => {
   return (
     <div className="d-flex align-items-center min-vh-100">
       <div className="container text-center">
-        <h3>{name} not found</h3>
+        <h4>{name}</h4>
       </div>
     </div>
   );

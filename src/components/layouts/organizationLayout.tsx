@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import NotFound from '../notFound';
 import { useMutation } from 'graphql-hooks';
 import {
   SET_USERS_ROLE_MUTATION,
@@ -18,14 +17,12 @@ import Members from '../common/members';
 
 type OrganizationLayoutPropsType = {
   organization: any;
-  fetchOrganization: () => any;
-  actions: any;
+  refetch: () => void;
 };
 
 const OrganizationLayout = ({
   organization,
-  fetchOrganization = () => {},
-  actions,
+  refetch,
 }: OrganizationLayoutPropsType) => {
   const [updateUserRoleMutation] = useMutation(SET_USERS_ROLE_MUTATION);
   const [updateOrganizationMutation] = useMutation(
@@ -34,19 +31,6 @@ const OrganizationLayout = ({
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
   const [data, setData] = useState<any>({});
-
-  const fetchOrgData = async () => {
-    const { loading: l, error: e, data } = await fetchOrganization();
-    if (!l && !e) {
-      let org = data['wbMyOrganizationByName'];
-      if (org !== null) {
-        org.users = [];
-        org.users = data['wbOrganizationUsers'];
-        actions.setOrganization(org);
-      }
-    }
-    setShow(false);
-  };
 
   const inviteUserOrUpdateRole = async (role, userEmails) => {
     const { loading, error } = await updateUserRoleMutation({
@@ -64,7 +48,10 @@ const OrganizationLayout = ({
       const { loading, error } = await inviteUserOrUpdateRole(data.role, [
         data.user[0].email,
       ]);
-      if (!loading && !error) fetchOrgData();
+      if (!loading && !error) {
+        refetch();
+        setShow(false);
+      }
     } else {
       let variables: any = { name: organization.name };
       if (organization.name !== data.name) variables.newName = data.name;
@@ -72,11 +59,14 @@ const OrganizationLayout = ({
       const { loading, error } = await updateOrganizationMutation({
         variables,
       });
-      if (!loading && !error) fetchOrgData();
+      if (!loading && !error) {
+        refetch();
+        setShow(false);
+      }
     }
   };
 
-  return Object.keys(organization).length !== 0 ? (
+  return (
     <div className="ag-theme-alpine">
       <div className="my-3">
         <div style={{ padding: `1rem` }}>
@@ -89,7 +79,7 @@ const OrganizationLayout = ({
             style={{ cursor: 'pointer' }}>
             <span>
               {organization.label}
-              {organization.role.name === 'organization_administrator' && (
+              {organization?.role?.name === 'organization_administrator' && (
                 <FaPen
                   className="ml-1"
                   size="14px"
@@ -122,7 +112,7 @@ const OrganizationLayout = ({
                   element: (
                     <Members
                       name="organization"
-                      refetch={fetchOrganization}
+                      refetch={refetch}
                       users={organization?.users}
                     />
                   ),
@@ -188,8 +178,6 @@ const OrganizationLayout = ({
         </SidePanel>
       </div>
     </div>
-  ) : (
-    <NotFound name="Organization" />
   );
 };
 
