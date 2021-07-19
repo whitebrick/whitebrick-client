@@ -53,18 +53,21 @@ const Organization = ({
   return (
     <Layout>
       {error ? (
-        <NotFound
-          name={
-            error?.graphQLErrors[0].originalError.wbCode ===
-            'WB_ORGANIZATION_NOT_FOUND'
-              ? cloudContext.userMessages['WB_ORGANIZATION_URL_NOT_FOUND'][0]
-              : error?.graphQLErrors[0].originalError.wbCode
-              ? cloudContext.userMessages['WB_ORGANIZATION_URL_FORBIDDEN'][0]
-              : cloudContext.userMessages[
-                  error?.graphQLErrors[0].originalError.wbCode
-                ][0]
-          }
-        />
+        <Layout>
+          <NotFound
+            name={
+              error?.graphQLErrors[0].originalError.wbCode ===
+              'WB_ORGANIZATION_NOT_FOUND'
+                ? cloudContext.userMessages['WB_ORGANIZATION_URL_NOT_FOUND'][0]
+                : error?.graphQLErrors[0].originalError.wbCode ===
+                  'WB_FORBIDDEN'
+                ? cloudContext.userMessages['WB_ORGANIZATION_URL_FORBIDDEN'][0]
+                : cloudContext.userMessages[
+                    error?.graphQLErrors[0].originalError.wbCode
+                  ][0]
+            }
+          />
+        </Layout>
       ) : (
         <React.Fragment>
           <Seo title={organization.label} />

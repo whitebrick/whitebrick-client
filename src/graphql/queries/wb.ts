@@ -10,6 +10,19 @@ export const SCHEMAS_QUERY: string = `query {
   }
 }`;
 
+export const SCHEMA_BY_NAME_QUERY: string = `query ($name: String!, $organizationName: String) {
+  wbMySchemaByName(name: $name, organizationName: $organizationName) {
+    name
+    label
+    userOwnerEmail
+    organizationOwnerName
+    role {
+      name
+    }
+  }
+}
+`;
+
 export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withColumns: Boolean){
   wbMyTables(schemaName: $schemaName, withColumns: $withColumns) {
     name
@@ -36,6 +49,34 @@ export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withCo
     }
   }
 }`;
+
+export const SCHEMA_TABLE_BY_NAME_QUERY: string = `query ($schemaName: String!, $tableName: String!, $withColumns: Boolean) {
+  wbMyTableByName(schemaName: $schemaName, tableName: $tableName, withColumns: $withColumns) {
+    name
+    label
+    columns {
+      name
+      label
+      type
+      isPrimaryKey
+      foreignKeys {
+        columnName
+        constraintName
+        tableName
+        relColumnName
+        relTableName
+      }
+      referencedBy {
+        columnName
+        constraintName
+        tableName
+        relColumnName
+        relTableName
+      }
+    }
+  }
+}
+`;
 
 export const ORGANIZATIONS_QUERY: string = `{
   wbMyOrganizations {

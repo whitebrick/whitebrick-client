@@ -31,7 +31,6 @@ type LayoutPropsType = {
   accessToken: string;
   formData: any;
   children?: React.ReactNode;
-  tables: TableItemType[];
   user: any;
   organizations: OrganizationItemType[];
   params?: any;
@@ -44,7 +43,6 @@ const Layout = ({
   accessToken,
   formData,
   children,
-  tables,
   user,
   actions,
   organizations,
@@ -189,34 +187,6 @@ const Layout = ({
     }
   };
 
-  useEffect(() => {
-    if (Object.keys(params).length > 0) {
-      if (params['databaseName'] && params['databaseName'] !== schema.name) {
-        if (
-          schemas &&
-          schemas['wbMySchemas'] &&
-          schemas['wbMySchemas'].length > 0
-        ) {
-          let s: any = schemas['wbMySchemas'].filter(
-            schema => schema.name === params['databaseName'],
-          )[0];
-          if (s && Object.keys(s).length > 0) actions.setSchema(s);
-        }
-      }
-      if (params['tableName']) {
-        let table: any = tables.filter(
-          table => table.name === params['tableName'],
-        )[0];
-        if (table && Object.keys(table).length > 0) {
-          actions.setTable(table);
-          actions.setColumns(table.columns);
-          actions.setOrderBy(table.columns[0].name);
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params, schemas, tables, actions]);
-
   if (error) return <p>Something Bad Happened</p>;
 
   return (
@@ -347,7 +317,6 @@ const Layout = ({
 
 const mapStateToProps = state => ({
   schema: state.schema,
-  tables: state.tables,
   table: state.table,
   accessToken: state.accessToken,
   formData: state.formData,
