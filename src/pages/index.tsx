@@ -13,24 +13,33 @@ type IndexPageProps = {
 };
 
 const IndexPage = ({ actions }: IndexPageProps) => {
+  const { isLoading, isAuthenticated, loginWithRedirect } = useAuth0();
+
   useEffect(() => {
     actions.setTable('');
     actions.setSchema({});
   }, [actions]);
 
-  const { isLoading, isAuthenticated, loginWithRedirect } = useAuth0();
-
   if (isLoading) return <Loading />;
-  if (isAuthenticated) navigate('/dashboard');
-  else {
+  if (isAuthenticated) {
+    navigate('/home');
+    return <Loading />;
+  } else {
     if (process.env.URL_ROOT_REDIRECT) navigate(process.env.URL_ROOT_REDIRECT);
     return (
       <div className="d-flex align-items-center min-vh-100">
         <Seo title="Whitebrick" />
         <div className="container text-center">
           <h3>Whitebrick</h3>
-          <button className="btn btn-outline-primary" onClick={loginWithRedirect}>
-            Login
+          <button
+            className="btn btn-outline-primary mr-2"
+            onClick={loginWithRedirect}>
+            Log in
+          </button>
+          <button
+            className="btn btn-outline-dark mr-2"
+            onClick={() => loginWithRedirect({ screen_hint: 'signup' })}>
+            Sign up
           </button>
         </div>
       </div>
