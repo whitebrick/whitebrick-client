@@ -30,13 +30,13 @@ const Header = ({ setType, setShow, setFormData }: HeaderPropsType) => {
   return (
     <header className="bg-white nav-shadow fixed-top">
       <nav className="navbar navbar-light">
-        <span className="navbar-brand mb-0 h1">
+        <span className="navbar-brand mb-0">
           <div
             style={{ cursor: 'pointer' }}
             aria-hidden="true"
             onClick={() => navigate('/')}>
-            <span>
-              <img src={WhitebrickLogo} alt="Logo" height="20vh" /> Whitebrick
+            <span className="logo">
+              <img src={WhitebrickLogo} alt="Logo" height="15vh" /> whitebrick
             </span>
           </div>
         </span>
@@ -76,7 +76,12 @@ const Header = ({ setType, setShow, setFormData }: HeaderPropsType) => {
                 </Menu.Group>
               </Menu>
             }>
-            <IconButton icon={PlusIcon} marginRight={10} appearance="minimal" />
+            <IconButton
+              icon={PlusIcon}
+              marginRight={10}
+              appearance="minimal"
+              height={20}
+            />
           </Popover>
           <Popover
             position={Position.BOTTOM_RIGHT}
@@ -87,13 +92,17 @@ const Header = ({ setType, setShow, setFormData }: HeaderPropsType) => {
                 </Menu.Group>
                 <Menu.Divider />
                 <Menu.Group>
-                  <Menu.Item icon={LogOutIcon} onClick={() => logout()}>
+                  <Menu.Item
+                    icon={LogOutIcon}
+                    onClick={() =>
+                      logout({ returnTo: window.location.origin })
+                    }>
                     Log out
                   </Menu.Item>
                 </Menu.Group>
               </Menu>
             }>
-            <Avatar src={user.picture} name={user.nickname} size={30} />
+            <Avatar src={user.picture} name={user.nickname} size={20} />
           </Popover>
         </div>
       </nav>

@@ -8,6 +8,9 @@ import { connect } from 'react-redux';
 import Seo from '../components/seo';
 import { navigate } from 'gatsby';
 
+// @ts-ignore
+import WhitebrickLogo from '../images/whitebrick-logo.svg';
+
 type IndexPageProps = {
   actions: any;
 };
@@ -30,7 +33,10 @@ const IndexPage = ({ actions }: IndexPageProps) => {
       <div className="d-flex align-items-center min-vh-100">
         <Seo title="Whitebrick" />
         <div className="container text-center">
-          <h3>Whitebrick</h3>
+          <div className="logo">
+            <img src={WhitebrickLogo} alt="Logo" style={{ maxWidth: '220px' }} />
+            <h1 style={{ fontSize: '4rem' }}>whitebrick</h1>
+          </div>
           <button
             className="btn btn-outline-primary mr-2"
             onClick={loginWithRedirect}>

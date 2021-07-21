@@ -29,9 +29,9 @@ const OrganizationDatabasesList = ({
     <div className="card my-4">
       {renderTitle && (
         <div className="card-header d-flex justify-content-between align-items-center">
-          <h4>{organization.label}</h4>
+          <h6>{organization.label}</h6>
           <button
-            className="btn btn-light"
+            className="btn btn-sm btn-light"
             onClick={() => navigate(`/${organization.name}`)}>
             <FaCog />
           </button>

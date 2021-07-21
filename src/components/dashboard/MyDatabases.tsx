@@ -33,7 +33,7 @@ const MyDatabases = ({
     filteredSchemas.length > 0 && (
       <div className="card my-4">
         <div className="card-header">
-          <h4>{name}</h4>
+          <h6>{name}</h6>
         </div>
         <div className="card-body">
           <div className="row">

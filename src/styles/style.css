@@ -4,6 +4,10 @@ body {
     background: #F6F6F6!important;
 }
 
+.logo {
+    font-family: 'Shadows Into Light Two', cursive;
+}
+
 .ReactModal__Overlay {
     background: rgba(0, 0, 0, 0.65)!important;
     z-index: 99999;
