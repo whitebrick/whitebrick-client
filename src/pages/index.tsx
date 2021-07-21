@@ -34,7 +34,11 @@ const IndexPage = ({ actions }: IndexPageProps) => {
         <Seo title="Whitebrick" />
         <div className="container text-center">
           <div className="logo">
-            <img src={WhitebrickLogo} alt="Logo" style={{ maxWidth: '220px' }} />
+            <img
+              src={WhitebrickLogo}
+              alt="Logo"
+              style={{ maxWidth: '220px' }}
+            />
             <h1 style={{ fontSize: '4rem' }}>whitebrick</h1>
           </div>
           <button
