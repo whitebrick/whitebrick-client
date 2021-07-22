@@ -1,3 +1,13 @@
+if (process.env.STAGING) {
+  require('dotenv').config({
+    path: `.env.staging`,
+  });
+} else {
+  require('dotenv').config({
+    path: `.env.${process.env.NODE_ENV}`,
+  });
+}
+
 module.exports = {
   siteMetadata: {
     title: `Whitebrick`,
