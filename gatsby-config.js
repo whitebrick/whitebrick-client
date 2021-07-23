@@ -1,12 +1,10 @@
-if (process.env.STAGING) {
-  require('dotenv').config({
-    path: `.env.staging`,
-  });
-} else {
-  require('dotenv').config({
-    path: `.env.${process.env.NODE_ENV}`,
-  });
-}
+let activeEnv = process.env.ACTIVE_ENV || process.env.NODE_ENV || 'development';
+
+require('dotenv').config({
+  path: `.env.${activeEnv}`,
+});
+
+console.log(`Loaded ${activeEnv} env file`);
 
 module.exports = {
   siteMetadata: {

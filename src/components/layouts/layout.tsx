@@ -33,8 +33,8 @@ type LayoutPropsType = {
   children?: React.ReactNode;
   user: any;
   organizations: OrganizationItemType[];
-  params?: any;
   actions: any;
+  cloudContext: any;
 };
 
 const Layout = ({
@@ -46,7 +46,7 @@ const Layout = ({
   user,
   actions,
   organizations,
-  params = {},
+  cloudContext,
 }: LayoutPropsType) => {
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
@@ -113,7 +113,7 @@ const Layout = ({
       const { data } = await fetchCloudContext();
       actions.setCloudContext(data['wbCloudContext']);
     };
-    fetchCloud();
+    if (isObjectEmpty(cloudContext)) fetchCloud();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -322,6 +322,7 @@ const mapStateToProps = state => ({
   formData: state.formData,
   user: state.user,
   organizations: state.organizations,
+  cloudContext: state.cloudContext,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -28,7 +28,10 @@ const IndexPage = ({ actions }: IndexPageProps) => {
     navigate('/home');
     return <Loading />;
   } else {
-    if (process.env.URL_ROOT_REDIRECT) navigate(process.env.URL_ROOT_REDIRECT);
+    if (process.env.GATSBY_URL_ROOT_REDIRECT) {
+      navigate(process.env.GATSBY_URL_ROOT_REDIRECT);
+      return <Loading />;
+    }
     return (
       <div className="d-flex align-items-center min-vh-100">
         <Seo title="Whitebrick" />

@@ -19,14 +19,14 @@ export const wrapRootElement = ({ element }) => {
   return (
     <Provider store={store}>
       <Auth0Provider
-        domain={process.env.AUTH0_DOMAIN}
-        clientId={process.env.AUTH0_CLIENTID}
-        audience={process.env.AUTH0_AUDIENCE}
+        domain={process.env.GATSBY_AUTH0_DOMAIN}
+        clientId={process.env.GATSBY_AUTH0_CLIENTID}
+        audience={process.env.GATSBY_AUTH0_AUDIENCE}
         responseType="token id_token"
         scope="openid profile email offline_access"
         useRefreshTokens={true}
         cacheLocation="localstorage"
-        redirectUri={process.env.AUTH0_CALLBACK}
+        redirectUri={process.env.GATSBY_AUTH0_CALLBACK}
         onRedirectCallback={onRedirectCallback}>
         <Auth0Context.Consumer>
           {({

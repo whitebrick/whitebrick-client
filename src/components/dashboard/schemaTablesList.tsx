@@ -22,7 +22,7 @@ const SchemaTablesList = ({ schema, tables, loaded }: TablesPropsType) => {
         {loaded && tables && tables.length > 0
           ? tables.map(table => (
               <div
-                className="col-md-2 text-center btn"
+                className="col-md-2 col-sm-6 text-center btn"
                 aria-hidden="true"
                 onClick={() => {
                   if (schema.organizationOwnerName)

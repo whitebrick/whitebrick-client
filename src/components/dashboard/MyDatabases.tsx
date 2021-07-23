@@ -48,7 +48,7 @@ const MyDatabases = ({
             ))}
             {name === 'My Databases' && (
               <div
-                className="col-md-2 text-center btn"
+                className="col-md-2 col-sm-6 text-center btn"
                 aria-hidden="true"
                 onClick={() => {
                   actions.setFormData({});

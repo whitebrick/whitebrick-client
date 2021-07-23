@@ -6,10 +6,8 @@ import Loading from '../loading';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import { SchemaItemType } from '../../types';
 
 type AuthWrapper = {
-  schema: SchemaItemType;
   actions: any;
   sendAdminSecret: boolean;
   accessToken: string;
@@ -22,7 +20,6 @@ type AuthWrapper = {
 };
 
 const AuthWrapper = ({
-  schema,
   sendAdminSecret,
   accessToken,
   isLoading: authLoading,
@@ -48,7 +45,7 @@ const AuthWrapper = ({
       })();
     } else setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schema, authLoading]);
+  }, [authLoading]);
 
   const adminClient = new GraphQLClient({
     url: process.env.GATSBY_HASURA_GRAPHQL_URL,
@@ -104,7 +101,6 @@ const AuthWrapper = ({
 };
 
 const mapStateToProps = state => ({
-  schema: state.schema,
   sendAdminSecret: state.sendAdminSecret,
   accessToken: state.accessToken,
 });

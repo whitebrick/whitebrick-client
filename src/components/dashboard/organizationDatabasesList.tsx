@@ -45,7 +45,7 @@ const OrganizationDatabasesList = ({
             )
             .map(schema => (
               <div
-                className="col-md-2 text-center btn"
+                className="col-md-2 col-sm-6 text-center btn"
                 aria-hidden="true"
                 onClick={() =>
                   navigate(`/${organization.name}/${schema.name}`)
@@ -55,7 +55,7 @@ const OrganizationDatabasesList = ({
               </div>
             ))}
           <div
-            className="col-md-2 text-center btn"
+            className="col-md-2 col-sm-6 text-center btn"
             aria-hidden="true"
             onClick={() => {
               actions.setFormData({});

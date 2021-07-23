@@ -27,12 +27,12 @@ if [[ "$1" == "dev" ]]; then
   s3=$S3_DEV
   cloudfront=$CLOUDFRONT_DEV
   redirect=$REDIRECT_DEV
-  cmd="DEVELOPMENT=true gatsby build"
+  cmd="npm run build:development"
 else
   s3=$S3_STAGING
   cloudfront=$CLOUDFRONT_STAGING
   redirect=$REDIRECT_STAGING
-  cmd="STAGING=true gatsby build"
+  cmd="npm run build:staging"
 fi
 
 if [[ "$2" != "skipBuild" ]]; then
