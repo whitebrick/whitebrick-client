@@ -8,6 +8,7 @@ import Layout from '../components/layouts/layout';
 import { useManualQuery, useMutation } from 'graphql-hooks';
 import { UPDATE_USER_DETAILS_MUTATION } from '../graphql/mutations/wb';
 import { USER_BY_EMAIL } from '../graphql/queries/wb';
+import ResetPassword from '../utils/resetPassword';
 
 type ProfileType = {
   user: any;
@@ -44,7 +45,17 @@ const Profile = ({ user }: ProfileType) => {
     }
   };
 
-  const updatePassword = () => {};
+  const updatePassword = () => {
+    const resetPassword = async () => await ResetPassword();
+    resetPassword().finally(() => {
+      toaster.success(
+        'Please check your registered email to change your password!',
+        {
+          duration: 10,
+        },
+      );
+    });
+  };
 
   return (
     <Layout>
@@ -103,7 +114,7 @@ const Profile = ({ user }: ProfileType) => {
                 <h5>Change Password</h5>
                 <div className="pt-4">
                   <Button appearance="primary" onClick={updatePassword}>
-                   Click here to reset your password
+                    Click here to reset your password
                   </Button>
                 </div>
               </div>
