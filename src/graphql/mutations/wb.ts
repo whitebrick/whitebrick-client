@@ -73,3 +73,12 @@ export const TABLE_SET_USER_ROLE_MUTATION: string = `mutation ($schemaName: Stri
 export const TABLE_REMOVE_USER_ROLE_MUTATION: string = `mutation ($schemaName: String!, $tableName: String!, $userEmails: [String]!) {
   wbRemoveTableUsers(schemaName: $schemaName, tableName: $tableName, userEmails: $userEmails)
 }`;
+
+export const UPDATE_USER_DETAILS_MUTATION: string = `mutation ($firstName: String, $lastName: String) {
+  wbUpdateMyProfile(firstName: $firstName, lastName: $lastName) {
+    firstName
+    lastName
+    email
+  }
+}
+`;

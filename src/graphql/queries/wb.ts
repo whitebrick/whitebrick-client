@@ -139,3 +139,12 @@ export const USERS_SEARCH_PATTERN = `query ($searchPattern: String!){
     email
   }
 }`;
+
+export const USER_BY_EMAIL: string = `query ($email: String!) {
+  wbUserByEmail(email: $email) {
+    firstName
+    lastName
+    email
+  }
+}
+`;

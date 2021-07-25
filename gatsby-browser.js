@@ -12,6 +12,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from './src/components/loading';
+import NotFound from './src/components/notFound';
 
 const onRedirectCallback = appState => navigate(appState?.returnTo || '/');
 
@@ -35,8 +36,10 @@ export const wrapRootElement = ({ element }) => {
             getAccessTokenSilently,
             getIdTokenClaims,
             user,
+            error,
           }) => {
             if (isLoading) return <Loading />;
+            if (error) return <NotFound name={error.message} />;
             if (!isLoading && isAuthenticated)
               return (
                 <AuthWrapper

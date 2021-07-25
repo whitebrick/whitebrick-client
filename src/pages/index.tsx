@@ -16,7 +16,7 @@ type IndexPageProps = {
 };
 
 const IndexPage = ({ actions }: IndexPageProps) => {
-  const { isLoading, isAuthenticated, loginWithRedirect } = useAuth0();
+  const { isLoading, error, isAuthenticated, loginWithRedirect } = useAuth0();
 
   useEffect(() => {
     actions.setTable('');
@@ -24,6 +24,7 @@ const IndexPage = ({ actions }: IndexPageProps) => {
   }, [actions]);
 
   if (isLoading) return <Loading />;
+  if (error) return <div>Oops... {error.message}</div>;
   if (isAuthenticated) {
     navigate('/home');
     return <Loading />;

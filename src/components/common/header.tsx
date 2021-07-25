@@ -13,19 +13,24 @@ import {
   PanelTableIcon,
   DatabaseIcon,
   ApplicationsIcon,
+  UserIcon,
 } from 'evergreen-ui';
 
 // @ts-ignore
 import WhitebrickLogo from '../../images/whitebrick-logo.svg';
+import { bindActionCreators } from 'redux';
+import { actions } from '../../state/actions';
+import { connect } from 'react-redux';
 
 type HeaderPropsType = {
+  user: any;
   setType: (value: string) => void;
   setShow: (value: boolean) => void;
   setFormData: (value: any) => void;
 };
 
-const Header = ({ setType, setShow, setFormData }: HeaderPropsType) => {
-  const { user, logout } = useAuth0();
+const Header = ({ user, setType, setShow, setFormData }: HeaderPropsType) => {
+  const { logout } = useAuth0();
 
   return (
     <header className="bg-white nav-shadow fixed-top">
@@ -88,6 +93,13 @@ const Header = ({ setType, setShow, setFormData }: HeaderPropsType) => {
             content={
               <Menu>
                 <Menu.Group>
+                  <Menu.Item
+                    icon={UserIcon}
+                    onClick={() => navigate('/profile')}>
+                    Profile
+                  </Menu.Item>
+                </Menu.Group>
+                <Menu.Group>
                   <Menu.Item icon={SettingsIcon}>Settings</Menu.Item>
                 </Menu.Group>
                 <Menu.Divider />
@@ -110,4 +122,12 @@ const Header = ({ setType, setShow, setFormData }: HeaderPropsType) => {
   );
 };
 
-export default Header;
+const mapStateToProps = state => ({
+  user: state.user,
+});
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(actions, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
