@@ -562,13 +562,19 @@ const TableLayout = ({
                   + Create a view
                 </div>
                 <div className="float-right">
-                  <div
+                  <button
                     onClick={() => saveView(defaultView)}
-                    aria-hidden="true"
-                    className="badge badge-dark p-2 mr-2"
-                    style={{ cursor: 'pointer' }}>
+                    className="btn btn-sm btn-dark mr-2">
                     Save to {defaultView}
-                  </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      gridAPI.setSideBarVisible(!gridAPI.isSideBarVisible());
+                      gridAPI.openToolPanel('columns');
+                    }}
+                    className="btn btn-sm btn-primary mr-2">
+                    Select Columns
+                  </button>
                 </div>
               </div>
             </div>

@@ -7,7 +7,7 @@ import { bindActionCreators } from 'redux';
 
 import { connect } from 'react-redux';
 import { actions } from '../state/actions';
-import ForeignKeyCellRenderer from './ForeignKeyCellRenderer';
+import ForeignKeyCellRenderer from './foreignKeyCellRenderer';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
 
 type GridPropsType = {
@@ -55,7 +55,23 @@ const Grid = ({
           foreignKeyRenderer: ForeignKeyCellRenderer,
         }}
         rowData={rows}
-        sideBar
+        sideBar={{
+          toolPanels: [
+            {
+              id: 'columns',
+              labelDefault: 'Columns',
+              labelKey: 'columns',
+              iconKey: 'columns',
+              toolPanel: 'agColumnsToolPanel',
+              toolPanelParams: {
+                suppressRowGroups: true,
+                suppressValues: true,
+                suppressPivotMode: true,
+              },
+            },
+          ],
+          hiddenByDefault: true,
+        }}
         enableRangeSelection
         enableFillHandle
         undoRedoCellEditing
