@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import SchemaTablesList from '../dashboard/schemaTablesList';
 import Tabs from '../elements/tabs';
-import { FaPen } from 'react-icons/fa';
+import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { SchemaItemType } from '../../types';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import Members from '../../components/common/members';
 import { useManualQuery } from 'graphql-hooks';
 import { SCHEMA_USERS_QUERY } from '../../graphql/queries/wb';
+import { Link } from 'gatsby';
 
 type SchemaLayoutType = {
   schema: SchemaItemType;
@@ -52,6 +53,17 @@ const SchemaLayout = ({
   return (
     <div className="mt-3">
       <div style={{ padding: `1rem` }}>
+        <p>
+          <Link to="/">Home</Link> <FaChevronRight />{' '}
+          <Link
+            to={
+              schema.organizationOwnerName
+                ? `/${schema.organizationOwnerName}/${schema.name}`
+                : `/db/${schema.name}`
+            }>
+            {schema.label}
+          </Link>
+        </p>
         <h3
           className="m-0"
           aria-hidden={true}

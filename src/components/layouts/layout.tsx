@@ -24,6 +24,7 @@ import {
 } from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
 import SchemaLayout from '../layouts/schemaLayout';
+import CreateSchema from '../../components/dashboard/createSchema';
 
 type LayoutPropsType = {
   table: TableItemType;
@@ -235,6 +236,7 @@ const Layout = ({
                         setShow={setShow}
                         setType={setType}
                       />
+                      <CreateSchema setType={setType} setShow={setShow} />
                     </React.Fragment>
                   )}
                 </div>

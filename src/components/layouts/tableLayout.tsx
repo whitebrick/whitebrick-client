@@ -20,6 +20,7 @@ import {
 } from '../../graphql/mutations/wb';
 import TableSidePanel from '../common/tableSidePanel';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
+import { Link } from 'gatsby';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -505,21 +506,38 @@ const TableLayout = ({
           <div className="my-3">
             <div style={{ padding: `1rem` }}>
               <p>
-                Databases <FaChevronRight /> {schema.label.toLowerCase()}{' '}
-                <FaChevronRight /> {table.name.toLowerCase()}
+                <Link to="/">Home</Link> <FaChevronRight />{' '}
+                <Link
+                  to={
+                    schema.organizationOwnerName
+                      ? `/${schema.organizationOwnerName}/${schema.name}`
+                      : `/db/${schema.name}`
+                  }>
+                  {schema.label}
+                </Link>{' '}
+                <FaChevronRight />
+                <Link
+                  to={
+                    schema.organizationOwnerName
+                      ? `/${schema.organizationOwnerName}/${schema.name}/${table.name}`
+                      : `/db/${schema.name}/table/${table.name}`
+                  }>
+                  {table.label}
+                </Link>
               </p>
-              <h3
-                className="m-0 w-25"
-                aria-hidden={true}
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  setType('updateTable');
-                  actions.setFormData(table);
-                  setShow(true);
-                }}>
+              <h3 className="m-0 w-25" style={{ cursor: 'pointer' }}>
                 <span>
                   {table.label}
-                  <FaPen className="ml-1" size="15px" />
+                  <FaPen
+                    className="ml-1"
+                    size="15px"
+                    aria-hidden={true}
+                    onClick={() => {
+                      setType('updateTable');
+                      actions.setFormData(table);
+                      setShow(true);
+                    }}
+                  />
                 </span>
               </h3>
               <p className="py-1">Total {rowCount} records</p>

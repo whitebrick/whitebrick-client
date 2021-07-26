@@ -14,6 +14,7 @@ import UserSearchInput from '../common/userInput';
 import Tabs from '../elements/tabs';
 import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
 import Members from '../common/members';
+import { Link } from 'gatsby';
 
 type OrganizationLayoutPropsType = {
   organization: any;
@@ -71,7 +72,8 @@ const OrganizationLayout = ({
       <div className="my-3">
         <div style={{ padding: `1rem` }}>
           <p>
-            Organizations <FaChevronRight /> {organization.label}
+            <Link to="/">Home</Link> <FaChevronRight />{' '}
+            <Link to={`/${organization.name}`}>{organization.label}</Link>
           </p>
           <h3
             className="mt-4 w-50"
