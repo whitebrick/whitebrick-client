@@ -3,6 +3,7 @@ import {
   ReferencedByItemType,
   ForeignKeyItemType,
   ColumnItemType,
+  ViewItemType,
   TableItemType,
 } from './table';
 import { OrganizationItemType } from './organization';
@@ -14,4 +15,5 @@ export type {
   ColumnItemType,
   ForeignKeyItemType,
   OrganizationItemType,
+  ViewItemType,
 };

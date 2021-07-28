@@ -81,6 +81,7 @@ const ViewForeignKeyData = ({
                 label={`${c.label}: ${c.type}`}
                 value={data[c.name]}
                 contentEditable={false}
+                disabled={true}
                 hint={
                   c.foreignKeys.length > 0
                     ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
@@ -92,6 +93,7 @@ const ViewForeignKeyData = ({
                 label={`${c.label}: ${c.type}`}
                 value={data[c.name]}
                 contentEditable={false}
+                disabled={true}
                 hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
               />
             )}

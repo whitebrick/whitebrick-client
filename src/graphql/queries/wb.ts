@@ -23,8 +23,8 @@ export const SCHEMA_BY_NAME_QUERY: string = `query ($name: String!, $organizatio
 }
 `;
 
-export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withColumns: Boolean){
-  wbMyTables(schemaName: $schemaName, withColumns: $withColumns) {
+export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withColumns: Boolean, $withSettings: Boolean){
+  wbMyTables(schemaName: $schemaName, withColumns: $withColumns, withSettings: $withSettings) {
     name
     label
     columns {
@@ -47,11 +47,12 @@ export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withCo
         relTableName
       }
     }
+    settings
   }
 }`;
 
-export const SCHEMA_TABLE_BY_NAME_QUERY: string = `query ($schemaName: String!, $tableName: String!, $withColumns: Boolean) {
-  wbMyTableByName(schemaName: $schemaName, tableName: $tableName, withColumns: $withColumns) {
+export const SCHEMA_TABLE_BY_NAME_QUERY: string = `query ($schemaName: String!, $tableName: String!, $withColumns: Boolean, $withSettings: Boolean) {
+  wbMyTableByName(schemaName: $schemaName, tableName: $tableName, withColumns: $withColumns, withSettings: $withSettings) {
     name
     label
     columns {
@@ -74,6 +75,7 @@ export const SCHEMA_TABLE_BY_NAME_QUERY: string = `query ($schemaName: String!, 
         relTableName
       }
     }
+    settings
   }
 }
 `;

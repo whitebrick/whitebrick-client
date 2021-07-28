@@ -134,15 +134,21 @@ const Layout = ({
 
   const fetchTablesAndColumns = async () => {
     const { data } = await fetchSchemaTables({
-      variables: { schemaName: schema.name, withColumns: true },
+      variables: {
+        schemaName: schema.name,
+        withColumns: true,
+        withSettings: true,
+      },
     });
+    actions.setTables(data.wbMyTables);
     let t = data.wbMyTables.filter(
       tableName => tableName.name === table.name,
     )[0];
     if (t.columns.length > 0) {
-      actions.setTables(data.wbMyTables);
       actions.setColumns(t.columns);
       actions.setOrderBy(t.columns[0].name);
+      actions.setViews(t.settings.views);
+      actions.setDefaultView(t.settings.defaultView);
     } else {
       actions.setColumns([]);
     }

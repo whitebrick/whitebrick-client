@@ -121,6 +121,16 @@ export default function gridReducer(state: any = {}, action) {
         ...state,
         defaultView: payload.defaultView,
       };
+    case types.SET_GRID_API:
+      return {
+        ...state,
+        gridAPI: payload.gridAPI,
+      };
+    case types.SET_COLUMN_API:
+      return {
+        ...state,
+        columnAPI: payload.columnAPI,
+      };
     default:
       return state;
   }

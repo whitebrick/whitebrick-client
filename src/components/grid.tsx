@@ -8,16 +8,13 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../state/actions';
 import ForeignKeyCellRenderer from './foreignKeyCellRenderer';
-import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
+import { ColumnItemType, TableItemType } from '../types';
 
 type GridPropsType = {
   onCellValueChanged: (params: any) => void;
   getContextMenuItems: any;
-  setColumnAPI: (value: any) => void;
-  setGridAPI: (value: any) => void;
   rows: any[];
   table: TableItemType;
-  schema: SchemaItemType;
   views: any[];
   orderBy: string;
   limit: number;
@@ -25,16 +22,15 @@ type GridPropsType = {
   actions: any;
   rowCount: number;
   current: number;
+  offset: string;
+  defaultView: string;
 };
 
 const Grid = ({
   onCellValueChanged,
   getContextMenuItems,
-  setColumnAPI,
-  setGridAPI,
   rows,
   table,
-  schema,
   views,
   orderBy,
   limit,
@@ -42,6 +38,8 @@ const Grid = ({
   actions,
   rowCount,
   current,
+  offset,
+  defaultView,
 }: GridPropsType) => {
   const handlePagination = (current, pageSize) => {
     actions.setOffset(Math.ceil((current - 1) * pageSize));
@@ -92,23 +90,23 @@ const Grid = ({
         getContextMenuItems={getContextMenuItems}
         popupParent={document.querySelector('body')}
         onGridReady={params => {
-          setGridAPI(params.api);
-          setColumnAPI(params.columnApi);
-          if (
-            views.filter(
-              view =>
-                view.name === 'Default View' &&
-                view.table === schema.name + '_' + table.name,
-            ).length <= 0
-          ) {
+          actions.setGridAPI(params.api);
+          actions.setColumnAPI(params.columnApi);
+          if (views.length <= 0) {
             let viewObj = {
-              table: schema.name + '_' + table.name,
               name: 'Default View',
               state: params.columnApi.getColumnState(),
               orderBy,
               limit,
+              offset,
             };
             actions.setView(viewObj);
+          } else {
+            let view = views.filter(view => view.name === defaultView)[0];
+            params.columnApi.applyColumnState({
+              state: view.state,
+              applyOrder: true,
+            });
           }
         }}>
         {columns.map(column => {
@@ -170,9 +168,10 @@ const mapStateToProps = state => ({
   orderBy: state.orderBy,
   limit: state.limit,
   views: state.views,
-  schema: state.schema,
   rowCount: state.rowCount,
   current: state.current,
+  offset: state.offset,
+  defaultView: state.defaultView,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -16,11 +16,13 @@ import {
   CREATE_OR_DELETE_PRIMARY_KEYS,
   REMOVE_OR_DELETE_COLUMN_MUTATION,
   REMOVE_OR_DELETE_FOREIGN_KEY,
+  SAVE_TABLE_USER_SETTINGS,
   UPDATE_COLUMN_MUTATION,
 } from '../../graphql/mutations/wb';
 import TableSidePanel from '../common/tableSidePanel';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { Link } from 'gatsby';
+import { toaster } from 'evergreen-ui';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -37,6 +39,8 @@ type TableLayoutPropsType = {
   formData: any;
   actions: any;
   isNewTable: boolean;
+  gridAPI: any;
+  columnAPI: any;
 };
 
 const TableLayout = ({
@@ -54,11 +58,10 @@ const TableLayout = ({
   formData,
   actions,
   isNewTable,
+  gridAPI,
+  columnAPI,
 }: TableLayoutPropsType) => {
-  const [gridAPI, setGridAPI] = useState(null);
-  const [columnAPI, setColumnAPI] = useState(null);
   const [changedValues, setChangedValues] = useState([]);
-  const [name, setName] = useState('');
   const [type, setType] = useState('');
   const [show, setShow] = useState(false);
   const [column, setColumn] = useState('');
@@ -76,6 +79,7 @@ const TableLayout = ({
   );
   const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
   const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
+  const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
 
   const deleteForeignKey = async () => {
     const { loading, error } = await removeOrDeleteForeignKey({
@@ -209,37 +213,50 @@ const TableLayout = ({
     setTimeout(() => editValues(values), 500);
   };
 
-  const saveView = (defaultView = null) => {
-    if (defaultView) {
-      let viewObj = views.filter(
-        view =>
-          view.table === schema.name + '_' + table.name &&
-          view.name === defaultView,
-      )[0];
+  const saveSettingsToDB = async () => {
+    const { loading, error } = await saveUserTableSettings({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+        settings: {
+          views,
+          defaultView,
+        },
+      },
+    });
+    if (!loading && !error)
+      toaster.success('Saved!', {
+        duration: 10,
+      });
+  };
+
+  const saveView = (toView = null) => {
+    if (toView) {
+      let viewObj = views.filter(view => view.name === toView)[0];
       let index = views.indexOf(viewObj);
       if (index !== -1) {
         viewObj = {
-          table: schema.name + '_' + table.name,
-          name: defaultView,
+          name: toView,
           state: columnAPI.getColumnState(),
           orderBy,
           limit,
+          offset,
         };
         views[index] = viewObj;
         actions.setViews(views);
       }
     } else {
       let viewObj = {
-        table: schema.name + '_' + table.name,
-        name,
+        name: formData.name,
         state: columnAPI.getColumnState(),
         orderBy,
         limit,
+        offset,
       };
       actions.setView(viewObj);
-      actions.setDefaultView(name);
-      setName('');
+      actions.setDefaultView(formData.name);
     }
+    saveSettingsToDB();
   };
 
   const getContextMenuItems = params => {
@@ -543,31 +560,27 @@ const TableLayout = ({
               <p className="py-1">Total {rowCount} records</p>
               <div>
                 {views.length > 0 &&
-                  views
-                    .filter(
-                      view => view.table === schema.name + '_' + table.name,
-                    )
-                    .map(view => (
-                      <div
-                        onClick={() => {
-                          columnAPI.applyColumnState({
-                            state: view.state,
-                            applyOrder: true,
-                          });
-                          actions.setLimit(view.limit);
-                          actions.setOrderBy(view.orderBy);
-                          actions.setDefaultView(view.name);
-                        }}
-                        aria-hidden="true"
-                        className={`badge badge-pill mr-1 p-2 ${
-                          defaultView === view.name
-                            ? 'badge-primary'
-                            : 'badge-secondary'
-                        }`}
-                        style={{ cursor: 'pointer' }}>
-                        {view.name}
-                      </div>
-                    ))}
+                  views.map(view => (
+                    <div
+                      onClick={() => {
+                        columnAPI.applyColumnState({
+                          state: view.state,
+                          applyOrder: true,
+                        });
+                        actions.setLimit(view.limit);
+                        actions.setOrderBy(view.orderBy);
+                        actions.setDefaultView(view.name);
+                      }}
+                      aria-hidden="true"
+                      className={`badge badge-pill mr-1 p-2 ${
+                        defaultView === view.name
+                          ? 'badge-primary'
+                          : 'badge-secondary'
+                      }`}
+                      style={{ cursor: 'pointer' }}>
+                      {view.name}
+                    </div>
+                  ))}
                 <div
                   onClick={() => {
                     setType('view');
@@ -600,8 +613,6 @@ const TableLayout = ({
           <Grid
             onCellValueChanged={onCellValueChanged}
             getContextMenuItems={getContextMenuItems}
-            setColumnAPI={setColumnAPI}
-            setGridAPI={setGridAPI}
           />
         </React.Fragment>
       )}
@@ -631,6 +642,8 @@ const mapStateToProps = state => ({
   views: state.views,
   schema: state.schema,
   defaultView: state.defaultView,
+  columnAPI: state.columnAPI,
+  gridAPI: state.gridAPI,
 });
 
 const mapDispatchToProps = dispatch => ({

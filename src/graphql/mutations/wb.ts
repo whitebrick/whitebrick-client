@@ -80,5 +80,8 @@ export const UPDATE_USER_DETAILS_MUTATION: string = `mutation ($firstName: Strin
     lastName
     email
   }
-}
-`;
+}`;
+
+export const SAVE_TABLE_USER_SETTINGS: string = `mutation ($schemaName: String!, $tableName: String!, $settings: JSON!) {
+  wbSaveTableUserSettings(schemaName: $schemaName, tableName: $tableName, settings: $settings)
+}`;

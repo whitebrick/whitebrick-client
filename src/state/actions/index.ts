@@ -139,4 +139,16 @@ export const actions = {
       payload: { defaultView },
     };
   },
+  setColumnAPI(columnAPI) {
+    return {
+      type: types.SET_COLUMN_API,
+      payload: { columnAPI },
+    };
+  },
+  setGridAPI(gridAPI) {
+    return {
+      type: types.SET_GRID_API,
+      payload: { gridAPI },
+    };
+  },
 };

@@ -23,11 +23,23 @@ export type ColumnItemType = {
   referencedBy: Array<ReferencedByItemType>;
 };
 
+export type ViewItemType = {
+  name: string;
+  state: any;
+  orderBy: string;
+  limit: number;
+  offset: string;
+};
+
 export type TableItemType = {
   name: string;
   label: string;
   columns: Array<ColumnItemType>;
   role: {
     name: string;
+  };
+  settings: {
+    views: ViewItemType[];
+    defaultView: string;
   };
 };

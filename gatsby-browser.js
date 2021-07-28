@@ -37,9 +37,13 @@ export const wrapRootElement = ({ element }) => {
             getIdTokenClaims,
             user,
             error,
+            logout,
           }) => {
             if (isLoading) return <Loading />;
-            if (error) return <NotFound name={error.message} />;
+            if (error) {
+              logout({ returnTo: window.location.origin });
+              return <NotFound name={error.message} />;
+            }
             if (!isLoading && isAuthenticated)
               return (
                 <AuthWrapper

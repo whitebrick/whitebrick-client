@@ -36,6 +36,7 @@ const OrgSchemaTable = ({
       schemaName: params.databaseName,
       tableName: params.tableName,
       withColumns: true,
+      withSettings: true,
     },
   });
   const [fetchSchemaByName] = useManualQuery(SCHEMA_BY_NAME_QUERY, {
@@ -61,14 +62,27 @@ const OrgSchemaTable = ({
         actions.setTable(data.wbMyTableByName);
         actions.setColumns(data.wbMyTableByName.columns);
         actions.setOrderBy(data.wbMyTableByName.columns[0].name);
+        if (data.wbMyTableByName.settings) {
+          if (
+            data.wbMyTableByName.settings.views &&
+            data.wbMyTableByName.settings.views.length > 0
+          ) {
+            actions.setViews(data.wbMyTableByName.settings.views);
+          }
+          if (data.wbMyTableByName.settings.defaultView)
+            actions.setDefaultView(data.wbMyTableByName.settings.defaultView);
+        }
       }
     }
   };
 
   useEffect(() => {
     if (params['databaseName'] && params['databaseName'] !== schema?.name)
-      fetchSchema();
-    if (params['tableName'] && params['tableName'] !== table?.name)
+      fetchSchema().then(() => {
+        if (params['tableName'] && params['tableName'] !== table?.name)
+          fetchSchemaTable().finally(() => setLoading(false));
+      });
+    else if (params['tableName'] && params['tableName'] !== table?.name)
       fetchSchemaTable().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
@@ -86,7 +100,7 @@ const OrgSchemaTable = ({
       />
     </Layout>
   ) : (
-    <Layout params={params} />
+    <Layout />
   );
 };
 
