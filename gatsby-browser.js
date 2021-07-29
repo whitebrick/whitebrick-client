@@ -7,7 +7,6 @@ import store from './src/state/store';
 import AuthWrapper from './src/components/common/AuthWrapper';
 
 import './src/styles/style.css';
-import 'rc-pagination/assets/index.css';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'bootstrap/dist/css/bootstrap.min.css';

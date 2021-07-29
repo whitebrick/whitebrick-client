@@ -1,18 +1,25 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
-import Pagination from 'rc-pagination';
 import { bindActionCreators } from 'redux';
+import { ClientContext } from 'graphql-hooks';
 
+import {
+  IServerSideGetRowsParams,
+  GridReadyEvent,
+  GridApi,
+  GetContextMenuItems,
+} from 'ag-grid-community';
 import { connect } from 'react-redux';
 import { actions } from '../state/actions';
 import ForeignKeyCellRenderer from './foreignKeyCellRenderer';
-import { ColumnItemType, TableItemType } from '../types';
+import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
+import * as gql from 'gql-query-builder';
 
 type GridPropsType = {
   onCellValueChanged: (params: any) => void;
-  getContextMenuItems: any;
+  getContextMenuItems: GetContextMenuItems;
   rows: any[];
   table: TableItemType;
   views: any[];
@@ -24,6 +31,9 @@ type GridPropsType = {
   current: number;
   offset: string;
   defaultView: string;
+  schema: SchemaItemType;
+  fields: [];
+  gridAPI: GridApi;
 };
 
 const Grid = ({
@@ -36,14 +46,70 @@ const Grid = ({
   limit,
   columns,
   actions,
-  rowCount,
-  current,
   offset,
   defaultView,
+  schema,
+  fields,
+  gridAPI,
 }: GridPropsType) => {
-  const handlePagination = (current, pageSize) => {
-    actions.setOffset(Math.ceil((current - 1) * pageSize));
-    actions.setCurrent(current);
+  const client = useContext(ClientContext);
+
+  const createServerSideDatasource = () => {
+    return {
+      getRows: async function (params: IServerSideGetRowsParams) {
+        const subscription = gql.subscription({
+          operation: schema.name + '_' + table.name,
+          variables: {
+            limit: params.request.endRow,
+            offset: params.request.startRow,
+            order_by: {
+              value: { [orderBy]: `asc` },
+              type: `[${schema.name + '_' + table.name.concat('_order_by!')}]`,
+            },
+          },
+          fields,
+        });
+        const operationAgg = gql.query({
+          operation: schema.name + '_' + table.name.concat('_aggregate'),
+          fields: [{ aggregate: ['count'] }],
+        });
+        const { data: c } = await client.request(operationAgg);
+        client.subscriptionClient.request(subscription).subscribe({
+          next({ data }) {
+            params.successCallback(
+              data[schema.name + '_' + table.name],
+              c[schema.name + '_' + table.name + '_aggregate'].aggregate.count,
+            );
+          },
+          error(error) {
+            params.failCallback();
+          },
+        });
+      },
+    };
+  };
+
+  const onGridReady = (params: GridReadyEvent) => {
+    actions.setGridAPI(params.api);
+    actions.setColumnAPI(params.columnApi);
+    const datasource = createServerSideDatasource();
+    params.api.setServerSideDatasource(datasource);
+    if (views.length <= 0) {
+      let viewObj = {
+        name: 'Default View',
+        state: params.columnApi.getColumnState(),
+        orderBy,
+        limit,
+        offset,
+      };
+      actions.setView(viewObj);
+    } else {
+      let view = views.filter(view => view.name === defaultView)[0];
+      params.columnApi.applyColumnState({
+        state: view.state,
+        applyOrder: true,
+      });
+    }
   };
 
   return (
@@ -52,7 +118,11 @@ const Grid = ({
         frameworkComponents={{
           foreignKeyRenderer: ForeignKeyCellRenderer,
         }}
-        rowData={rows}
+        rowModelType={'serverSide'}
+        // @ts-ignore
+        serverSideStoreType={'partial'}
+        pagination={true}
+        paginationPageSize={limit}
         sideBar={{
           toolPanels: [
             {
@@ -89,26 +159,7 @@ const Grid = ({
         allowContextMenuWithControlKey={true}
         getContextMenuItems={getContextMenuItems}
         popupParent={document.querySelector('body')}
-        onGridReady={params => {
-          actions.setGridAPI(params.api);
-          actions.setColumnAPI(params.columnApi);
-          if (views.length <= 0) {
-            let viewObj = {
-              name: 'Default View',
-              state: params.columnApi.getColumnState(),
-              orderBy,
-              limit,
-              offset,
-            };
-            actions.setView(viewObj);
-          } else {
-            let view = views.filter(view => view.name === defaultView)[0];
-            params.columnApi.applyColumnState({
-              state: view.state,
-              applyOrder: true,
-            });
-          }
-        }}>
+        onGridReady={onGridReady}>
         {columns.map(column => {
           if (column.foreignKeys.length > 0) {
             return (
@@ -134,8 +185,10 @@ const Grid = ({
         <div className="p-4">
           <select
             value={limit}
-            onBlur={e => actions.setLimit(parseInt(e.target.value))}
-            onChange={e => actions.setLimit(parseInt(e.target.value))}>
+            onChange={e => {
+              actions.setLimit(Number(e.target.value));
+              gridAPI.paginationSetPageSize(Number(e.target.value));
+            }}>
             <option>5</option>
             <option>10</option>
             <option>20</option>
@@ -144,16 +197,6 @@ const Grid = ({
             <option>500</option>
           </select>{' '}
           records per page
-          <div className="float-right">
-            <Pagination
-              total={rowCount}
-              pageSize={limit}
-              current={current}
-              onChange={(current, pageSize) =>
-                handlePagination(current, pageSize)
-              }
-            />
-          </div>
         </div>
       )}
     </React.Fragment>
@@ -172,6 +215,9 @@ const mapStateToProps = state => ({
   current: state.current,
   offset: state.offset,
   defaultView: state.defaultView,
+  schema: state.schema,
+  fields: state.fields,
+  gridAPI: state.gridAPI,
 });
 
 const mapDispatchToProps = dispatch => ({

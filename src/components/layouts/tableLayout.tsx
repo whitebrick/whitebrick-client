@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 
-import { useMutation, useSubscription } from 'graphql-hooks';
+import { useMutation } from 'graphql-hooks';
 
 import graphQLFetch from '../../utils/GraphQLFetch';
 import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
@@ -23,6 +23,12 @@ import TableSidePanel from '../common/tableSidePanel';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { Link } from 'gatsby';
 import { toaster } from 'evergreen-ui';
+import Seo from '../seo';
+
+import {
+  GridApi,
+  ColumnApi
+} from 'ag-grid-community';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -38,9 +44,8 @@ type TableLayoutPropsType = {
   fetchTables: () => any;
   formData: any;
   actions: any;
-  isNewTable: boolean;
-  gridAPI: any;
-  columnAPI: any;
+  gridAPI: GridApi;
+  columnAPI: ColumnApi;
 };
 
 const TableLayout = ({
@@ -57,7 +62,6 @@ const TableLayout = ({
   fetchTables = () => {},
   formData,
   actions,
-  isNewTable,
   gridAPI,
   columnAPI,
 }: TableLayoutPropsType) => {
@@ -99,50 +103,6 @@ const TableLayout = ({
       gridAPI.refreshCells({ force: true });
     }
   };
-
-  useEffect(() => {
-    const handleTableChange = async () => {
-      if (columns.length > 0 && !isNewTable) {
-        const operation = gql.query({
-          operation: schema.name + '_' + table.name,
-          variables: {
-            limit,
-            offset,
-            order_by: {
-              value: { [orderBy]: `asc` },
-              type: `[${schema.name + '_' + table.name.concat('_order_by!')}]`,
-            },
-          },
-          fields,
-        });
-        const operationAgg = gql.query({
-          operation: schema.name + '_' + table.name.concat('_aggregate'),
-          fields: [{ aggregate: ['count'] }],
-        });
-        const fetchData = async () => await graphQLFetch(operation);
-        fetchData().then(({ data }) => {
-          actions.setRows(data[schema.name + '_' + table.name]);
-        });
-        const fetchCount = async () => await graphQLFetch(operationAgg);
-        fetchCount().then(({ data }) =>
-          actions.setRowCount(
-            data[schema.name + '_' + table.name + '_aggregate'].aggregate.count,
-          ),
-        );
-      }
-    };
-    handleTableChange().finally(() => console.log('fetched table change'));
-  }, [
-    schema,
-    table,
-    isNewTable,
-    columns,
-    fields,
-    limit,
-    offset,
-    orderBy,
-    actions,
-  ]);
 
   useEffect(() => {
     actions.setOffset(0);
@@ -495,141 +455,122 @@ const TableLayout = ({
     fetchData().finally(() => console.log('deleted row'));
   };
 
-  const subscription = gql.subscription({
-    operation: schema.name + '_' + table.name,
-    variables: {
-      limit,
-      offset,
-      order_by: {
-        value: { [orderBy]: `asc` },
-        type: `[${schema.name + '_' + table.name.concat('_order_by!')}]`,
-      },
-    },
-    fields,
-  });
-
-  useSubscription(subscription, ({ data, errors }) => {
-    if (errors && errors.length > 0) {
-      console.log(errors);
-      return;
-    }
-    actions.setRows(data[schema.name + '_' + table.name]);
-  });
-
   return (
-    <div className="ag-theme-alpine">
-      {table.name !== '' && (
-        <React.Fragment>
-          <div className="my-3">
-            <div style={{ padding: `1rem` }}>
-              <p>
-                <Link to="/">Home</Link> <FaChevronRight />{' '}
-                <Link
-                  to={
-                    schema.organizationOwnerName
-                      ? `/${schema.organizationOwnerName}/${schema.name}`
-                      : `/db/${schema.name}`
-                  }>
-                  {schema.label}
-                </Link>{' '}
-                <FaChevronRight />
-                <Link
-                  to={
-                    schema.organizationOwnerName
-                      ? `/${schema.organizationOwnerName}/${schema.name}/${table.name}`
-                      : `/db/${schema.name}/table/${table.name}`
-                  }>
-                  {table.label}
-                </Link>
-              </p>
-              <h3 className="m-0 w-25" style={{ cursor: 'pointer' }}>
-                <span>
-                  {table.label}
-                  <FaPen
-                    className="ml-1"
-                    size="15px"
-                    aria-hidden={true}
+    <React.Fragment>
+      <Seo title={`${table.label} | ${schema.label}`} />
+      <div className="ag-theme-alpine">
+        {table.name !== '' && (
+          <React.Fragment>
+            <div className="my-3">
+              <div style={{ padding: `1rem` }}>
+                <p>
+                  <Link to="/">Home</Link> <FaChevronRight />{' '}
+                  <Link
+                    to={
+                      schema.organizationOwnerName
+                        ? `/${schema.organizationOwnerName}/${schema.name}`
+                        : `/db/${schema.name}`
+                    }>
+                    {schema.label}
+                  </Link>{' '}
+                  <FaChevronRight />
+                  <Link
+                    to={
+                      schema.organizationOwnerName
+                        ? `/${schema.organizationOwnerName}/${schema.name}/${table.name}`
+                        : `/db/${schema.name}/table/${table.name}`
+                    }>
+                    {table.label}
+                  </Link>
+                </p>
+                <h3 className="m-0 w-25" style={{ cursor: 'pointer' }}>
+                  <span>
+                    {table.label}
+                    <FaPen
+                      className="ml-1"
+                      size="15px"
+                      aria-hidden={true}
+                      onClick={() => {
+                        setType('updateTable');
+                        actions.setFormData(table);
+                        setShow(true);
+                      }}
+                    />
+                  </span>
+                </h3>
+                <p className="py-1">Total {rowCount} records</p>
+                <div>
+                  {views.length > 0 &&
+                    views.map(view => (
+                      <div
+                        onClick={() => {
+                          columnAPI.applyColumnState({
+                            state: view.state,
+                            applyOrder: true,
+                          });
+                          actions.setLimit(view.limit);
+                          actions.setOrderBy(view.orderBy);
+                          actions.setDefaultView(view.name);
+                        }}
+                        aria-hidden="true"
+                        className={`badge badge-pill mr-1 p-2 ${
+                          defaultView === view.name
+                            ? 'badge-primary'
+                            : 'badge-secondary'
+                        }`}
+                        style={{ cursor: 'pointer' }}>
+                        {view.name}
+                      </div>
+                    ))}
+                  <div
                     onClick={() => {
-                      setType('updateTable');
-                      actions.setFormData(table);
+                      setType('view');
+                      actions.setFormData({});
                       setShow(true);
                     }}
-                  />
-                </span>
-              </h3>
-              <p className="py-1">Total {rowCount} records</p>
-              <div>
-                {views.length > 0 &&
-                  views.map(view => (
-                    <div
+                    aria-hidden="true"
+                    className="badge badge-pill badge-dark p-2"
+                    style={{ cursor: 'pointer' }}>
+                    + Create a view
+                  </div>
+                  <div className="float-right">
+                    <button
+                      onClick={() => saveView(defaultView)}
+                      className="btn btn-sm btn-dark mr-2">
+                      Save to {defaultView}
+                    </button>
+                    <button
                       onClick={() => {
-                        columnAPI.applyColumnState({
-                          state: view.state,
-                          applyOrder: true,
-                        });
-                        actions.setLimit(view.limit);
-                        actions.setOrderBy(view.orderBy);
-                        actions.setDefaultView(view.name);
+                        gridAPI.setSideBarVisible(!gridAPI.isSideBarVisible());
+                        gridAPI.openToolPanel('columns');
                       }}
-                      aria-hidden="true"
-                      className={`badge badge-pill mr-1 p-2 ${
-                        defaultView === view.name
-                          ? 'badge-primary'
-                          : 'badge-secondary'
-                      }`}
-                      style={{ cursor: 'pointer' }}>
-                      {view.name}
-                    </div>
-                  ))}
-                <div
-                  onClick={() => {
-                    setType('view');
-                    actions.setFormData({});
-                    setShow(true);
-                  }}
-                  aria-hidden="true"
-                  className="badge badge-pill badge-dark p-2"
-                  style={{ cursor: 'pointer' }}>
-                  + Create a view
-                </div>
-                <div className="float-right">
-                  <button
-                    onClick={() => saveView(defaultView)}
-                    className="btn btn-sm btn-dark mr-2">
-                    Save to {defaultView}
-                  </button>
-                  <button
-                    onClick={() => {
-                      gridAPI.setSideBarVisible(!gridAPI.isSideBarVisible());
-                      gridAPI.openToolPanel('columns');
-                    }}
-                    className="btn btn-sm btn-primary mr-2">
-                    Select Columns
-                  </button>
+                      className="btn btn-sm btn-primary mr-2">
+                      Select Columns
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <Grid
-            onCellValueChanged={onCellValueChanged}
-            getContextMenuItems={getContextMenuItems}
-          />
-        </React.Fragment>
-      )}
-      <TableSidePanel
-        show={show}
-        setShow={setShow}
-        column={column}
-        onSave={onSave}
-        type={type}
-        deleteForeignKey={deleteForeignKey}
-      />
-    </div>
+            <Grid
+              onCellValueChanged={onCellValueChanged}
+              getContextMenuItems={getContextMenuItems}
+            />
+          </React.Fragment>
+        )}
+        <TableSidePanel
+          show={show}
+          setShow={setShow}
+          column={column}
+          onSave={onSave}
+          type={type}
+          deleteForeignKey={deleteForeignKey}
+        />
+      </div>
+    </React.Fragment>
   );
 };
 
 const mapStateToProps = state => ({
-  isNewTable: state.isNewTable,
   rows: state.rowData,
   table: state.table,
   formData: state.formData,
