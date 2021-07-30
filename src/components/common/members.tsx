@@ -9,6 +9,8 @@ import {
   SearchInput,
   Button,
   PlusIcon,
+  HelpIcon,
+  Tooltip
 } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
@@ -29,6 +31,7 @@ import {
 } from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
 import InviteUserModal from './inviteUserModal';
+import RolePermissions from './rolePermissions';
 
 type MembersType = {
   user: any;
@@ -57,6 +60,7 @@ const Members = ({
 
   const [searchInput, setSearchInput] = useState('');
   const [show, setShow] = useState(false);
+  const [showRoles, setShowRoles] = useState(false);
   const roles = !isObjectEmpty(cloudContext) && cloudContext?.roles[name];
   const userRole =
     name === 'organization'
@@ -213,7 +217,16 @@ const Members = ({
         <Table.Head>
           <Table.TextHeaderCell>User</Table.TextHeaderCell>
           <Table.TextHeaderCell>Source</Table.TextHeaderCell>
-          <Table.TextHeaderCell>Role</Table.TextHeaderCell>
+          <Table.TextHeaderCell>
+            Role{' '}
+            <Tooltip content="Role permissions">
+              <IconButton
+                icon={HelpIcon}
+                appearance="minimal"
+                onClick={() => setShowRoles(true)}
+              />
+            </Tooltip>
+          </Table.TextHeaderCell>
         </Table.Head>
         <Table.Body>
           {users &&
@@ -259,6 +272,12 @@ const Members = ({
         setShow={setShow}
         name={name}
         refetch={refetch}
+      />
+      <RolePermissions
+        show={showRoles}
+        setShow={setShowRoles}
+        name={name}
+        cloudContext={cloudContext}
       />
     </div>
   );
