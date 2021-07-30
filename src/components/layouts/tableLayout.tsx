@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 
-import { useMutation } from 'graphql-hooks';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 
 import graphQLFetch from '../../utils/GraphQLFetch';
 import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
@@ -26,6 +26,9 @@ import { toaster } from 'evergreen-ui';
 import Seo from '../seo';
 
 import { GridApi, ColumnApi } from 'ag-grid-community';
+import Tabs from '../elements/tabs';
+import Members from '../common/members';
+import { TABLE_USERS_QUERY } from '../../graphql/queries/wb';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -81,6 +84,19 @@ const TableLayout = ({
   const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
   const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
+
+  const [users, setUsers] = useState([]);
+  const [fetchSchemaTableUsers] = useManualQuery(TABLE_USERS_QUERY, {
+    variables: {
+      schemaName: schema.name,
+      tableName: table.name,
+    },
+  });
+
+  const fetchData = () => {
+    fetchSchemaTableUsers().then(r => setUsers(r?.data?.wbTableUsers));
+  };
+  useEffect(fetchData, []);
 
   const deleteForeignKey = async () => {
     const { loading, error } = await removeOrDeleteForeignKey({
@@ -452,6 +468,77 @@ const TableLayout = ({
     fetchData().finally(() => console.log('deleted row'));
   };
 
+  const tabs = [
+    {
+      title: 'Data',
+      element: (
+        <React.Fragment>
+          <div>
+            {views.length > 0 &&
+              views.map(view => (
+                <div
+                  onClick={() => {
+                    columnAPI.applyColumnState({
+                      state: view.state,
+                      applyOrder: true,
+                    });
+                    actions.setLimit(view.limit);
+                    actions.setOrderBy(view.orderBy);
+                    actions.setDefaultView(view.name);
+                  }}
+                  aria-hidden="true"
+                  className={`badge badge-pill mr-1 p-2 ${
+                    defaultView === view.name
+                      ? 'badge-primary'
+                      : 'badge-secondary'
+                  }`}
+                  style={{ cursor: 'pointer' }}>
+                  {view.name}
+                </div>
+              ))}
+            <div
+              onClick={() => {
+                setType('view');
+                actions.setFormData({});
+                setShow(true);
+              }}
+              aria-hidden="true"
+              className="badge badge-pill badge-dark p-2"
+              style={{ cursor: 'pointer' }}>
+              + Create a view
+            </div>
+            <div className="float-right">
+              <button
+                onClick={() => saveView(defaultView)}
+                className="btn btn-sm btn-dark mr-2">
+                Save to {defaultView}
+              </button>
+              <button
+                onClick={() => {
+                  gridAPI.setSideBarVisible(!gridAPI.isSideBarVisible());
+                  gridAPI.openToolPanel('columns');
+                }}
+                className="btn btn-sm btn-primary mr-2">
+                Select Columns
+              </button>
+            </div>
+          </div>
+          <div className="w-100 mt-4">
+            <Grid
+              onCellValueChanged={onCellValueChanged}
+              getContextMenuItems={getContextMenuItems}
+            />
+          </div>
+        </React.Fragment>
+      ),
+    },
+    {
+      title: 'Members',
+      element: <Members users={users} refetch={fetchData} name={'table'} />,
+      noPane: true,
+    },
+  ];
+
   return (
     <React.Fragment>
       <Seo title={`${table.label} | ${schema.label}`} />
@@ -496,62 +583,9 @@ const TableLayout = ({
                   </span>
                 </h3>
                 <p className="py-1">Total {rowCount} records</p>
-                <div>
-                  {views.length > 0 &&
-                    views.map(view => (
-                      <div
-                        onClick={() => {
-                          columnAPI.applyColumnState({
-                            state: view.state,
-                            applyOrder: true,
-                          });
-                          actions.setLimit(view.limit);
-                          actions.setOrderBy(view.orderBy);
-                          actions.setDefaultView(view.name);
-                        }}
-                        aria-hidden="true"
-                        className={`badge badge-pill mr-1 p-2 ${
-                          defaultView === view.name
-                            ? 'badge-primary'
-                            : 'badge-secondary'
-                        }`}
-                        style={{ cursor: 'pointer' }}>
-                        {view.name}
-                      </div>
-                    ))}
-                  <div
-                    onClick={() => {
-                      setType('view');
-                      actions.setFormData({});
-                      setShow(true);
-                    }}
-                    aria-hidden="true"
-                    className="badge badge-pill badge-dark p-2"
-                    style={{ cursor: 'pointer' }}>
-                    + Create a view
-                  </div>
-                  <div className="float-right">
-                    <button
-                      onClick={() => saveView(defaultView)}
-                      className="btn btn-sm btn-dark mr-2">
-                      Save to {defaultView}
-                    </button>
-                    <button
-                      onClick={() => {
-                        gridAPI.setSideBarVisible(!gridAPI.isSideBarVisible());
-                        gridAPI.openToolPanel('columns');
-                      }}
-                      className="btn btn-sm btn-primary mr-2">
-                      Select Columns
-                    </button>
-                  </div>
-                </div>
+                <Tabs items={tabs} />
               </div>
             </div>
-            <Grid
-              onCellValueChanged={onCellValueChanged}
-              getContextMenuItems={getContextMenuItems}
-            />
           </React.Fragment>
         )}
         <TableSidePanel

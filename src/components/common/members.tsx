@@ -242,10 +242,12 @@ const Members = ({
                 </Table.TextCell>
                 <Table.TextCell>
                   {user.role.impliedFrom
-                    ? cloudContext.roles[user.role.impliedFrom.split('_')[0]][
-                        user.role.impliedFrom
-                      ].label
-                    : 'Direct Member'}
+                    ? `Implicitly Assigned from ${
+                        cloudContext.roles[user.role.impliedFrom.split('_')[0]][
+                          user.role.impliedFrom
+                        ].label
+                      }`
+                    : 'Explicitly Assigned'}
                 </Table.TextCell>
                 <Table.TextCell>{renderRoleColumn(user)}</Table.TextCell>
               </Table.Row>

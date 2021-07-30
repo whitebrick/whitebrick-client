@@ -114,9 +114,15 @@ export const ORGANIZATION_QUERY: string = `query ($name: String!) {
 
 export const TABLE_USERS_QUERY = `query ($schemaName: String!, $tableName: String!){
   wbTableUsers(schemaName: $schemaName, tableName: $tableName){
+    userId
+    userFirstName
+    userLastName
     userEmail
-    role
-    roleImpliedFrom
+    role{
+      name
+      impliedFrom
+      permissions
+    }
   }
 }`;
 
