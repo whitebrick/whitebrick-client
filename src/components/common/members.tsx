@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   Select,
@@ -6,6 +6,9 @@ import {
   IconButton,
   TrashIcon,
   LogOutIcon,
+  SearchInput,
+  Button,
+  PlusIcon,
 } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
@@ -25,6 +28,7 @@ import {
   TableItemType,
 } from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
+import InviteUserModal from './inviteUserModal';
 
 type MembersType = {
   user: any;
@@ -51,6 +55,8 @@ const Members = ({
     if (role) return role.split('_').pop();
   };
 
+  const [searchInput, setSearchInput] = useState('');
+  const [show, setShow] = useState(false);
   const roles = !isObjectEmpty(cloudContext) && cloudContext?.roles[name];
   const userRole =
     name === 'organization'
@@ -172,50 +178,87 @@ const Members = ({
     refetch();
   };
 
+  const filteredUsers =
+    searchInput === ''
+      ? users
+      : users.filter(
+          user =>
+            user.userFirstName
+              .toLowerCase()
+              .includes(searchInput.toLowerCase()) ||
+            user.userLastName
+              .toLowerCase()
+              .includes(searchInput.toLowerCase()) ||
+            user.userEmail.toLowerCase().includes(searchInput.toLowerCase()),
+        );
+
   return (
-    <Table>
-      <Table.Head>
-        <Table.TextHeaderCell>User</Table.TextHeaderCell>
-        <Table.TextHeaderCell>Source</Table.TextHeaderCell>
-        <Table.TextHeaderCell>Role</Table.TextHeaderCell>
-      </Table.Head>
-      <Table.Body height={240}>
-        {users &&
-          users.length > 0 &&
-          users.map(user => (
-            <Table.Row key={user.userId}>
-              <Table.TextCell>
-                <div className="d-flex align-items-center items-center">
-                  <img
-                    src="https://www.gravatar.com/avatar/HASH"
-                    className="rounded-circle"
-                    alt="image"
-                  />
-                  <div className="ml-3">
-                    <h6>
-                      {user.userFirstName} {user.userLastName}
-                      {user.userEmail === u.email && (
-                        <Pill display="inline-flex" marginLeft={8}>
-                          it's you
-                        </Pill>
-                      )}
-                    </h6>
-                    <div className="text-black-50">{user.userEmail}</div>
+    <div>
+      <div className="py-2">
+        <SearchInput
+          placeholder="Search Users"
+          onChange={e => setSearchInput(e.target.value)}
+          value={searchInput}
+        />
+        <div className="float-right">
+          <Button
+            appearance="primary"
+            iconBefore={PlusIcon}
+            onClick={() => setShow(true)}>
+            Invite Users
+          </Button>
+        </div>
+      </div>
+      <Table>
+        <Table.Head>
+          <Table.TextHeaderCell>User</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Source</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Role</Table.TextHeaderCell>
+        </Table.Head>
+        <Table.Body>
+          {users &&
+            users.length > 0 &&
+            filteredUsers.map(user => (
+              <Table.Row key={user.userId}>
+                <Table.TextCell>
+                  <div className="d-flex align-items-center items-center">
+                    <img
+                      src="https://www.gravatar.com/avatar/HASH"
+                      className="rounded-circle"
+                      alt="image"
+                    />
+                    <div className="ml-3">
+                      <h6>
+                        {user.userFirstName} {user.userLastName}
+                        {user.userEmail === u.email && (
+                          <Pill display="inline-flex" marginLeft={8}>
+                            it's you
+                          </Pill>
+                        )}
+                      </h6>
+                      <div className="text-black-50">{user.userEmail}</div>
+                    </div>
                   </div>
-                </div>
-              </Table.TextCell>
-              <Table.TextCell>
-                {user.role.impliedFrom
-                  ? cloudContext.roles[user.role.impliedFrom.split('_')[0]][
-                      user.role.impliedFrom
-                    ].label
-                  : 'Direct Member'}
-              </Table.TextCell>
-              <Table.TextCell>{renderRoleColumn(user)}</Table.TextCell>
-            </Table.Row>
-          ))}
-      </Table.Body>
-    </Table>
+                </Table.TextCell>
+                <Table.TextCell>
+                  {user.role.impliedFrom
+                    ? cloudContext.roles[user.role.impliedFrom.split('_')[0]][
+                        user.role.impliedFrom
+                      ].label
+                    : 'Direct Member'}
+                </Table.TextCell>
+                <Table.TextCell>{renderRoleColumn(user)}</Table.TextCell>
+              </Table.Row>
+            ))}
+        </Table.Body>
+      </Table>
+      <InviteUserModal
+        show={show}
+        setShow={setShow}
+        name={name}
+        refetch={refetch}
+      />
+    </div>
   );
 };
 

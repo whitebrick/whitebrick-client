@@ -1,5 +1,6 @@
 import React from 'react';
 import { useManualQuery } from 'graphql-hooks';
+import { Text } from 'evergreen-ui';
 import { USERS_SEARCH_PATTERN } from '../../graphql/queries/wb';
 import AsyncSelect from 'react-select/async';
 import { components } from 'react-select';
@@ -12,6 +13,17 @@ type UserSearchInputType = {
 
 const UserSearchInput = ({ data, setData }: UserSearchInputType) => {
   const [fetchUserSearchPattern] = useManualQuery(USERS_SEARCH_PATTERN);
+
+  const customStyles = {
+    menu: provided => ({
+      ...provided,
+      zIndex: 9000,
+    }),
+    option: styles => ({
+      ...styles,
+      zIndex: 9000,
+    }),
+  };
 
   const mapOptionsToValues = options => {
     return options.map(option => ({
@@ -46,15 +58,18 @@ const UserSearchInput = ({ data, setData }: UserSearchInputType) => {
   };
 
   return (
-    <React.Fragment>
-      <label htmlFor="search-user">Search by User E-mail or name</label>
+    <div style={{ zIndex: 100 }}>
+      <Text color="muted" fontWeight={500}>
+        Search by User E-mail or name
+      </Text>
       <AsyncSelect
+        styles={customStyles}
         placeholder="Search"
         loadOptions={promiseOptions}
         onChange={({ value }) => setData({ ...data, user: value })}
         components={{ Option: CustomOption }}
       />
-    </React.Fragment>
+    </div>
   );
 };
 
