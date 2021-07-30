@@ -20,7 +20,6 @@ import * as gql from 'gql-query-builder';
 type GridPropsType = {
   onCellValueChanged: (params: any) => void;
   getContextMenuItems: GetContextMenuItems;
-  rows: any[];
   table: TableItemType;
   views: any[];
   orderBy: string;
@@ -39,7 +38,6 @@ type GridPropsType = {
 const Grid = ({
   onCellValueChanged,
   getContextMenuItems,
-  rows,
   table,
   views,
   orderBy,
@@ -74,6 +72,9 @@ const Grid = ({
           fields: [{ aggregate: ['count'] }],
         });
         const { data: c } = await client.request(operationAgg);
+        actions.setRowCount(
+          c[schema.name + '_' + table.name + '_aggregate'].aggregate.count,
+        );
         client.subscriptionClient.request(subscription).subscribe({
           next({ data }) {
             params.successCallback(
@@ -181,7 +182,7 @@ const Grid = ({
           }
         })}
       </AgGridReact>
-      {table.name !== '' && rows.length > 0 && (
+      {table.name !== '' && (
         <div className="p-4">
           <select
             value={limit}
@@ -204,7 +205,6 @@ const Grid = ({
 };
 
 const mapStateToProps = state => ({
-  rows: state.rowData,
   table: state.table,
   tables: state.tables,
   columns: state.columns,

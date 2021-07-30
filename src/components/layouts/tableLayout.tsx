@@ -25,10 +25,7 @@ import { Link } from 'gatsby';
 import { toaster } from 'evergreen-ui';
 import Seo from '../seo';
 
-import {
-  GridApi,
-  ColumnApi
-} from 'ag-grid-community';
+import { GridApi, ColumnApi } from 'ag-grid-community';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -571,7 +568,6 @@ const TableLayout = ({
 };
 
 const mapStateToProps = state => ({
-  rows: state.rowData,
   table: state.table,
   formData: state.formData,
   columns: state.columns,
