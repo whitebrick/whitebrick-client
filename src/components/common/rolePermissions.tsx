@@ -1,6 +1,7 @@
 import React from 'react';
 import Modal from './modal';
 import { Table, TickCircleIcon, CrossIcon } from 'evergreen-ui';
+import { isObjectEmpty } from '../../utils/objectEmpty';
 
 type rolePermissionsType = {
   show: boolean;
@@ -15,8 +16,9 @@ const RolePermissions = ({
   name,
   cloudContext,
 }: rolePermissionsType) => {
-  const roles = cloudContext.roles[name];
-  let p = cloudContext.policy;
+  const roles = !isObjectEmpty(cloudContext) && cloudContext.roles[name];
+
+  const p = !isObjectEmpty(cloudContext) && cloudContext.policy;
   const policies = Object.keys(p).filter(policy =>
     policy.split('_').includes(name),
   );
@@ -34,13 +36,15 @@ const RolePermissions = ({
             <Table.TextHeaderCell flexBasis={250} flexShrink={0} flexGrow={0}>
               Access
             </Table.TextHeaderCell>
-            {Object.keys(roles).reverse().map(role => (
-              <Table.TextHeaderCell>
-                <div className="d-flex justify-content-center align-items-center">
-                  {roles[role].label}
-                </div>
-              </Table.TextHeaderCell>
-            ))}
+            {Object.keys(roles)
+              .reverse()
+              .map(role => (
+                <Table.TextHeaderCell>
+                  <div className="d-flex justify-content-center align-items-center">
+                    {roles[role].label}
+                  </div>
+                </Table.TextHeaderCell>
+              ))}
           </Table.Head>
           <Table.Body>
             {policies.map((policy, index) => (
@@ -48,24 +52,26 @@ const RolePermissions = ({
                 <Table.TextCell flexBasis={250} flexShrink={0} flexGrow={0}>
                   {p[policy].description}
                 </Table.TextCell>
-                {Object.keys(roles).reverse().map(role => {
-                  if (p[policy].permittedRoles.includes(role))
-                    return (
-                      <Table.TextCell>
-                        <div className="d-flex justify-content-center align-items-center">
-                          <TickCircleIcon color="success" />
-                        </div>
-                      </Table.TextCell>
-                    );
-                  else
-                    return (
-                      <Table.TextCell>
-                        <div className="d-flex justify-content-center align-items-center">
-                          <CrossIcon color="danger" />
-                        </div>
-                      </Table.TextCell>
-                    );
-                })}
+                {Object.keys(roles)
+                  .reverse()
+                  .map(role => {
+                    if (p[policy].permittedRoles.includes(role))
+                      return (
+                        <Table.TextCell>
+                          <div className="d-flex justify-content-center align-items-center">
+                            <TickCircleIcon color="success" />
+                          </div>
+                        </Table.TextCell>
+                      );
+                    else
+                      return (
+                        <Table.TextCell>
+                          <div className="d-flex justify-content-center align-items-center">
+                            <CrossIcon color="danger" />
+                          </div>
+                        </Table.TextCell>
+                      );
+                  })}
               </Table.Row>
             ))}
           </Table.Body>

@@ -16,6 +16,7 @@ import {
   SchemaItemType,
   TableItemType,
 } from '../../types';
+import { isObjectEmpty } from '../../utils/objectEmpty';
 
 type InviteUserModalType = {
   show: boolean;
@@ -44,7 +45,7 @@ const InviteUserModal = ({
   const [updateTableUserRole] = useMutation(TABLE_SET_USER_ROLE_MUTATION);
   const [updateOrganizationUserRole] = useMutation(SET_USERS_ROLE_MUTATION);
 
-  const roles = cloudContext.roles[name];
+  const roles = !isObjectEmpty(cloudContext) && cloudContext.roles[name];
 
   useEffect(() => {
     if (name !== '') {

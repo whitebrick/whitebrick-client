@@ -147,8 +147,7 @@ const TableLayout = ({
   };
 
   const editValues = values => {
-    // @ts-ignore
-    values = [...new Set(values)];
+    values = [...Array.from(new Set(values))];
     values.forEach((params, index) => {
       let filteredParams = values.filter(
         value => params.rowIndex === value.rowIndex,
@@ -160,9 +159,11 @@ const TableLayout = ({
       });
       let variables = { where: {}, _set: {} };
       for (let key in data) {
-        variables.where[key] = {
-          _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
-        };
+        if (data[key]) {
+          variables.where[key] = {
+            _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
+          };
+        }
       }
       variables['_set'][params.colDef.field] = parseInt(params.newValue)
         ? parseInt(params.newValue)

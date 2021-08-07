@@ -10,7 +10,7 @@ import {
   Button,
   PlusIcon,
   HelpIcon,
-  Tooltip
+  Tooltip,
 } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
@@ -61,7 +61,10 @@ const Members = ({
   const [searchInput, setSearchInput] = useState('');
   const [show, setShow] = useState(false);
   const [showRoles, setShowRoles] = useState(false);
+
+  const cloudContextRoles = !isObjectEmpty(cloudContext) && cloudContext?.roles;
   const roles = !isObjectEmpty(cloudContext) && cloudContext?.roles[name];
+
   const userRole =
     name === 'organization'
       ? getRole(organization?.role?.name)
@@ -256,7 +259,7 @@ const Members = ({
                 <Table.TextCell>
                   {user.role.impliedFrom
                     ? `Implicitly Assigned from ${
-                        cloudContext.roles[user.role.impliedFrom.split('_')[0]][
+                        cloudContextRoles[user.role.impliedFrom.split('_')[0]][
                           user.role.impliedFrom
                         ].label
                       }`

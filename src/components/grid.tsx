@@ -83,6 +83,7 @@ const Grid = ({
             );
           },
           error(error) {
+            console.error(error);
             params.failCallback();
           },
         });
