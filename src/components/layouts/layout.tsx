@@ -161,7 +161,6 @@ const Layout = ({
         variables: {
           name: formData.name,
           label: formData.label,
-          email: user.email,
         },
       });
       if (!loading && !error) {

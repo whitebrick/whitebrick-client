@@ -1,5 +1,5 @@
-export const CREATE_SCHEMA_MUTATION: string = `mutation ($name: String!, $label: String!, $email: String!){
-  wbCreateSchema(name: $name, label: $label, userOwnerEmail: $email){
+export const CREATE_SCHEMA_MUTATION: string = `mutation ($name: String!, $label: String!){
+  wbCreateSchema(name: $name, label: $label){
     name
   }
 }`;
