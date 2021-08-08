@@ -9,6 +9,7 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Loading from '../../../components/loading';
 import NotFound from '../../../components/notFound';
 import { SchemaItemType } from '../../../types';
+import Seo from '../../../components/seo';
 
 type OrgSchemaType = {
   cloudContext: any;
@@ -42,7 +43,7 @@ const OrgSchema = ({
   };
 
   useEffect(() => {
-    if (params['databaseName'] && params['databaseName'] !== schema?.name)
+    if (params['databaseName'] && params['databaseName'])
       fetchSchema().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
@@ -68,7 +69,10 @@ const OrgSchema = ({
       />
     </Layout>
   ) : (
-    <Layout params={params} />
+    <React.Fragment>
+      <Seo title={schema.label} />
+      <Layout />
+    </React.Fragment>
   );
 };
 

@@ -9,6 +9,7 @@ import { actions } from '../../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { SchemaItemType } from '../../../types';
+import Seo from '../../../components/seo';
 
 type DatabaseNamePropsType = {
   cloudContext: any;
@@ -41,7 +42,7 @@ const DatabaseName = ({
   };
 
   useEffect(() => {
-    if (params['databaseName'] && params['databaseName'] !== schema?.name)
+    if (params['databaseName'] && params['databaseName'])
       fetchSchema().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
@@ -64,7 +65,10 @@ const DatabaseName = ({
       />
     </Layout>
   ) : (
-    <Layout params={params} />
+    <React.Fragment>
+      <Seo title={schema.label} />
+      <Layout />
+    </React.Fragment>
   );
 };
 

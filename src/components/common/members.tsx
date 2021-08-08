@@ -151,7 +151,7 @@ const Members = ({
         </React.Fragment>
       );
     } else {
-      return roles[user.role.name].label;
+      return roles && roles[user.role.name].label;
     }
   };
 
@@ -259,6 +259,7 @@ const Members = ({
                 <Table.TextCell>
                   {user.role.impliedFrom
                     ? `Implicitly Assigned from ${
+                        cloudContextRoles &&
                         cloudContextRoles[user.role.impliedFrom.split('_')[0]][
                           user.role.impliedFrom
                         ].label

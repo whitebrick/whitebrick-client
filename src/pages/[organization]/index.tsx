@@ -70,7 +70,7 @@ const Organization = ({
         </Layout>
       ) : (
         <React.Fragment>
-          <Seo title={organization.label} />
+          <Seo title={`${organization.label} | Organization`} />
           <OrganizationLayout refetch={fetchData} />
         </React.Fragment>
       )}

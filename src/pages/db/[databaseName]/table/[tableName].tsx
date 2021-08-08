@@ -77,12 +77,12 @@ const Table = ({
   };
 
   useEffect(() => {
-    if (params['databaseName'] && params['databaseName'] !== schema?.name)
+    if (params['databaseName'] && params['databaseName'])
       fetchSchema().then(() => {
-        if (params['tableName'] && params['tableName'] !== table?.name)
+        if (params['tableName'] && params['tableName'])
           fetchSchemaTable().finally(() => setLoading(false));
       });
-    else if (params['tableName'] && params['tableName'] !== table?.name)
+    else if (params['tableName'] && params['tableName'])
       fetchSchemaTable().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
