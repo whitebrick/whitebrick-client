@@ -14,7 +14,21 @@
 
 
 ## Schemas
+### CRUD
+...
+### Access Control
+...
+
 
 ## Tables
+### CRUD
+...
+### Access Control
+...
+
 
 ## Columns
+### CRUD
+...
+### Access Control
+...
