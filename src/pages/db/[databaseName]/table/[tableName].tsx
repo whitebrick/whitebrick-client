@@ -100,7 +100,7 @@ const Table = ({
       />
     </Layout>
   ) : (
-    <Layout />
+    <Layout hideSidebar={true} />
   );
 };
 

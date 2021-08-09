@@ -36,6 +36,7 @@ type LayoutPropsType = {
   organizations: OrganizationItemType[];
   actions: any;
   cloudContext: any;
+  hideSidebar?: boolean;
 };
 
 const Layout = ({
@@ -48,6 +49,7 @@ const Layout = ({
   actions,
   organizations,
   cloudContext,
+  hideSidebar = false,
 }: LayoutPropsType) => {
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
@@ -90,8 +92,6 @@ const Layout = ({
       type: 'text',
       required: true,
     },
-    { type: 'heading', label: 'User Roles' },
-    { type: 'permissionGrid', label: 'schema' },
   ];
 
   const newOrganizationFormFields: any[] = [
@@ -203,12 +203,14 @@ const Layout = ({
         setType={setType}
       />
       <div className="mt-5">
-        <Sidebar
-          setFormData={actions.setFormData}
-          setShow={setShow}
-          setType={setType}
-        />
-        <main id="main">
+        {!hideSidebar && (
+          <Sidebar
+            setFormData={actions.setFormData}
+            setShow={setShow}
+            setType={setType}
+          />
+        )}
+        <main id="main" style={{ marginLeft: !hideSidebar ? '250px' : '0' }}>
           {!children ? (
             <React.Fragment>
               {user && schema.name !== '' && !isObjectEmpty(table) ? (

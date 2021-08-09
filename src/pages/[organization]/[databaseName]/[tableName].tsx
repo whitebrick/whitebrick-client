@@ -100,7 +100,7 @@ const OrgSchemaTable = ({
       />
     </Layout>
   ) : (
-    <Layout />
+    <Layout hideSidebar={true} />
   );
 };
 

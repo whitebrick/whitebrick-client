@@ -107,7 +107,6 @@ const TableSidePanel = ({
       required: true,
     },
     { name: 'label', label: 'Label', type: 'text', required: true },
-    { label: 'User Roles', type: 'heading' },
   ];
 
   return (
