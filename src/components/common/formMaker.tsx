@@ -135,8 +135,8 @@ const FormMaker = ({
                 </option>
               )}
               {res.map(option => (
-                <option key={option.key} value={option.key}>
-                  {option.value}
+                <option key={option.value} value={option.value}>
+                  {option.key}
                 </option>
               ))}
               {addNewOptions &&
