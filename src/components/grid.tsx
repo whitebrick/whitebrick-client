@@ -52,6 +52,14 @@ const Grid = ({
 }: GridPropsType) => {
   const client = useContext(ClientContext);
 
+  const autoSizeColumns = (columnAPI) => {
+    const allColumnIds = [];
+    columnAPI.getAllColumns().forEach(function (column) {
+      allColumnIds.push(column.colId);
+    });
+    columnAPI.autoSizeColumns(allColumnIds, true);
+  };
+
   const createServerSideDatasource = () => {
     return {
       getRows: async function (params: IServerSideGetRowsParams) {
@@ -81,6 +89,7 @@ const Grid = ({
               data[schema.name + '_' + table.name],
               c[schema.name + '_' + table.name + '_aggregate'].aggregate.count,
             );
+            autoSizeColumns(params.columnApi);
           },
           error(error) {
             console.error(error);
