@@ -151,4 +151,16 @@ export const actions = {
       payload: { gridAPI },
     };
   },
+  setShow(show) {
+    return {
+      type: types.SET_SHOW,
+      payload: { show },
+    };
+  },
+  setType(type) {
+    return {
+      type: types.SET_TYPE,
+      payload: { type },
+    };
+  },
 };

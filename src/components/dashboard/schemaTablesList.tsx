@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
@@ -8,45 +8,68 @@ import { navigate } from 'gatsby';
 import Skeleton from 'react-loading-skeleton';
 import { SchemaItemType, TableItemType } from '../../types';
 import { Pane } from 'evergreen-ui';
+import { useManualQuery } from 'graphql-hooks';
+import { SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
 
 type TablesPropsType = {
   schema: SchemaItemType;
   tables: TableItemType[];
-  loaded: boolean;
+  actions: any;
 };
 
-const SchemaTablesList = ({ schema, tables, loaded }: TablesPropsType) => {
+const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
+  const [loaded, setLoaded] = useState(false);
+  const [fetchTables] = useManualQuery(SCHEMA_TABLES_QUERY);
+
+  useEffect(() => {
+    const fetchTablesData = async () => {
+      actions.setTables([]);
+      const { data } = await fetchTables({
+        variables: {
+          schemaName: schema.name,
+        },
+      });
+      return data;
+    };
+    fetchTablesData()
+      .then(r => actions.setTables(r.wbMyTables))
+      .finally(() => setLoaded(true));
+  }, []);
+
   return (
     <Pane padding={16} flex={1} background="tint1">
       <div className="row">
-        {loaded && tables && tables.length > 0
-          ? tables.map((table, index) => (
-              <div
-                key={index}
-                className="col-md-2 col-sm-6 text-center btn"
-                aria-hidden="true"
-                onClick={() => {
-                  if (schema.organizationOwnerName)
-                    navigate(
-                      `/${schema.organizationOwnerName}/${schema.name}/${table.name}`,
-                    );
-                  else navigate(`/db/${schema.name}/table/${table.name}`);
-                }}>
-                <Avatar name={table.label} size="75" round="12px" />
-                <p className="mt-2">{table.label}</p>
-              </div>
-            ))
-          : loaded && tables && tables.length == 0 ? ''
-          : [...Array(12)].map((e, i) => (
-              <div className="col-md-2 text-center btn" key={i}>
-                <Skeleton height="100px" />
-              </div>
-            ))}
-        {loaded && (
-          <div className="col-md-2 text-center btn">
-            <Avatar name="+" size="75" round="12px" />
-            <p className="mt-2">Add table</p>
-          </div>
+        {loaded ? (
+          <React.Fragment>
+            {tables &&
+              tables.length > 0 &&
+              tables.map((table, index) => (
+                <div
+                  key={index}
+                  className="col-md-2 col-sm-6 text-center btn"
+                  aria-hidden="true"
+                  onClick={() => {
+                    if (schema.organizationOwnerName)
+                      navigate(
+                        `/${schema.organizationOwnerName}/${schema.name}/${table.name}`,
+                      );
+                    else navigate(`/db/${schema.name}/table/${table.name}`);
+                  }}>
+                  <Avatar name={table.label} size="75" round="12px" />
+                  <p className="mt-2">{table.label}</p>
+                </div>
+              ))}
+            <div className="col-md-2 text-center btn">
+              <Avatar name="+" size="75" round="12px" color="#4B5563" />
+              <p className="mt-2">Add table</p>
+            </div>
+          </React.Fragment>
+        ) : (
+          [...Array(12)].map((e, i) => (
+            <div className="col-md-2 text-center btn" key={i}>
+              <Skeleton height="100px" />
+            </div>
+          ))
         )}
       </div>
     </Pane>

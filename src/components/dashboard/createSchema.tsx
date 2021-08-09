@@ -8,8 +8,6 @@ import { OrganizationItemType, SchemaItemType } from '../../types';
 
 type CreateSchemaType = {
   cloudContext: any;
-  setType: (value: string) => void;
-  setShow: (value: boolean) => void;
   actions: any;
   schemas: SchemaItemType[];
   organizations: OrganizationItemType[];
@@ -17,8 +15,6 @@ type CreateSchemaType = {
 
 const CreateSchema = ({
   cloudContext,
-  setType,
-  setShow,
   actions,
   schemas,
   organizations,
@@ -35,10 +31,10 @@ const CreateSchema = ({
               aria-hidden="true"
               onClick={() => {
                 actions.setFormData({});
-                setType('database');
-                setShow(true);
+                actions.setType('database');
+                actions.setShow(true);
               }}>
-              <Avatar name="+" size="75" round="12px" color="gray" />
+              <Avatar name="+" size="75" round="12px" color="#4B5563" />
             </div>
           </div>
         </div>

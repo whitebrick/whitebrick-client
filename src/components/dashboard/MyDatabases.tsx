@@ -9,8 +9,6 @@ import { navigate } from 'gatsby';
 type MyDatabasesPropsType = {
   schemas: any[];
   user: any;
-  setType: (value: string) => void;
-  setShow: (value: boolean) => void;
   actions: any;
   name?: string;
 };
@@ -18,8 +16,6 @@ type MyDatabasesPropsType = {
 const MyDatabases = ({
   schemas,
   user,
-  setShow,
-  setType,
   actions,
   name = 'My Databases',
 }: MyDatabasesPropsType) => {
@@ -53,10 +49,10 @@ const MyDatabases = ({
                 aria-hidden="true"
                 onClick={() => {
                   actions.setFormData({});
-                  setType('database');
-                  setShow(true);
+                  actions.setType('database');
+                  actions.setShow(true);
                 }}>
-                <Avatar name="+" size="75" round="12px" />
+                <Avatar name="+" size="75" round="12px" color="#4B5563" />
                 <p className="mt-2">Add database</p>
               </div>
             )}

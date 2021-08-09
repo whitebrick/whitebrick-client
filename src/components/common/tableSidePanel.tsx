@@ -9,7 +9,6 @@ import { ColumnItemType, TableItemType } from '../../types';
 
 type TableSidePanelPropsType = {
   show: boolean;
-  setShow: (value: boolean) => void;
   onSave: () => void;
   type: string;
   column: any;
@@ -24,7 +23,6 @@ type TableSidePanelPropsType = {
 
 const TableSidePanel = ({
   show,
-  setShow,
   onSave,
   type,
   column,
@@ -112,7 +110,7 @@ const TableSidePanel = ({
   return (
     <SidePanel
       show={show}
-      setShow={setShow}
+      setShow={actions.setShow}
       onSave={onSave}
       name={
         type === 'add'
@@ -203,6 +201,8 @@ const TableSidePanel = ({
 };
 
 const mapStateToProps = state => ({
+  show: state.show,
+  type: state.type,
   formData: state.formData,
   table: state.table,
   columns: state.columns,

@@ -31,6 +31,7 @@ import Members from '../common/members';
 import { TABLE_USERS_QUERY } from '../../graphql/queries/wb';
 
 type TableLayoutPropsType = {
+  type: string;
   table: TableItemType;
   columns: Array<ColumnItemType>;
   fields: [];
@@ -49,6 +50,7 @@ type TableLayoutPropsType = {
 };
 
 const TableLayout = ({
+  type,
   table,
   columns,
   fields,
@@ -66,8 +68,6 @@ const TableLayout = ({
   columnAPI,
 }: TableLayoutPropsType) => {
   const [changedValues, setChangedValues] = useState([]);
-  const [type, setType] = useState('');
-  const [show, setShow] = useState(false);
   const [column, setColumn] = useState('');
   const [params, setParams] = useState({});
   const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
@@ -109,7 +109,7 @@ const TableLayout = ({
       },
     });
     if (!loading && !error) {
-      setShow(false);
+      actions.setShow(false);
       await fetchTables();
       let column = columns.filter(column => column.name === formData.name)[0];
       actions.setFormData(column);
@@ -143,7 +143,7 @@ const TableLayout = ({
         query: operation.query,
         variables: operation.variables,
       });
-    fetchData().finally(() => setShow(false));
+    fetchData().finally(() => actions.setShow(false));
   };
 
   const editValues = values => {
@@ -239,16 +239,16 @@ const TableLayout = ({
       {
         name: 'Add Column',
         action: () => {
-          setType('add');
-          setShow(true);
+          actions.setType('add');
+          actions.setShow(true);
           setColumn(params.column.colId);
         },
       },
       {
         name: 'Edit Column',
         action: () => {
-          setType('edit');
-          setShow(true);
+          actions.setType('edit');
+          actions.setShow(true);
           let column = columns.filter(
             column => column.name === params.column.colId,
           )[0];
@@ -300,7 +300,7 @@ const TableLayout = ({
           variables: operation.variables,
         });
       await fetchData();
-      setShow(false);
+      actions.setShow(false);
     } else if (type === 'editRow') {
       let variables = { where: {}, _set: {} };
       for (let key in params) {
@@ -320,10 +320,10 @@ const TableLayout = ({
       const { loading, error } = await updateTableMutation({
         variables,
       });
-      if (!error && !loading) setShow(false);
+      if (!error && !loading) actions.setShow(false);
     } else if (type === 'view') {
       saveView();
-      setShow(false);
+      actions.setShow(false);
     } else if (type === 'edit') {
       let variables: any = {
         schemaName: schema.name,
@@ -352,7 +352,7 @@ const TableLayout = ({
       }
       fetchTables();
       gridAPI.refreshCells({ force: true });
-      setShow(false);
+      actions.setShow(false);
     } else {
       const { loading, error } = await addOrCreateColumnMutation({
         variables: {
@@ -404,9 +404,9 @@ const TableLayout = ({
           });
           if (!loading && !error) {
             gridAPI.refreshCells({ force: true });
-            setShow(false);
+            actions.setShow(false);
           }
-        } else setShow(false);
+        } else actions.setShow(false);
       }
     }
   };
@@ -431,15 +431,15 @@ const TableLayout = ({
   };
 
   const onAddRow = () => {
-    setType('newRow');
-    setShow(true);
+    actions.setType('newRow');
+    actions.setShow(true);
   };
 
   const onEditRow = params => {
-    setType('editRow');
+    actions.setType('editRow');
     setParams(params.node.data);
     actions.setFormData(params.node.data);
-    setShow(true);
+    actions.setShow(true);
   };
 
   const onDeleteRow = params => {
@@ -499,9 +499,9 @@ const TableLayout = ({
               ))}
             <div
               onClick={() => {
-                setType('view');
+                actions.setType('view');
                 actions.setFormData({});
-                setShow(true);
+                actions.setShow(true);
               }}
               aria-hidden="true"
               className="badge badge-pill badge-dark p-2"
@@ -576,9 +576,9 @@ const TableLayout = ({
                       size="15px"
                       aria-hidden={true}
                       onClick={() => {
-                        setType('updateTable');
+                        actions.setType('updateTable');
                         actions.setFormData(table);
-                        setShow(true);
+                        actions.setShow(true);
                       }}
                     />
                   </span>
@@ -590,11 +590,8 @@ const TableLayout = ({
           </React.Fragment>
         )}
         <TableSidePanel
-          show={show}
-          setShow={setShow}
           column={column}
           onSave={onSave}
-          type={type}
           deleteForeignKey={deleteForeignKey}
         />
       </div>
@@ -603,6 +600,7 @@ const TableLayout = ({
 };
 
 const mapStateToProps = state => ({
+  type: state.type,
   table: state.table,
   formData: state.formData,
   columns: state.columns,

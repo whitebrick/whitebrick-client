@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useManualQuery, useMutation, useQuery } from 'graphql-hooks';
+import React, { useEffect } from 'react';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
-import Table from './tableLayout';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import SidePanel from '../common/sidePanel';
 import Sidebar from '../sidebar';
@@ -15,31 +14,29 @@ import {
   CREATE_TABLE_MUTATION,
 } from '../../graphql/mutations/wb';
 import Header from '../common/header';
-import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
-import MyDatabases from '../dashboard/MyDatabases';
-import {
-  OrganizationItemType,
-  SchemaItemType,
-  TableItemType,
-} from '../../types';
+import { SchemaItemType, TableItemType } from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
-import SchemaLayout from '../layouts/schemaLayout';
-import CreateSchema from '../../components/dashboard/createSchema';
+import TableLayout from './tableLayout';
 
 type LayoutPropsType = {
+  show: boolean;
+  type: string;
+  schemas: SchemaItemType[];
   table: TableItemType;
   schema: SchemaItemType;
   accessToken: string;
   formData: any;
   children?: React.ReactNode;
   user: any;
-  organizations: OrganizationItemType[];
   actions: any;
   cloudContext: any;
   hideSidebar?: boolean;
 };
 
 const Layout = ({
+  show,
+  type,
+  schemas,
   table,
   schema,
   accessToken,
@@ -47,14 +44,10 @@ const Layout = ({
   children,
   user,
   actions,
-  organizations,
   cloudContext,
   hideSidebar = false,
 }: LayoutPropsType) => {
-  const [show, setShow] = useState(false);
-  const [type, setType] = useState('');
-  const [loaded, setLoaded] = useState(false);
-  const { error, data: schemas, refetch } = useQuery(SCHEMAS_QUERY);
+  const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
   const [fetchCloudContext] = useManualQuery(`{ wbCloudContext }`);
   const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
@@ -66,7 +59,7 @@ const Layout = ({
       name: 'schema',
       label: 'Database Name',
       type: 'select',
-      options: schemas?.wbMySchemas,
+      options: schemas,
       nested: true,
       nestedValue: 'name',
     },
@@ -104,33 +97,37 @@ const Layout = ({
     },
   ];
 
+  const fetchSchemasData = async () => {
+    const { data } = await fetchSchemas();
+    actions.setSchemas(data.wbMySchemas);
+  };
+
   useEffect(() => {
-    if (schemas && schemas['wbMySchemas'] && schemas['wbMySchemas'].length > 0)
-      actions.setSchemas(schemas['wbMySchemas']);
-  }, [schemas, actions]);
+    if (schemas.length < 1) fetchSchemasData();
+  }, []);
 
   useEffect(() => {
     const fetchCloud = async () => {
       const { data } = await fetchCloudContext();
-      actions.setCloudContext(data['wbCloudContext']);
+      return data;
     };
-    if (isObjectEmpty(cloudContext)) fetchCloud();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (isObjectEmpty(cloudContext))
+      fetchCloud().then(data =>
+        actions.setCloudContext(data['wbCloudContext']),
+      );
   }, []);
 
-  useEffect(() => {
-    const fetchTables = async () => {
-      if (schema.name !== '' && schema.name !== undefined) {
-        await fetchSchemaTables({
-          variables: { schemaName: schema.name, withColumns: true },
-        })
-          .then(({ data }) => actions.setTables(data?.wbMyTables))
-          .finally(() => setLoaded(true));
-      }
-    };
-    actions.setTables([]);
-    fetchTables();
-  }, [schema, fetchSchemaTables, actions]);
+  // useEffect(() => {
+  //   const fetchTables = async () => {
+  //     if (schema.name !== '' && schema.name !== undefined) {
+  //       await fetchSchemaTables({
+  //         variables: { schemaName: schema.name, withColumns: true },
+  //       }).then(({ data }) => actions.setTables(data?.wbMyTables));
+  //     }
+  //   };
+  //   actions.setTables([]);
+  //   fetchTables();
+  // }, [schema, fetchSchemaTables, actions]);
 
   const fetchTablesAndColumns = async () => {
     const { data } = await fetchSchemaTables({
@@ -152,7 +149,6 @@ const Layout = ({
     } else {
       actions.setColumns([]);
     }
-    setLoaded(true);
   };
 
   const onSave = async () => {
@@ -164,8 +160,8 @@ const Layout = ({
         },
       });
       if (!loading && !error) {
-        refetch();
-        setShow(false);
+        fetchSchemasData();
+        actions.setShow(false);
       }
     } else if (type === 'organization') {
       const { error, loading } = await createOrganization({
@@ -174,7 +170,7 @@ const Layout = ({
           label: formData.label,
         },
       });
-      if (!loading && !error) setShow(false);
+      if (!loading && !error) actions.setShow(false);
     } else if (type === 'editSchema') {
       // implement the edit schema once we have API
     } else {
@@ -188,65 +184,34 @@ const Layout = ({
       });
       if (!loading && !error) {
         await fetchTablesAndColumns();
-        setShow(false);
+        actions.setShow(false);
       }
     }
   };
-
-  if (error) return <p>Something Bad Happened</p>;
 
   return (
     <>
       <Header
         setFormData={actions.setFormData}
-        setShow={setShow}
-        setType={setType}
+        setShow={actions.setShow}
+        setType={actions.setType}
       />
       <div className="mt-5">
         {!hideSidebar && (
           <Sidebar
             setFormData={actions.setFormData}
-            setShow={setShow}
-            setType={setType}
+            setShow={actions.setShow}
+            setType={actions.setType}
           />
         )}
         <main id="main" style={{ marginLeft: !hideSidebar ? '250px' : '0' }}>
           {!children ? (
             <React.Fragment>
-              {user && schema.name !== '' && !isObjectEmpty(table) ? (
-                <Table
+              {user && schema.name !== '' && !isObjectEmpty(table) && (
+                <TableLayout
                   key={schema.name + table.name}
                   fetchTables={fetchTablesAndColumns}
                 />
-              ) : (
-                <div>
-                  {Object.keys(schema).length > 0 ? (
-                    <SchemaLayout
-                      loaded={loaded}
-                      setShow={setShow}
-                      setType={setType}
-                    />
-                  ) : (
-                    <React.Fragment>
-                      {organizations &&
-                        organizations.length > 0 &&
-                        organizations.map(org => (
-                          <OrganizationDatabasesList
-                            organization={org}
-                            setShow={setShow}
-                            setType={setType}
-                          />
-                        ))}
-                      <MyDatabases setShow={setShow} setType={setType} />
-                      <MyDatabases
-                        name="Databases shared with me"
-                        setShow={setShow}
-                        setType={setType}
-                      />
-                      <CreateSchema setType={setType} setShow={setShow} />
-                    </React.Fragment>
-                  )}
-                </div>
               )}
             </React.Fragment>
           ) : (
@@ -255,7 +220,7 @@ const Layout = ({
           <SidePanel
             show={show}
             renderSaveButton={type !== 'token'}
-            setShow={setShow}
+            setShow={actions.setShow}
             onSave={onSave}
             name={
               type === 'token'
@@ -291,7 +256,7 @@ const Layout = ({
                     className="list-group-item"
                     aria-hidden="true"
                     onClick={() => {
-                      setType('database');
+                      actions.setType('database');
                       actions.setFormData({});
                     }}>
                     Database
@@ -300,7 +265,7 @@ const Layout = ({
                     className="list-group-item"
                     aria-hidden="true"
                     onClick={() => {
-                      setType('table');
+                      actions.setType('table');
                       actions.setFormData({});
                     }}>
                     Table
@@ -309,7 +274,7 @@ const Layout = ({
                     className="list-group-item"
                     aria-hidden="true"
                     onClick={() => {
-                      setType('organization');
+                      actions.setType('organization');
                       actions.setFormData({});
                     }}>
                     Organization
@@ -325,12 +290,14 @@ const Layout = ({
 };
 
 const mapStateToProps = state => ({
+  show: state.show,
+  type: state.type,
+  schemas: state.schemas,
   schema: state.schema,
   table: state.table,
   accessToken: state.accessToken,
   formData: state.formData,
   user: state.user,
-  organizations: state.organizations,
   cloudContext: state.cloudContext,
 });
 

@@ -10,6 +10,7 @@ import Loading from '../../../components/loading';
 import NotFound from '../../../components/notFound';
 import { SchemaItemType } from '../../../types';
 import Seo from '../../../components/seo';
+import SchemaLayout from '../../../components/layouts/schemaLayout';
 
 type OrgSchemaType = {
   cloudContext: any;
@@ -45,7 +46,6 @@ const OrgSchema = ({
   useEffect(() => {
     if (params['databaseName'] && params['databaseName'])
       fetchSchema().finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
   return isLoading ? (
@@ -71,7 +71,9 @@ const OrgSchema = ({
   ) : (
     <React.Fragment>
       <Seo title={schema.label} />
-      <Layout />
+      <Layout>
+        <SchemaLayout />
+      </Layout>
     </React.Fragment>
   );
 };

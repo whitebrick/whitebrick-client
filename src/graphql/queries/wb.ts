@@ -23,31 +23,10 @@ export const SCHEMA_BY_NAME_QUERY: string = `query ($name: String!, $organizatio
 }
 `;
 
-export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!, $withColumns: Boolean, $withSettings: Boolean){
-  wbMyTables(schemaName: $schemaName, withColumns: $withColumns, withSettings: $withSettings) {
+export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!){
+  wbMyTables(schemaName: $schemaName) {
     name
     label
-    columns {
-      name
-      label
-      type
-      isPrimaryKey
-      foreignKeys {
-        columnName
-        constraintName
-        tableName
-        relColumnName
-        relTableName
-      }
-      referencedBy {
-        columnName
-        constraintName
-        tableName
-        relColumnName
-        relTableName
-      }
-    }
-    settings
   }
 }`;
 

@@ -27,6 +27,8 @@ const initialState = {
   sendAdminSecret: false,
   columnAPI: null,
   gridAPI: null,
+  show: false,
+  type: '',
 };
 
 export default createStore(gridReducer, initialState);

@@ -11,8 +11,6 @@ import { OrganizationItemType, SchemaItemType } from '@/types';
 type DatabasesPropsType = {
   organization: OrganizationItemType;
   schemas: Array<SchemaItemType>;
-  setType: (value: string) => void;
-  setShow: (value: boolean) => void;
   actions: any;
   renderTitle?: boolean;
 };
@@ -20,8 +18,6 @@ type DatabasesPropsType = {
 const OrganizationDatabasesList = ({
   organization,
   schemas,
-  setType,
-  setShow,
   actions,
   renderTitle = true,
 }: DatabasesPropsType) => {
@@ -60,10 +56,10 @@ const OrganizationDatabasesList = ({
             aria-hidden="true"
             onClick={() => {
               actions.setFormData({});
-              setType('database');
-              setShow(true);
+              actions.setType('database');
+              actions.setShow(true);
             }}>
-            <Avatar name="+" size="75" round="12px" />
+            <Avatar name="+" size="75" round="12px" color="#4B5563" />
             <p className="mt-2">Add database</p>
           </div>
         </div>

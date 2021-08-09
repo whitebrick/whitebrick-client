@@ -13,19 +13,10 @@ import { Link } from 'gatsby';
 
 type SchemaLayoutType = {
   schema: SchemaItemType;
-  loaded: boolean;
-  setShow: (value: boolean) => void;
-  setType: (value: string) => void;
   actions: any;
 };
 
-const SchemaLayout = ({
-  schema,
-  loaded,
-  setShow,
-  setType,
-  actions,
-}: SchemaLayoutType) => {
+const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
   const [users, setUsers] = useState([]);
   const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
     variables: {
@@ -41,7 +32,7 @@ const SchemaLayout = ({
   const tabs = [
     {
       title: 'Tables',
-      element: <SchemaTablesList loaded={loaded} />,
+      element: <SchemaTablesList />,
     },
     {
       title: 'Members',
@@ -69,9 +60,9 @@ const SchemaLayout = ({
           aria-hidden={true}
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            setType('editSchema');
+            actions.setType('editSchema');
             actions.setFormData(schema);
-            setShow(true);
+            actions.setShow(true);
           }}>
           <span>
             {schema.label}
