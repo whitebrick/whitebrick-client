@@ -52,12 +52,13 @@ const Grid = ({
 }: GridPropsType) => {
   const client = useContext(ClientContext);
 
-  const autoSizeColumns = (columnAPI) => {
+  const autoSizeColumns = (columnAPI, gridAPI) => {
     const allColumnIds = [];
     columnAPI.getAllColumns().forEach(function (column) {
       allColumnIds.push(column.colId);
     });
-    columnAPI.autoSizeColumns(allColumnIds, true);
+    if (allColumnIds.length > 2) columnAPI.autoSizeColumns(allColumnIds, true);
+    else gridAPI.sizeColumnsToFit();
   };
 
   const createServerSideDatasource = () => {
@@ -89,7 +90,7 @@ const Grid = ({
               data[schema.name + '_' + table.name],
               c[schema.name + '_' + table.name + '_aggregate'].aggregate.count,
             );
-            autoSizeColumns(params.columnApi);
+            autoSizeColumns(params.columnApi, params.api);
           },
           error(error) {
             console.error(error);
