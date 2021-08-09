@@ -39,6 +39,7 @@ const MyDatabases = ({
           <div className="row">
             {filteredSchemas.map(schema => (
               <div
+                key={schema.name}
                 className="col-md-2 text-center btn"
                 aria-hidden="true"
                 onClick={() => navigate(`/db/${schema.name}`)}>

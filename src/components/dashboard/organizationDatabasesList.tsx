@@ -45,6 +45,7 @@ const OrganizationDatabasesList = ({
             )
             .map(schema => (
               <div
+                key={schema.name}
                 className="col-md-2 col-sm-6 text-center btn"
                 aria-hidden="true"
                 onClick={() =>

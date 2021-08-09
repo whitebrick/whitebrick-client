@@ -20,8 +20,9 @@ const SchemaTablesList = ({ schema, tables, loaded }: TablesPropsType) => {
     <Pane padding={16} flex={1} background="tint1">
       <div className="row">
         {loaded && tables && tables.length > 0
-          ? tables.map(table => (
+          ? tables.map((table, index) => (
               <div
+                key={index}
                 className="col-md-2 col-sm-6 text-center btn"
                 aria-hidden="true"
                 onClick={() => {
