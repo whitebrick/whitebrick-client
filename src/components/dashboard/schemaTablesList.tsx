@@ -36,6 +36,7 @@ const SchemaTablesList = ({ schema, tables, loaded }: TablesPropsType) => {
                 <p className="mt-2">{table.label}</p>
               </div>
             ))
+          : loaded && tables && tables.length == 0 ? ''
           : [...Array(12)].map((e, i) => (
               <div className="col-md-2 text-center btn" key={i}>
                 <Skeleton height="100px" />
