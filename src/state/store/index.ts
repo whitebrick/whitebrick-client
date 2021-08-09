@@ -12,6 +12,7 @@ const initialState = {
   table: '',
   isNewTable: false,
   columns: [],
+  column: {},
   fields: [],
   rowData: [],
   rowCount: 0,
@@ -29,6 +30,7 @@ const initialState = {
   gridAPI: null,
   show: false,
   type: '',
+  params: {},
 };
 
 export default createStore(gridReducer, initialState);

@@ -34,7 +34,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
     fetchTablesData()
       .then(r => actions.setTables(r.wbMyTables))
       .finally(() => setLoaded(true));
-  }, []);
+  }, [schema]);
 
   return (
     <Pane padding={16} flex={1} background="tint1">

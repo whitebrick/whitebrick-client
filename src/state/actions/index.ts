@@ -61,6 +61,12 @@ export const actions = {
       payload: { rows },
     };
   },
+  setColumn(column) {
+    return {
+      type: types.SET_COLUMN,
+      payload: { column },
+    };
+  },
   setColumns(columns) {
     return {
       type: types.SET_COLUMNS,
@@ -161,6 +167,12 @@ export const actions = {
     return {
       type: types.SET_TYPE,
       payload: { type },
+    };
+  },
+  setParams(params) {
+    return {
+      type: types.SET_PARAMS,
+      payload: { params },
     };
   },
 };

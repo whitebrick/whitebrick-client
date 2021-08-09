@@ -55,7 +55,7 @@ const Header = ({ user, setType, setShow, setFormData }: HeaderPropsType) => {
                     icon={PanelTableIcon}
                     onClick={() => {
                       setFormData({});
-                      setType('table');
+                      setType('createTable');
                       setShow(true);
                     }}>
                     New Table
@@ -64,7 +64,7 @@ const Header = ({ user, setType, setShow, setFormData }: HeaderPropsType) => {
                     icon={DatabaseIcon}
                     onClick={() => {
                       setFormData({});
-                      setType('database');
+                      setType('createDatabase');
                       setShow(true);
                     }}>
                     New Database
@@ -73,7 +73,7 @@ const Header = ({ user, setType, setShow, setFormData }: HeaderPropsType) => {
                     icon={ApplicationsIcon}
                     onClick={() => {
                       setFormData({});
-                      setType('organization');
+                      setType('createOrganization');
                       setShow(true);
                     }}>
                     New Organization

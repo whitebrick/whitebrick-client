@@ -8,18 +8,11 @@ import { actions } from '../../state/actions';
 import { useManualQuery, useMutation } from 'graphql-hooks';
 
 import graphQLFetch from '../../utils/GraphQLFetch';
-import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
 import Grid from '../grid';
 import {
-  ADD_OR_CREATE_COLUMN_MUTATION,
-  CREATE_OR_ADD_FOREIGN_KEY,
-  CREATE_OR_DELETE_PRIMARY_KEYS,
   REMOVE_OR_DELETE_COLUMN_MUTATION,
-  REMOVE_OR_DELETE_FOREIGN_KEY,
   SAVE_TABLE_USER_SETTINGS,
-  UPDATE_COLUMN_MUTATION,
 } from '../../graphql/mutations/wb';
-import TableSidePanel from '../common/tableSidePanel';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { Link } from 'gatsby';
 import { toaster } from 'evergreen-ui';
@@ -31,8 +24,8 @@ import Members from '../common/members';
 import { TABLE_USERS_QUERY } from '../../graphql/queries/wb';
 
 type TableLayoutPropsType = {
-  type: string;
   table: TableItemType;
+  column: any;
   columns: Array<ColumnItemType>;
   fields: [];
   rowCount: number;
@@ -42,7 +35,6 @@ type TableLayoutPropsType = {
   views: any[];
   schema: SchemaItemType;
   defaultView: string;
-  fetchTables: () => any;
   formData: any;
   actions: any;
   gridAPI: GridApi;
@@ -50,7 +42,6 @@ type TableLayoutPropsType = {
 };
 
 const TableLayout = ({
-  type,
   table,
   columns,
   fields,
@@ -61,28 +52,15 @@ const TableLayout = ({
   views,
   schema,
   defaultView,
-  fetchTables = () => {},
   formData,
   actions,
   gridAPI,
   columnAPI,
 }: TableLayoutPropsType) => {
   const [changedValues, setChangedValues] = useState([]);
-  const [column, setColumn] = useState('');
-  const [params, setParams] = useState({});
-  const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
-  const [addOrCreateColumnMutation] = useMutation(
-    ADD_OR_CREATE_COLUMN_MUTATION,
-  );
-  const [updateColumnMutation] = useMutation(UPDATE_COLUMN_MUTATION);
   const [removeOrDeleteColumnMutation] = useMutation(
     REMOVE_OR_DELETE_COLUMN_MUTATION,
   );
-  const [createOrDeletePrimaryKeys] = useMutation(
-    CREATE_OR_DELETE_PRIMARY_KEYS,
-  );
-  const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
-  const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
 
   const [users, setUsers] = useState([]);
@@ -97,25 +75,6 @@ const TableLayout = ({
     fetchSchemaTableUsers().then(r => setUsers(r?.data?.wbTableUsers));
   };
   useEffect(fetchData, []);
-
-  const deleteForeignKey = async () => {
-    const { loading, error } = await removeOrDeleteForeignKey({
-      variables: {
-        schemaName: schema.name,
-        tableName: table.name,
-        columnNames: [formData.name],
-        del: true,
-        parentTableName: formData['foreignKeys'][0]['relTableName'],
-      },
-    });
-    if (!loading && !error) {
-      actions.setShow(false);
-      await fetchTables();
-      let column = columns.filter(column => column.name === formData.name)[0];
-      actions.setFormData(column);
-      gridAPI.refreshCells({ force: true });
-    }
-  };
 
   useEffect(() => {
     actions.setOffset(0);
@@ -239,21 +198,21 @@ const TableLayout = ({
       {
         name: 'Add Column',
         action: () => {
-          actions.setType('add');
+          actions.setType('addColumn');
           actions.setShow(true);
-          setColumn(params.column.colId);
+          actions.setColumn(params.column.colId);
         },
       },
       {
         name: 'Edit Column',
         action: () => {
-          actions.setType('edit');
+          actions.setType('editColumn');
           actions.setShow(true);
           let column = columns.filter(
             column => column.name === params.column.colId,
           )[0];
           actions.setFormData(column);
-          setColumn(params.column.colId);
+          actions.setColumn(params.column.colId);
         },
       },
       {
@@ -279,136 +238,6 @@ const TableLayout = ({
       'paste',
       'export',
     ];
-  };
-
-  const onSave = async () => {
-    if (type === 'newRow') {
-      const operation = gql.mutation({
-        operation: ''.concat('insert_', schema.name + '_' + table.name),
-        variables: {
-          objects: {
-            value: formData,
-            type: `[${schema.name + '_' + table.name}_insert_input!]`,
-            required: true,
-          },
-        },
-        fields: ['affected_rows'],
-      });
-      const fetchData = async () =>
-        await graphQLFetch({
-          query: operation.query,
-          variables: operation.variables,
-        });
-      await fetchData();
-      actions.setShow(false);
-    } else if (type === 'editRow') {
-      let variables = { where: {}, _set: {} };
-      for (let key in params) {
-        variables.where[key] = {
-          _eq: parseInt(params[key]) ? parseInt(params[key]) : params[key],
-        };
-      }
-      variables['_set'] = formData;
-      doMutation(variables);
-    } else if (type === 'updateTable') {
-      let variables: any = {
-        schemaName: schema.name,
-        tableName: table.name,
-        newTableLabel: formData.label,
-      };
-      if (formData.name !== table.name) variables.newTableName = formData.name;
-      const { loading, error } = await updateTableMutation({
-        variables,
-      });
-      if (!error && !loading) actions.setShow(false);
-    } else if (type === 'view') {
-      saveView();
-      actions.setShow(false);
-    } else if (type === 'edit') {
-      let variables: any = {
-        schemaName: schema.name,
-        tableName: table.name,
-        columnName: column,
-      };
-      let col = columns.filter(c => c.name === column)[0];
-      if (formData.name !== col.name) variables.newColumnName = formData.name;
-      if (formData.label !== col.label)
-        variables.newColumnLabel = formData.label;
-      if (formData.type !== col.type) variables.newType = formData.type;
-      await updateColumnMutation({
-        variables,
-      });
-      if (formData.table && formData.column) {
-        await createOrAddForeignKey({
-          variables: {
-            schemaName: schema.name,
-            tableName: table.name,
-            columnNames: [formData.name],
-            parentTableName: formData.table,
-            parentColumnNames: [formData.column],
-            create: true,
-          },
-        });
-      }
-      fetchTables();
-      gridAPI.refreshCells({ force: true });
-      actions.setShow(false);
-    } else {
-      const { loading, error } = await addOrCreateColumnMutation({
-        variables: {
-          schemaName: schema.name,
-          tableName: table.name,
-          create: true,
-          columnName: formData.name,
-          columnLabel: formData.label,
-          columnType: formData.type,
-        },
-      });
-      if (!loading && !error) {
-        let columnNames = [];
-        columns
-          .filter(column => column['isPrimaryKey'] === true)
-          .map(c => columnNames.push(c.name));
-        if (formData['isPrimaryKey']) {
-          const {
-            loading: deleteLoading,
-            error: deleteError,
-          } = await createOrDeletePrimaryKeys({
-            variables: {
-              schemaName: schema.name,
-              tableName: table.name,
-              del: true,
-              columnNames,
-            },
-          });
-          if (!deleteLoading && !deleteError) {
-            await createOrDeletePrimaryKeys({
-              variables: {
-                schemaName: schema.name,
-                tableName: table.name,
-                columnNames: [formData.name],
-              },
-            });
-          }
-        }
-        if (formData.table && formData.column) {
-          const { loading, error } = await createOrAddForeignKey({
-            variables: {
-              schemaName: schema.name,
-              tableName: table.name,
-              columnNames: [formData.name],
-              parentTableName: formData.table,
-              parentColumnNames: [formData.column],
-              create: true,
-            },
-          });
-          if (!loading && !error) {
-            gridAPI.refreshCells({ force: true });
-            actions.setShow(false);
-          }
-        } else actions.setShow(false);
-      }
-    }
   };
 
   const onRemove = async colID => {
@@ -437,7 +266,7 @@ const TableLayout = ({
 
   const onEditRow = params => {
     actions.setType('editRow');
-    setParams(params.node.data);
+    actions.setParams(params.node.data);
     actions.setFormData(params.node.data);
     actions.setShow(true);
   };
@@ -589,11 +418,6 @@ const TableLayout = ({
             </div>
           </React.Fragment>
         )}
-        <TableSidePanel
-          column={column}
-          onSave={onSave}
-          deleteForeignKey={deleteForeignKey}
-        />
       </div>
     </React.Fragment>
   );
@@ -603,6 +427,8 @@ const mapStateToProps = state => ({
   type: state.type,
   table: state.table,
   formData: state.formData,
+  params: state.params,
+  column: state.column,
   columns: state.columns,
   fields: state.fields,
   rowCount: state.rowCount,

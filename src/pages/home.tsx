@@ -18,16 +18,14 @@ const Home = ({ organizations }: HomePropsType) => (
   <React.Fragment>
     <Seo title="Home" />
     <Layout>
-      <React.Fragment>
-        {organizations &&
-          organizations.length > 0 &&
-          organizations.map(org => (
-            <OrganizationDatabasesList organization={org} />
-          ))}
-        <MyDatabases />
-        <MyDatabases name="Databases shared with me" />
-        <CreateSchema />
-      </React.Fragment>
+      {organizations &&
+        organizations.length > 0 &&
+        organizations.map(org => (
+          <OrganizationDatabasesList organization={org} />
+        ))}
+      <MyDatabases />
+      <MyDatabases name="Databases shared with me" />
+      <CreateSchema />
     </Layout>
   </React.Fragment>
 );

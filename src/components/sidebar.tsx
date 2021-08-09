@@ -91,7 +91,7 @@ const Sidebar = ({
               style={{ color: '#5E6A7B' }}
               onClick={() => {
                 setShow(true);
-                setType('organization');
+                setType('createOrganization');
               }}>
               <FaPlus size="14px" />
               <span className="ml-2">Add an organization</span>

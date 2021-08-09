@@ -12,6 +12,7 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Loading from '../../../../components/loading';
 import NotFound from '../../../../components/notFound';
 import { SchemaItemType, TableItemType } from '../../../../types';
+import TableLayout from '../../../../components/layouts/tableLayout';
 
 type TablePropsType = {
   params: any;
@@ -100,7 +101,9 @@ const Table = ({
       />
     </Layout>
   ) : (
-    <Layout hideSidebar={true} />
+    <Layout hideSidebar={true}>
+      <TableLayout key={schema.name + table.name} />
+    </Layout>
   );
 };
 

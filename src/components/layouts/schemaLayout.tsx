@@ -60,7 +60,7 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
           aria-hidden={true}
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            actions.setType('editSchema');
+            actions.setType('editDatabase');
             actions.setFormData(schema);
             actions.setShow(true);
           }}>

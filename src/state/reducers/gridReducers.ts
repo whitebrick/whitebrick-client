@@ -73,6 +73,11 @@ export default function gridReducer(state: any = {}, action) {
         ...state,
         table: payload.table,
       };
+    case types.SET_COLUMN:
+      return {
+        ...state,
+        column: payload.column,
+      };
     case types.SET_COLUMNS:
       let f = [];
       payload.columns.forEach(column => f.push(column.name));
@@ -140,6 +145,11 @@ export default function gridReducer(state: any = {}, action) {
       return {
         ...state,
         type: payload.type,
+      };
+    case types.SET_PARAMS:
+      return {
+        ...state,
+        params: payload.params,
       };
     default:
       return state;

@@ -12,6 +12,7 @@ import { actions } from '../../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { SchemaItemType, TableItemType } from '../../../types';
+import TableLayout from '../../../components/layouts/tableLayout';
 
 type OrgSchemaTableType = {
   params: any;
@@ -100,7 +101,9 @@ const OrgSchemaTable = ({
       />
     </Layout>
   ) : (
-    <Layout hideSidebar={true} />
+    <Layout hideSidebar={true}>
+      <TableLayout key={schema.name + table.name} />
+    </Layout>
   );
 };
 

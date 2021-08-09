@@ -18,19 +18,23 @@ import { Link } from 'gatsby';
 
 type OrganizationLayoutPropsType = {
   organization: any;
+  show: boolean;
+  type: string;
   refetch: () => void;
+  actions: any;
 };
 
 const OrganizationLayout = ({
   organization,
   refetch,
+  show,
+  type,
+  actions,
 }: OrganizationLayoutPropsType) => {
   const [updateUserRoleMutation] = useMutation(SET_USERS_ROLE_MUTATION);
   const [updateOrganizationMutation] = useMutation(
     UPDATE_ORGANIZATION_MUTATION,
   );
-  const [show, setShow] = useState(false);
-  const [type, setType] = useState('');
   const [data, setData] = useState<any>({});
 
   const inviteUserOrUpdateRole = async (role, userEmails) => {
@@ -51,7 +55,7 @@ const OrganizationLayout = ({
       ]);
       if (!loading && !error) {
         refetch();
-        setShow(false);
+        actions.setShow(false);
       }
     } else {
       let variables: any = { name: organization.name };
@@ -62,7 +66,7 @@ const OrganizationLayout = ({
       });
       if (!loading && !error) {
         refetch();
-        setShow(false);
+        actions.setShow(false);
       }
     }
   };
@@ -88,8 +92,8 @@ const OrganizationLayout = ({
                   aria-hidden="true"
                   onClick={() => {
                     setData(organization);
-                    setShow(true);
-                    setType('edit');
+                    actions.setShow(true);
+                    actions.setType('editOrganization');
                   }}
                 />
               )}
@@ -103,8 +107,6 @@ const OrganizationLayout = ({
                   element: (
                     <OrganizationDatabasesList
                       organization={organization}
-                      setShow={setShow}
-                      setType={setType}
                       renderTitle={false}
                     />
                   ),
@@ -125,7 +127,7 @@ const OrganizationLayout = ({
         </div>
         <SidePanel
           show={show}
-          setShow={setShow}
+          setShow={actions.setShow}
           onSave={onSave}
           name={
             type === 'invite'
