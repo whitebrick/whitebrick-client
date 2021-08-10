@@ -107,7 +107,7 @@ const Sidebar = ({
               <div
                 onClick={() => {
                   setShow(true);
-                  setType('table');
+                  setType('createTable');
                   setFormData({ schema });
                 }}
                 aria-hidden="true"

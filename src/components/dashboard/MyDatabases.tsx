@@ -49,7 +49,7 @@ const MyDatabases = ({
                 aria-hidden="true"
                 onClick={() => {
                   actions.setFormData({});
-                  actions.setType('database');
+                  actions.setType('createDatabase');
                   actions.setShow(true);
                 }}>
                 <Avatar name="+" size="75" round="12px" color="#4B5563" />
