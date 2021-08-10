@@ -80,7 +80,7 @@ const OrganizationLayout = ({
             <Link to={`/${organization.name}`}>{organization.label}</Link>
           </p>
           <h3
-            className="mt-4 w-50"
+            className="mt-4 w-25"
             aria-hidden={true}
             style={{ cursor: 'pointer' }}>
             <span>

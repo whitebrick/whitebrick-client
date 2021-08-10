@@ -56,17 +56,19 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
           </Link>
         </p>
         <h3
-          className="m-0"
+          className="m-0 w-25"
           aria-hidden={true}
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            actions.setType('editDatabase');
-            actions.setFormData(schema);
-            actions.setShow(true);
-          }}>
+          style={{ cursor: 'pointer' }}>
           <span>
             {schema.label}
-            <FaPen className="ml-1" size="15px" />
+            <FaPen
+              className="ml-1"
+              size="15px"
+              onClick={() => {
+                actions.setType('editDatabase');
+                actions.setFormData(schema);
+                actions.setShow(true);
+              }}/>
           </span>
         </h3>
         <div className="mt-4">
