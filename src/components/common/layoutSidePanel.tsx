@@ -14,6 +14,7 @@ import {
 import { useManualQuery, useMutation } from 'graphql-hooks';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
+  ADD_OR_REMOVE_COLUMN_SEQUENCE,
   CREATE_OR_ADD_FOREIGN_KEY,
   CREATE_OR_DELETE_PRIMARY_KEYS,
   CREATE_ORGANIZATION_MUTATION,
@@ -140,6 +141,21 @@ const LayoutSidePanel = ({
       type: 'checkbox',
     },
     {
+      name: 'autoIncrement',
+      label: 'Auto Increase value?',
+      type: 'checkbox',
+      render:
+        column && columns
+          ? columns.filter(c => c.name === column)[0].type === 'integer'
+          : null,
+    },
+    {
+      name: 'startSequenceNumber',
+      label: 'Start at (optional)',
+      type: 'text',
+      render: !!formData.autoIncrement,
+    },
+    {
       name: 'foreignKey',
       label: 'Add a foreign key relation',
       type: 'button',
@@ -213,6 +229,9 @@ const LayoutSidePanel = ({
   );
   const [updateOrganizationMutation] = useMutation(
     UPDATE_ORGANIZATION_MUTATION,
+  );
+  const [addOrRemoveColumnSequenceMutation] = useMutation(
+    ADD_OR_REMOVE_COLUMN_SEQUENCE,
   );
 
   const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
@@ -396,9 +415,35 @@ const LayoutSidePanel = ({
       if (formData.label !== col.label)
         variables.newColumnLabel = formData.label;
       if (formData.type !== col.type) variables.newType = formData.type;
-      await updateColumnMutation({
-        variables,
-      });
+      if (
+        variables.newColumnName ||
+        variables.newColumnLabel ||
+        variables.newType
+      )
+        await updateColumnMutation({
+          variables,
+        });
+      if (formData.autoIncrement) {
+        let vars: any = {
+          schemaName: schema.name,
+          tableName: table.name,
+          columnName: formData.name,
+        };
+        if (formData.startSequenceNumber)
+          vars.nextSeqNumber = parseInt(formData.startSequenceNumber);
+        await addOrRemoveColumnSequenceMutation({ variables: vars });
+      } else {
+        if (formData.default) {
+          await addOrRemoveColumnSequenceMutation({
+            variables: {
+              schemaName: schema.name,
+              tableName: table.name,
+              columnName: formData.name,
+              remove: true,
+            },
+          });
+        }
+      }
       if (formData.table && formData.column) {
         await createOrAddForeignKey({
           variables: {

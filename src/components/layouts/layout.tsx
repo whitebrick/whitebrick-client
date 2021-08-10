@@ -5,11 +5,13 @@ import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Sidebar from '../sidebar';
-import { SCHEMAS_QUERY, SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
+import {
+  SCHEMAS_QUERY,
+  SCHEMA_TABLE_BY_NAME_QUERY,
+} from '../../graphql/queries/wb';
 import Header from '../common/header';
 import { SchemaItemType, TableItemType } from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
-import TableLayout from './tableLayout';
 import LayoutSidePanel from '../../components/common/layoutSidePanel';
 
 type LayoutPropsType = {
@@ -17,7 +19,6 @@ type LayoutPropsType = {
   table: TableItemType;
   schema: SchemaItemType;
   children?: React.ReactNode;
-  user: any;
   actions: any;
   cloudContext: any;
   hideSidebar?: boolean;
@@ -28,14 +29,13 @@ const Layout = ({
   table,
   schema,
   children,
-  user,
   actions,
   cloudContext,
   hideSidebar = false,
 }: LayoutPropsType) => {
   const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
   const [fetchCloudContext] = useManualQuery(`{ wbCloudContext }`);
-  const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
+  const [fetchSchemaTable] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
 
   const fetchSchemasData = async () => {
     const { data } = await fetchSchemas();
@@ -57,23 +57,23 @@ const Layout = ({
       );
   }, []);
 
-  const fetchTablesAndColumns = async () => {
-    const { data } = await fetchSchemaTables({
+  const fetchTableAndColumns = async () => {
+    const { data } = await fetchSchemaTable({
       variables: {
         schemaName: schema.name,
+        tableName: table.name,
         withColumns: true,
         withSettings: true,
       },
     });
-    actions.setTables(data.wbMyTables);
-    let t = data.wbMyTables.filter(
-      tableName => tableName.name === table.name,
-    )[0];
-    if (t.columns.length > 0) {
-      actions.setColumns(t.columns);
-      actions.setOrderBy(t.columns[0].name);
-      actions.setViews(t.settings.views);
-      actions.setDefaultView(t.settings.defaultView);
+    actions.setTable(data.wbMyTableByName);
+    if (data.wbMyTableByName.columns.length > 0) {
+      actions.setColumns(data.wbMyTableByName.columns);
+      actions.setOrderBy(data.wbMyTableByName.columns[0].name);
+      if (data.wbMyTableByName.settings) {
+        actions.setViews(data.wbMyTableByName.settings.views);
+        actions.setDefaultView(data.wbMyTableByName.settings.defaultView);
+      }
     } else {
       actions.setColumns([]);
     }
@@ -96,7 +96,7 @@ const Layout = ({
         )}
         <main id="main" style={{ marginLeft: !hideSidebar ? '250px' : '0' }}>
           {children}
-          <LayoutSidePanel fetchTables={fetchTablesAndColumns} />
+          <LayoutSidePanel fetchTables={fetchTableAndColumns} />
         </main>
       </div>
     </>
@@ -107,7 +107,6 @@ const mapStateToProps = state => ({
   schemas: state.schemas,
   schema: state.schema,
   table: state.table,
-  user: state.user,
   cloudContext: state.cloudContext,
 });
 

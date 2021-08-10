@@ -85,3 +85,8 @@ export const UPDATE_USER_DETAILS_MUTATION: string = `mutation ($firstName: Strin
 export const SAVE_TABLE_USER_SETTINGS: string = `mutation ($schemaName: String!, $tableName: String!, $settings: JSON!) {
   wbSaveTableUserSettings(schemaName: $schemaName, tableName: $tableName, settings: $settings)
 }`;
+
+export const ADD_OR_REMOVE_COLUMN_SEQUENCE: string = `mutation ($columnName: String!, $schemaName: String!, $tableName: String!, $nextSeqNumber: Int, $remove: Boolean) {
+  wbAddOrRemoveColumnSequence(columnName: $columnName, schemaName: $schemaName, tableName: $tableName, nextSeqNumber: $nextSeqNumber, remove: $remove)
+}
+`;

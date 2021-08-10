@@ -91,6 +91,20 @@ const FormMaker = ({
             disabled={readOnly}
           />
         );
+      else if (type === 'number' || type === 'integer')
+        return (
+          <TextInputField
+            label={label}
+            placeholder={`Enter ${label}`}
+            value={!formData[name] ? defaultValue : formData[name]}
+            onChange={e =>
+              actions.setFormData({ ...formData, [name]: e.target.value })
+            }
+            type="number"
+            required={required}
+            disabled={readOnly}
+          />
+        );
       else if (type === 'select') {
         if (nested) {
           return (
@@ -180,22 +194,20 @@ const FormMaker = ({
         }
       } else if (type === 'checkbox') {
         return (
-          <>
-            <div className="form-check form-check-inline">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id={name}
-                defaultChecked={formData[name]}
-                onChange={e =>
-                  actions.setFormData({ ...formData, [name]: e.target.checked })
-                }
-              />
-              <label className="form-check-label" htmlFor={name}>
-                {label}
-              </label>
-            </div>
-          </>
+          <div className="form-check my-2">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={name}
+              defaultChecked={formData[name]}
+              onChange={e =>
+                actions.setFormData({ ...formData, [name]: e.target.checked })
+              }
+            />
+            <label className="form-check-label" htmlFor={name}>
+              {label}
+            </label>
+          </div>
         );
       } else if (type === 'button') {
         return (

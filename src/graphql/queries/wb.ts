@@ -36,6 +36,7 @@ export const SCHEMA_TABLE_BY_NAME_QUERY: string = `query ($schemaName: String!, 
     label
     columns {
       name
+      default
       label
       type
       isPrimaryKey

@@ -26,7 +26,7 @@ import { TABLE_USERS_QUERY } from '../../graphql/queries/wb';
 type TableLayoutPropsType = {
   table: TableItemType;
   column: any;
-  columns: Array<ColumnItemType>;
+  columns: ColumnItemType[];
   fields: [];
   rowCount: number;
   orderBy: string;
@@ -208,9 +208,13 @@ const TableLayout = ({
         action: () => {
           actions.setType('editColumn');
           actions.setShow(true);
-          let column = columns.filter(
+          let column: any = columns.filter(
             column => column.name === params.column.colId,
           )[0];
+          if (column.default) {
+            column.autoIncrement = true;
+            column.startSequenceNumber = column.default;
+          }
           actions.setFormData(column);
           actions.setColumn(params.column.colId);
         },

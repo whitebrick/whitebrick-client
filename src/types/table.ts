@@ -21,6 +21,7 @@ export type ColumnItemType = {
   isPrimaryKey: boolean;
   foreignKeys: Array<ForeignKeyItemType>;
   referencedBy: Array<ReferencedByItemType>;
+  default: string;
 };
 
 export type ViewItemType = {
