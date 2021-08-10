@@ -9,7 +9,7 @@ import {
   SCHEMAS_QUERY,
   SCHEMA_TABLE_BY_NAME_QUERY,
 } from '../../graphql/queries/wb';
-import Header from '../common/header';
+import Header from '../elements/header';
 import { SchemaItemType, TableItemType } from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
 import LayoutSidePanel from '../../components/common/layoutSidePanel';

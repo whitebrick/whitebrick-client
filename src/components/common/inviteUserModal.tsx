@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RadioGroup } from 'evergreen-ui';
-import Modal from './modal';
-import UserSearchInput from './userInput';
+import Modal from '../elements/modal';
+import UserSearchInput from '../elements/userInput';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';

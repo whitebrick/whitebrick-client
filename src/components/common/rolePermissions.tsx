@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from './modal';
+import Modal from '../elements/modal';
 import { Table, TickCircleIcon, CrossIcon } from 'evergreen-ui';
 import { isObjectEmpty } from '../../utils/objectEmpty';
 

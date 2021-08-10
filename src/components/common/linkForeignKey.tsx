@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import Modal from './modal';
+import Modal from '../elements/modal';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';

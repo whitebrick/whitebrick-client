@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import SidePanel from './sidePanel';
+import SidePanel from '../elements/sidePanel';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';

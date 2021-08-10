@@ -3,12 +3,6 @@ import { bindActionCreators } from 'redux';
 import { TextInputField, SelectField } from 'evergreen-ui';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
-import { useManualQuery } from 'graphql-hooks';
-import {
-  SCHEMA_USERS_QUERY,
-  TABLE_USERS_QUERY,
-} from '../../graphql/queries/wb';
-import PermissionGrid from './permissionGrid';
 import { SchemaItemType, TableItemType } from '../../types';
 
 type FormMakerPropsType = {
@@ -19,26 +13,7 @@ type FormMakerPropsType = {
   actions: any;
 };
 
-const FormMaker = ({
-  fields,
-  formData,
-  schema,
-  table,
-  actions,
-}: FormMakerPropsType) => {
-  const [fetchTableUsers] = useManualQuery(TABLE_USERS_QUERY, {
-    variables: {
-      schemaName: schema.name,
-      tableName: table.name,
-    },
-  });
-
-  const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
-    variables: {
-      schemaName: schema.name,
-    },
-  });
-
+const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
   const handleSelectChange = (multiple, name, e) => {
     if (multiple) {
       let values = Array.from(
@@ -47,16 +22,6 @@ const FormMaker = ({
       );
       actions.setFormData({ ...formData, [name]: values });
     } else actions.setFormData({ ...formData, [name]: e.target.value });
-  };
-
-  const fetchTableUsersData = async () => {
-    const { data } = await fetchTableUsers();
-    return data['wbTableUsers'];
-  };
-
-  const fetchSchemaUsersData = async () => {
-    const { data } = await fetchSchemaUsers();
-    return data['wbSchemaUsers'];
   };
 
   const renderField = ({
@@ -240,15 +205,6 @@ const FormMaker = ({
               </p>
             </div>
           </div>
-        );
-      } else if (type === 'permissionGrid') {
-        return (
-          <PermissionGrid
-            label={label}
-            fetchData={
-              label === 'table' ? fetchTableUsersData : fetchSchemaUsersData
-            }
-          />
         );
       }
     }

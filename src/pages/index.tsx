@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { navigate } from 'gatsby';
 
 import Loading from '../components/loading';
-import { bindActionCreators } from 'redux';
 import { actions } from '../state/actions';
-import { connect } from 'react-redux';
 import Seo from '../components/seo';
-import { navigate } from 'gatsby';
 
 // @ts-ignore
 import WhitebrickLogo from '../images/whitebrick-logo.svg';
