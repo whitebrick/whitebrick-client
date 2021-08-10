@@ -23,7 +23,6 @@ import { TABLE_USERS_QUERY } from '../../graphql/queries/wb';
 
 type TableLayoutPropsType = {
   table: TableItemType;
-  column: any;
   columns: ColumnItemType[];
   fields: [];
   rowCount: number;
@@ -74,7 +73,7 @@ const TableLayout = ({
   const fetchData = () => {
     fetchSchemaTableUsers().then(r => setUsers(r?.data?.wbTableUsers));
   };
-  useEffect(fetchData, []);
+  useEffect(fetchData, [fetchSchemaTableUsers]);
 
   useEffect(() => {
     actions.setOffset(0);
@@ -92,16 +91,17 @@ const TableLayout = ({
         },
         _set: {
           value: variables._set,
-          type: `${`${schema.name}_${table.name}`}_set_input`,
+          type: `${schema.name}_${table.name}_set_input`,
         },
       },
       fields: ['affected_rows'],
     });
-    const fetchData = async () => await client.request(operation);
+    const fetchData = async () => client.request(operation);
     fetchData().finally(() => actions.setShow(false));
   };
 
-  const editValues = values => {
+  const editValues = val => {
+    let values = val;
     values = [...Array.from(new Set(values))];
     values.forEach((params, index) => {
       const filteredParams = values.filter(
@@ -113,19 +113,19 @@ const TableLayout = ({
         data[param.colDef?.field] = param.oldValue;
       });
       const variables = { where: {}, _set: {} };
-      for (const key in data) {
+      Object.keys(data).forEach(key => {
         if (data[key]) {
           variables.where[key] = {
-            _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
+            _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
           };
         }
-      }
-      variables._set[params.colDef.field] = parseInt(params.newValue)
-        ? parseInt(params.newValue)
+      });
+      variables._set[params.colDef.field] = parseInt(params.newValue, 10)
+        ? parseInt(params.newValue, 10)
         : params.newValue;
       filteredParams.forEach(param => {
-        variables._set[param.colDef.field] = parseInt(param.newValue)
-          ? parseInt(param.newValue)
+        variables._set[param.colDef.field] = parseInt(param.newValue, 10)
+          ? parseInt(param.newValue, 10)
           : param.newValue;
       });
       values.splice(index, 1);
@@ -171,8 +171,9 @@ const TableLayout = ({
           limit,
           offset,
         };
-        views[index] = viewObj;
-        actions.setViews(views);
+        const v = views;
+        v[index] = viewObj;
+        actions.setViews(v);
       }
     } else {
       const viewObj = {
@@ -186,6 +187,62 @@ const TableLayout = ({
       actions.setDefaultView(formData.name);
     }
     saveSettingsToDB();
+  };
+
+  const onAddRow = () => {
+    actions.setType('newRow');
+    actions.setShow(true);
+  };
+
+  const onEditRow = params => {
+    actions.setType('editRow');
+    actions.setParams(params.node.data);
+    actions.setFormData(params.node.data);
+    actions.setShow(true);
+  };
+
+  const onDeleteRow = params => {
+    const variables = { where: {} };
+    const { data } = params.node;
+    Object.keys(data).forEach(key => {
+      if (data[key]) {
+        variables.where[key] = {
+          _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
+        };
+      }
+    });
+    const operation = gql.mutation({
+      operation: ''.concat('delete_', `${schema.name}_${table.name}`),
+      variables: {
+        where: {
+          value: variables.where,
+          type: `${`${schema.name}_${table.name}`}_bool_exp`,
+          required: true,
+        },
+      },
+      fields: ['affected_rows'],
+    });
+    const fetchData = async () => client.request(operation);
+    fetchData().finally(() => console.log('deleted row'));
+  };
+
+  const onRemove = async colID => {
+    const { loading, error } = await removeOrDeleteColumnMutation({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+        columnName: colID,
+        del: true,
+      },
+    });
+    if (!loading && !error) {
+      const col = columns.filter(c => c.name === colID)[0];
+      const index = columns.indexOf(col);
+      columns.splice(index, 1);
+      fields.splice(index, 1);
+      actions.setColumns(columns);
+      gridAPI.refreshCells({ force: true });
+    }
   };
 
   const getContextMenuItems = params => {
@@ -240,60 +297,6 @@ const TableLayout = ({
     ];
   };
 
-  const onRemove = async colID => {
-    const { loading, error } = await removeOrDeleteColumnMutation({
-      variables: {
-        schemaName: schema.name,
-        tableName: table.name,
-        columnName: colID,
-        del: true,
-      },
-    });
-    if (!loading && !error) {
-      const col = columns.filter(c => c.name === colID)[0];
-      const index = columns.indexOf(col);
-      columns.splice(index, 1);
-      fields.splice(index, 1);
-      actions.setColumns(columns);
-      gridAPI.refreshCells({ force: true });
-    }
-  };
-
-  const onAddRow = () => {
-    actions.setType('newRow');
-    actions.setShow(true);
-  };
-
-  const onEditRow = params => {
-    actions.setType('editRow');
-    actions.setParams(params.node.data);
-    actions.setFormData(params.node.data);
-    actions.setShow(true);
-  };
-
-  const onDeleteRow = params => {
-    const variables = { where: {} };
-    const { data } = params.node;
-    for (const key in data) {
-      variables.where[key] = {
-        _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
-      };
-    }
-    const operation = gql.mutation({
-      operation: ''.concat('delete_', `${schema.name}_${table.name}`),
-      variables: {
-        where: {
-          value: variables.where,
-          type: `${`${schema.name}_${table.name}`}_bool_exp`,
-          required: true,
-        },
-      },
-      fields: ['affected_rows'],
-    });
-    const fetchData = async () => await client.request(operation);
-    fetchData().finally(() => console.log('deleted row'));
-  };
-
   const tabs = [
     {
       title: 'Data',
@@ -335,11 +338,13 @@ const TableLayout = ({
             </div>
             <div className="float-right">
               <button
+                type="submit"
                 onClick={() => saveView(defaultView)}
                 className="btn btn-sm btn-dark mr-2">
                 Save to {defaultView}
               </button>
               <button
+                type="submit"
                 onClick={() => {
                   gridAPI.setSideBarVisible(!gridAPI.isSideBarVisible());
                   gridAPI.openToolPanel('columns');

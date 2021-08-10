@@ -31,14 +31,17 @@ const ForeignKeyCellRenderer = ({
           <div>
             <Badge color="blue">{cellValue}</Badge>
             <div className="float-right d-flex align-items-center">
-              <button className="btn" onClick={() => setShow(true)}>
+              <button
+                type="submit"
+                className="btn"
+                onClick={() => setShow(true)}>
                 <ExpandAllIcon />
               </button>
             </div>
           </div>
         ) : (
           <div className="float-right d-flex align-items-center">
-            <button className="btn" onClick={() => setLink(true)}>
+            <button type="submit" className="btn" onClick={() => setLink(true)}>
               <SmallPlusIcon />
             </button>
           </div>

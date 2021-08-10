@@ -23,14 +23,13 @@ const Profile = ({ user }: ProfileType) => {
   const [data, setData] = useState(null);
   const [updateBasicDetails] = useMutation(UPDATE_USER_DETAILS_MUTATION);
 
-  const fetchData = async () => {
-    const { loading, data, error } = await fetchUserBasicData();
-    if (!loading && !error) setData(data?.wbUserByEmail);
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      const { loading, data, error } = await fetchUserBasicData();
+      if (!loading && !error) setData(data?.wbUserByEmail);
+    };
     fetchData();
-  }, []);
+  }, [fetchUserBasicData]);
 
   const onSave = async () => {
     delete data.email;
@@ -46,7 +45,7 @@ const Profile = ({ user }: ProfileType) => {
   };
 
   const updatePassword = () => {
-    const resetPassword = async () => await ResetPassword();
+    const resetPassword = () => ResetPassword();
     resetPassword().finally(() => {
       toaster.success(
         'Please check your registered email to change your password!',

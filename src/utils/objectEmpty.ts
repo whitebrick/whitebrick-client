@@ -1,3 +1,3 @@
-export const isObjectEmpty = (obj: object): boolean => {
+export const isObjectEmpty = (obj: any): boolean => {
   return Object.keys(obj).length < 1;
 };

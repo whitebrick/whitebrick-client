@@ -35,40 +35,36 @@ const OrgSchema = ({
     },
   });
 
-  const fetchSchema = async () => {
-    const { loading, data, error } = await fetchSchemaByName();
-    if (!loading) {
-      if (error) setError(error);
-      else actions.setSchema(data.wbMySchemaByName);
-    }
-  };
-
   useEffect(() => {
+    const fetchSchema = async () => {
+      const { loading, data, error } = await fetchSchemaByName();
+      if (!loading) {
+        if (error) setError(error);
+        else actions.setSchema(data.wbMySchemaByName);
+      }
+    };
     if (params.databaseName && params.databaseName)
       fetchSchema().finally(() => setLoading(false));
-  }, [params]);
+  }, [actions, fetchSchemaByName, params]);
 
-  return isLoading ? (
-    <Loading />
-  ) : error ? (
-    <Layout>
-      <NotFound
-        name={
-          error?.graphQLErrors[0].originalError.wbCode ===
-          'WB_ORGANIZATION_NOT_FOUND'
-            ? cloudContext.userMessages.WB_ORGANIZATION_URL_NOT_FOUND[0]
-            : error?.graphQLErrors[0].originalError.wbCode === 'WB_FORBIDDEN'
-            ? cloudContext.userMessages.WB_SCHEMA_URL_FORBIDDEN[0]
-            : error?.graphQLErrors[0].originalError.wbCode ===
-              'WB_SCHEMA_NOT_FOUND'
-            ? cloudContext.userMessages.WB_SCHEMA_URL_NOT_FOUND[0]
-            : cloudContext.userMessages[
-                error?.graphQLErrors[0].originalError.wbCode
-              ][0]
-        }
-      />
-    </Layout>
-  ) : (
+  const getError = error => {
+    if (
+      error?.graphQLErrors[0].originalError.wbCode ===
+      'WB_ORGANIZATION_NOT_FOUND'
+    )
+      return cloudContext.userMessages.WB_ORGANIZATION_URL_NOT_FOUND[0];
+    if (error?.graphQLErrors[0].originalError.wbCode === 'WB_FORBIDDEN')
+      return cloudContext.userMessages.WB_SCHEMA_URL_FORBIDDEN[0];
+    if (error?.graphQLErrors[0].originalError.wbCode === 'WB_SCHEMA_NOT_FOUND')
+      return cloudContext.userMessages.WB_SCHEMA_URL_NOT_FOUND[0];
+    return cloudContext.userMessages[
+      error?.graphQLErrors[0].originalError.wbCode
+    ][0];
+  };
+
+  if (isLoading) return <Loading />;
+  if (error) return <NotFound name={getError(error)} />;
+  return (
     <>
       <Seo title={schema.label} />
       <Layout>

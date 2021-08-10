@@ -48,13 +48,13 @@ const LinkForeignKey = ({
 
   const updateValue = async (row, relData) => {
     const variables = { where: {}, _set: {} };
-    for (const key in row) {
+    Object.keys(row).forEach(key => {
       if (row[key]) {
         variables.where[key] = {
-          _eq: parseInt(row[key]) ? parseInt(row[key]) : row[key],
+          _eq: parseInt(row[key], 10) ? parseInt(row[key], 10) : row[key],
         };
       }
-    }
+    });
     variables._set[colDef.field] =
       relData[colDef.field.split('_').reverse()[0]];
     const operation = gql.mutation({

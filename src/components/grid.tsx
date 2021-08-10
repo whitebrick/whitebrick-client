@@ -26,8 +26,6 @@ type GridPropsType = {
   limit: number;
   columns: Array<ColumnItemType>;
   actions: any;
-  rowCount: number;
-  current: number;
   offset: string;
   defaultView: string;
   schema: SchemaItemType;
@@ -54,7 +52,7 @@ const Grid = ({
 
   const autoSizeColumns = (columnAPI, gridAPI) => {
     const allColumnIds = [];
-    columnAPI.getAllColumns().forEach(function (column) {
+    columnAPI.getAllColumns().forEach(function ids(column) {
       allColumnIds.push(column.colId);
     });
     if (allColumnIds.length > 4) columnAPI.autoSizeColumns(allColumnIds, true);

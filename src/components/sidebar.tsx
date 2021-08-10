@@ -66,6 +66,7 @@ const Sidebar = ({
   const handleRefreshToken = async () => {
     await getAccessTokenSilently({ ignoreCache: true });
     const tokenClaims = await getIdTokenClaims();
+    // eslint-disable-next-line no-underscore-dangle
     actions.setAccessToken(tokenClaims.__raw);
     actions.setTokenClaims(tokenClaims);
   };
@@ -127,9 +128,7 @@ const Sidebar = ({
                   aria-hidden="true"
                   onClick={deleteTable}>
                   <FaTrash size="14px" />{' '}
-                  <div className="ml-2">
-                    Delete '{table.label.toLowerCase()}'
-                  </div>
+                  <div className="ml-2">Delete {table.label.toLowerCase()}</div>
                 </div>
               )}
             </>

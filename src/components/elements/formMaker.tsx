@@ -3,13 +3,10 @@ import { bindActionCreators } from 'redux';
 import { TextInputField, SelectField } from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { actions } from '../../state/actions';
-import { SchemaItemType, TableItemType } from '../../types';
 
 type FormMakerPropsType = {
   fields: any[];
   formData: any;
-  schema: SchemaItemType;
-  table: TableItemType;
   actions: any;
 };
 
@@ -18,6 +15,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
     if (multiple) {
       const values = Array.from(
         e.target.selectedOptions,
+        // @ts-ignore
         option => option.value,
       );
       actions.setFormData({ ...formData, [name]: values });
@@ -38,7 +36,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
     multiple = false,
     addNewOptions = false,
     addNewOptionsValue = null,
-    onClick = () => {},
+    onClick = null,
     defaultValue = null,
     render = true,
   }) => {
@@ -102,7 +100,9 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
         }
         if (keyValuePairs) {
           const res = [];
-          for (const key in options) res.push({ key, value: options[key] });
+          Object.keys(options).forEach(key =>
+            res.push({ key, value: options[key] }),
+          );
           return (
             <SelectField
               label={label}
@@ -135,7 +135,6 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
               className="form-control"
               multiple={multiple}
               value={!formData[name] ? defaultValue : formData[name]}
-              onBlur={() => {}}
               disabled={readOnly}
               onChange={e => handleSelectChange(multiple, name, e)}>
               {!multiple && (
@@ -179,6 +178,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
       if (type === 'button') {
         return (
           <button
+            type="submit"
             className="btn btn-outline-primary btn-block mt-5"
             onClick={onClick}>
             {label}
@@ -199,7 +199,10 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
             <div className="card-body">
               <span>Table: {formData.foreignKeys[0].relTableName}</span>
               <p>Column: {formData.foreignKeys[0].relColumnName}</p>
-              <button className="btn btn-danger btn-block" onClick={onClick}>
+              <button
+                type="submit"
+                className="btn btn-danger btn-block"
+                onClick={onClick}>
                 Remove Foreignkey relation
               </button>
             </div>
@@ -211,7 +214,8 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
           </div>
         );
       }
-    }
+    } else return null;
+    return null;
   };
 
   return <div className="w-75">{fields.map(field => renderField(field))}</div>;

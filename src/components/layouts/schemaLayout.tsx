@@ -27,7 +27,7 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
   const fetchData = () => {
     fetchSchemaUsers().then(r => setUsers(r?.data?.wbSchemaUsers));
   };
-  useEffect(fetchData, []);
+  useEffect(fetchData, [fetchSchemaUsers]);
 
   const tabs = [
     {

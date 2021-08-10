@@ -48,25 +48,27 @@ const Organization = ({
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getError = error => {
+    if (
+      error?.graphQLErrors[0].originalError.wbCode ===
+      'WB_ORGANIZATION_NOT_FOUND'
+    )
+      return cloudContext.userMessages.WB_ORGANIZATION_URL_NOT_FOUND[0];
+    if (error?.graphQLErrors[0].originalError.wbCode === 'WB_FORBIDDEN')
+      return cloudContext.userMessages.WB_ORGANIZATION_URL_FORBIDDEN[0];
+    return cloudContext.userMessages[
+      error?.graphQLErrors[0].originalError.wbCode
+    ][0];
+  };
 
   return (
     <Layout>
       {error ? (
         <Layout>
-          <NotFound
-            name={
-              error?.graphQLErrors[0].originalError.wbCode ===
-              'WB_ORGANIZATION_NOT_FOUND'
-                ? cloudContext.userMessages.WB_ORGANIZATION_URL_NOT_FOUND[0]
-                : error?.graphQLErrors[0].originalError.wbCode ===
-                  'WB_FORBIDDEN'
-                ? cloudContext.userMessages.WB_ORGANIZATION_URL_FORBIDDEN[0]
-                : cloudContext.userMessages[
-                    error?.graphQLErrors[0].originalError.wbCode
-                  ][0]
-            }
-          />
+          <NotFound name={getError(error)} />
         </Layout>
       ) : (
         <>

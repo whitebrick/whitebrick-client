@@ -19,10 +19,10 @@ const ResetPassword = () => {
     `https://${process.env.GATSBY_AUTH0_DOMAIN}/dbconnections/change_password`,
     apiConfig,
   )
-    .then(function (response) {
+    .then(function ReturnResponse(response) {
       return response.data;
     })
-    .catch(function (error) {
+    .catch(function CatchError(error) {
       console.error(error);
     });
 };

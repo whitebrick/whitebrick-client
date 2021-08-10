@@ -34,7 +34,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
     fetchTablesData()
       .then(r => actions.setTables(r.wbMyTables))
       .finally(() => setLoaded(true));
-  }, [schema]);
+  }, [actions, fetchTables, schema]);
 
   return (
     <Pane padding={16} flex={1} background="tint1">
@@ -43,9 +43,9 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
           <>
             {tables &&
               tables.length > 0 &&
-              tables.map((table, index) => (
+              tables.map(table => (
                 <div
-                  key={index}
+                  key={table.name}
                   className="col-md-2 col-sm-6 text-center btn"
                   aria-hidden="true"
                   onClick={() => {
@@ -61,6 +61,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
               ))}
             <div
               className="col-md-2 text-center btn"
+              aria-hidden="true"
               onClick={() => {
                 actions.setFormData({ schema });
                 actions.setType('createTable');
@@ -71,8 +72,8 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
             </div>
           </>
         ) : (
-          [...Array(12)].map((e, i) => (
-            <div className="col-md-2 text-center btn" key={i}>
+          [...Array(12)].map(e => (
+            <div className="col-md-2 text-center btn" key={e}>
               <Skeleton height="100px" />
             </div>
           ))

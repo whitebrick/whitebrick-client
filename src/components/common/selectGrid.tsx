@@ -36,7 +36,7 @@ const SelectGrid = ({
         setData(r[`${schema.name}_${tableName}`]),
       );
     }
-  }, [tableName]);
+  }, [client, columns, schema.name, tableName]);
 
   const onSelectionChanged = params => {
     const row = params.api.getSelectedRows();

@@ -56,7 +56,7 @@ const InviteUserModal = ({
       setOptions(opts);
       setData({ ...data, role: Object.keys(roles)[0] });
     }
-  }, [name]);
+  }, [data, name, roles]);
 
   const onSave = async () => {
     if (name === 'schema') {

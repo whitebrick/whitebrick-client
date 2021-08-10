@@ -57,6 +57,7 @@ const Members = ({
 }: MembersType) => {
   const getRole = role => {
     if (role) return role.split('_').pop();
+    return null;
   };
 
   const [searchInput, setSearchInput] = useState('');
@@ -66,12 +67,13 @@ const Members = ({
   const cloudContextRoles = !isObjectEmpty(cloudContext) && cloudContext?.roles;
   const roles = !isObjectEmpty(cloudContext) && cloudContext?.roles[name];
 
-  const userRole =
-    name === 'organization'
-      ? getRole(organization?.role?.name)
-      : name === 'schema'
-      ? getRole(schema?.role?.name)
-      : getRole(table?.role?.name);
+  const getUserRole = () => {
+    if (name === 'organization') return getRole(organization?.role?.name);
+    if (name === 'schema') return getRole(schema?.role?.name);
+    return getRole(table?.role?.name);
+  };
+
+  const userRole = getUserRole();
   const [updateSchemaUserRole] = useMutation(SCHEMA_SET_USER_ROLE_MUTATION);
   const [updateTableUserRole] = useMutation(TABLE_SET_USER_ROLE_MUTATION);
   const [updateOrganizationUserRole] = useMutation(SET_USERS_ROLE_MUTATION);
@@ -115,46 +117,6 @@ const Members = ({
     }
   };
 
-  const renderRoleColumn = user => {
-    if (userRole === 'administrator' || userRole === 'owner') {
-      if (user.userEmail === u.email)
-        return (
-          <>
-            {roles[user.role.name].label}
-            <IconButton
-              icon={LogOutIcon}
-              appearance="primary"
-              intent="danger"
-              marginLeft={105}
-            />
-          </>
-        );
-      if (user.role.impliedFrom) return roles[user.role.name].label;
-      return (
-        <>
-          <Select
-            width="70%"
-            value={user.role.name}
-            onChange={e => handleUserRole(e.target.value, user.userEmail)}>
-            {Object.keys(roles).map((role: string, index: number) => (
-              <option key={index} value={role}>
-                {roles[role].label}
-              </option>
-            ))}
-          </Select>
-          <IconButton
-            icon={TrashIcon}
-            appearance="primary"
-            intent="danger"
-            marginLeft={10}
-            onClick={() => removeUser(user.userEmail)}
-          />
-        </>
-      );
-    }
-    return roles && roles[user.role.name].label;
-  };
-
   const handleUserRole = async (role, email) => {
     if (name === 'schema') {
       await updateSchemaUserRole({
@@ -183,6 +145,46 @@ const Members = ({
       });
     }
     refetch();
+  };
+
+  const renderRoleColumn = user => {
+    if (userRole === 'administrator' || userRole === 'owner') {
+      if (user.userEmail === u.email)
+        return (
+          <>
+            {roles[user.role.name].label}
+            <IconButton
+              icon={LogOutIcon}
+              appearance="primary"
+              intent="danger"
+              marginLeft={105}
+            />
+          </>
+        );
+      if (user.role.impliedFrom) return roles[user.role.name].label;
+      return (
+        <>
+          <Select
+            width="70%"
+            value={user.role.name}
+            onChange={e => handleUserRole(e.target.value, user.userEmail)}>
+            {Object.keys(roles).map((role: string) => (
+              <option key={role} value={role}>
+                {roles[role].label}
+              </option>
+            ))}
+          </Select>
+          <IconButton
+            icon={TrashIcon}
+            appearance="primary"
+            intent="danger"
+            marginLeft={10}
+            onClick={() => removeUser(user.userEmail)}
+          />
+        </>
+      );
+    }
+    return roles && roles[user.role.name].label;
   };
 
   const filteredUsers =
@@ -241,14 +243,14 @@ const Members = ({
                     <img
                       src={gravatar.url(user.userEmail)}
                       className="rounded-circle"
-                      alt="image"
+                      alt={`${user.firstName}'s profile pic`}
                     />
                     <div className="ml-3">
                       <h6>
                         {user.userFirstName} {user.userLastName}
                         {user.userEmail === u.email && (
                           <Pill display="inline-flex" marginLeft={8}>
-                            it's you
+                            it&apos;s you
                           </Pill>
                         )}
                       </h6>

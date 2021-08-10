@@ -18,6 +18,12 @@ type SidePanelPropsType = {
   renderSaveButton?: boolean;
 };
 
+const defaultProps = {
+  description: null,
+  onSave: null,
+  renderSaveButton: true,
+};
+
 const SidePanel = ({
   name,
   description = null,
@@ -84,4 +90,5 @@ const SidePanel = ({
   );
 };
 
+SidePanel.defaultProps = defaultProps;
 export default SidePanel;

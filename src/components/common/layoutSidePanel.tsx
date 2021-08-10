@@ -82,6 +82,47 @@ const LayoutSidePanel = ({
   actions,
 }: LayoutSidePanelPropsType) => {
   const client = useContext(ClientContext);
+  const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
+  const [createTable] = useMutation(CREATE_TABLE_MUTATION);
+  const [createOrganization] = useMutation(CREATE_ORGANIZATION_MUTATION);
+  const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
+  const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
+  const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
+  const [updateColumnMutation] = useMutation(UPDATE_COLUMN_MUTATION);
+  const [addOrCreateColumnMutation] = useMutation(
+    ADD_OR_CREATE_COLUMN_MUTATION,
+  );
+  const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
+  const [createOrDeletePrimaryKeys] = useMutation(
+    CREATE_OR_DELETE_PRIMARY_KEYS,
+  );
+  const [updateOrganizationMutation] = useMutation(
+    UPDATE_ORGANIZATION_MUTATION,
+  );
+  const [addOrRemoveColumnSequenceMutation] = useMutation(
+    ADD_OR_REMOVE_COLUMN_SEQUENCE,
+  );
+
+  const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
+
+  const deleteForeignKey = async () => {
+    const { loading, error } = await removeOrDeleteForeignKey({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+        columnNames: [formData.name],
+        del: true,
+        parentTableName: formData.foreignKeys[0].relTableName,
+      },
+    });
+    if (!loading && !error) {
+      actions.setShow(false);
+      await fetchTables();
+      const column = columns.filter(column => column.name === formData.name)[0];
+      actions.setFormData(column);
+      gridAPI.refreshCells({ force: true });
+    }
+  };
 
   const col = column && columns.filter(c => c.name === column)[0];
   const newTableFormFields: any[] = [
@@ -212,48 +253,6 @@ const LayoutSidePanel = ({
     { name: 'label', label: 'Label', type: 'text', required: true },
   ];
 
-  const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
-  const [createTable] = useMutation(CREATE_TABLE_MUTATION);
-  const [createOrganization] = useMutation(CREATE_ORGANIZATION_MUTATION);
-  const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
-  const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
-  const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
-  const [updateColumnMutation] = useMutation(UPDATE_COLUMN_MUTATION);
-  const [addOrCreateColumnMutation] = useMutation(
-    ADD_OR_CREATE_COLUMN_MUTATION,
-  );
-  const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
-  const [createOrDeletePrimaryKeys] = useMutation(
-    CREATE_OR_DELETE_PRIMARY_KEYS,
-  );
-  const [updateOrganizationMutation] = useMutation(
-    UPDATE_ORGANIZATION_MUTATION,
-  );
-  const [addOrRemoveColumnSequenceMutation] = useMutation(
-    ADD_OR_REMOVE_COLUMN_SEQUENCE,
-  );
-
-  const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
-
-  const deleteForeignKey = async () => {
-    const { loading, error } = await removeOrDeleteForeignKey({
-      variables: {
-        schemaName: schema.name,
-        tableName: table.name,
-        columnNames: [formData.name],
-        del: true,
-        parentTableName: formData.foreignKeys[0].relTableName,
-      },
-    });
-    if (!loading && !error) {
-      actions.setShow(false);
-      await fetchTables();
-      const column = columns.filter(column => column.name === formData.name)[0];
-      actions.setFormData(column);
-      gridAPI.refreshCells({ force: true });
-    }
-  };
-
   const fetchSchemasData = async () => {
     const { data } = await fetchSchemas();
     actions.setSchemas(data.wbMySchemas);
@@ -275,7 +274,7 @@ const LayoutSidePanel = ({
       },
       fields: ['affected_rows'],
     });
-    const fetchData = async () => await client.request(operation);
+    const fetchData = async () => client.request(operation);
     fetchData().finally(() => actions.setShow(false));
   };
 
@@ -308,8 +307,9 @@ const LayoutSidePanel = ({
           limit,
           offset,
         };
-        views[index] = viewObj;
-        actions.setViews(views);
+        const v = views;
+        v[index] = viewObj;
+        actions.setViews(v);
       }
     } else {
       const viewObj = {
@@ -369,16 +369,18 @@ const LayoutSidePanel = ({
         },
         fields: ['affected_rows'],
       });
-      const fetchData = async () => await client.request(operation);
+      const fetchData = async () => client.request(operation);
       await fetchData();
       actions.setShow(false);
     } else if (type === 'editRow') {
       const variables = { where: {}, _set: {} };
-      for (const key in params) {
+      Object.keys(params).forEach(key => {
         variables.where[key] = {
-          _eq: parseInt(params[key]) ? parseInt(params[key]) : params[key],
+          _eq: parseInt(params[key], 10)
+            ? parseInt(params[key], 10)
+            : params[key],
         };
-      }
+      });
       variables._set = formData;
       doMutation(variables);
     } else if (type === 'updateTable') {
@@ -421,7 +423,7 @@ const LayoutSidePanel = ({
           columnName: formData.name,
         };
         if (formData.startSequenceNumber)
-          vars.nextSeqNumber = parseInt(formData.startSequenceNumber);
+          vars.nextSeqNumber = parseInt(formData.startSequenceNumber, 10);
         await addOrRemoveColumnSequenceMutation({ variables: vars });
       } else if (formData.default) {
         await addOrRemoveColumnSequenceMutation({
@@ -571,6 +573,7 @@ const LayoutSidePanel = ({
         <>
           {columns.map(c => (
             <div className="mt-3">
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label>
                 {c.label}: <span className="text-small">{c.type}</span>
               </label>
@@ -588,8 +591,8 @@ const LayoutSidePanel = ({
                     onChange={e =>
                       actions.setFormData({
                         ...formData,
-                        [c.name]: parseInt(e.target.value)
-                          ? parseInt(e.target.value)
+                        [c.name]: parseInt(e.target.value, 10)
+                          ? parseInt(e.target.value, 10)
                           : e.target.value,
                       })
                     }
@@ -603,8 +606,8 @@ const LayoutSidePanel = ({
                   onChange={e =>
                     actions.setFormData({
                       ...formData,
-                      [c.name]: parseInt(e.target.value)
-                        ? parseInt(e.target.value)
+                      [c.name]: parseInt(e.target.value, 10)
+                        ? parseInt(e.target.value, 10)
                         : e.target.value,
                     })
                   }

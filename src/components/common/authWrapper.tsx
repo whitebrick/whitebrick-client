@@ -32,21 +32,6 @@ const AuthWrapper = ({
 }: AuthWrapper) => {
   const [isLoading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      (async () => {
-        await getAccessTokenSilently({ ignoreCache: true });
-        const tokenClaims = await getIdTokenClaims();
-        actions.setAccessToken(tokenClaims.__raw);
-        actions.setTokenClaims(tokenClaims);
-        actions.setUser(user);
-        client.setHeader('Authorization', `Bearer ${tokenClaims.__raw}`);
-        setLoading(false);
-      })();
-    } else setLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading]);
-
   const adminClient = new GraphQLClient({
     url: process.env.GATSBY_HASURA_GRAPHQL_URL,
     subscriptionClient: new SubscriptionClient(
@@ -91,6 +76,21 @@ const AuthWrapper = ({
       authorization: accessToken ? `Bearer ${accessToken}` : null,
     },
   });
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      (async () => {
+        await getAccessTokenSilently({ ignoreCache: true });
+        const tokenClaims = await getIdTokenClaims();
+        actions.setAccessToken(tokenClaims.__raw);
+        actions.setTokenClaims(tokenClaims);
+        actions.setUser(user);
+        client.setHeader('Authorization', `Bearer ${tokenClaims.__raw}`);
+        setLoading(false);
+      })();
+    } else setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading]);
 
   if (isLoading) return <Loading />;
   return (

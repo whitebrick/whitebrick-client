@@ -47,37 +47,35 @@ const Table = ({
     },
   });
 
-  const fetchSchema = async () => {
-    const { loading, data, error } = await fetchSchemaByName();
-    if (!loading) {
-      if (error) setError(error);
-      else actions.setSchema(data.wbMySchemaByName);
-    }
-  };
-
-  const fetchSchemaTable = async () => {
-    const { loading, data, error } = await fetchSchemaTableByName();
-    if (!loading) {
-      if (error) setError(error);
-      else {
-        actions.setTable(data.wbMyTableByName);
-        actions.setColumns(data.wbMyTableByName.columns);
-        actions.setOrderBy(data.wbMyTableByName.columns[0].name);
-        if (data.wbMyTableByName.settings) {
-          if (
-            data.wbMyTableByName.settings.views &&
-            data.wbMyTableByName.settings.views.length > 0
-          ) {
-            actions.setViews(data.wbMyTableByName.settings.views);
+  useEffect(() => {
+    const fetchSchema = async () => {
+      const { loading, data, error } = await fetchSchemaByName();
+      if (!loading) {
+        if (error) setError(error);
+        else actions.setSchema(data.wbMySchemaByName);
+      }
+    };
+    const fetchSchemaTable = async () => {
+      const { loading, data, error } = await fetchSchemaTableByName();
+      if (!loading) {
+        if (error) setError(error);
+        else {
+          actions.setTable(data.wbMyTableByName);
+          actions.setColumns(data.wbMyTableByName.columns);
+          actions.setOrderBy(data.wbMyTableByName.columns[0].name);
+          if (data.wbMyTableByName.settings) {
+            if (
+              data.wbMyTableByName.settings.views &&
+              data.wbMyTableByName.settings.views.length > 0
+            ) {
+              actions.setViews(data.wbMyTableByName.settings.views);
+            }
+            if (data.wbMyTableByName.settings.defaultView)
+              actions.setDefaultView(data.wbMyTableByName.settings.defaultView);
           }
-          if (data.wbMyTableByName.settings.defaultView)
-            actions.setDefaultView(data.wbMyTableByName.settings.defaultView);
         }
       }
-    }
-  };
-
-  useEffect(() => {
+    };
     if (params.databaseName && params.databaseName)
       fetchSchema().then(() => {
         if (params.tableName && params.tableName)
@@ -85,22 +83,24 @@ const Table = ({
       });
     else if (params.tableName && params.tableName)
       fetchSchemaTable().finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [actions, fetchSchemaByName, fetchSchemaTableByName, params]);
 
-  return isLoading ? (
-    <Loading />
-  ) : error ? (
-    <Layout>
-      <NotFound
-        name={
-          cloudContext.userMessages[
-            error?.graphQLErrors[0].originalError.wbCode
-          ][0]
-        }
-      />
-    </Layout>
-  ) : (
+  if (isLoading) return <Loading />;
+  if (error) {
+    return (
+      <Layout>
+        <NotFound
+          name={
+            cloudContext.userMessages[
+              error?.graphQLErrors[0].originalError.wbCode
+            ][0]
+          }
+        />
+      </Layout>
+    );
+  }
+
+  return (
     <Layout hideSidebar>
       <TableLayout key={schema.name + table.name} />
     </Layout>

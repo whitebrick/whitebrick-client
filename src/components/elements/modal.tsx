@@ -12,6 +12,13 @@ type ModalType = {
   children: React.ReactNode;
 };
 
+const defaultProps = {
+  label: null,
+  onSave: null,
+  hasFooter: true,
+  width: 560,
+};
+
 const Modal = ({
   isShown,
   setIsShown,
@@ -37,4 +44,5 @@ const Modal = ({
   );
 };
 
+Modal.defaultProps = defaultProps;
 export default Modal;

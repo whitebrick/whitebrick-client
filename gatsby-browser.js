@@ -13,7 +13,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from './src/components/loading';
 import NotFound from './src/components/notFound';
 
-const onRedirectCallback = appState => navigate(appState?.returnTo || '/');
+const onRedirectCallback = appState => navigate(appState.returnTo || '/');
 
 export const wrapRootElement = ({ element }) => {
   return (
@@ -24,7 +24,7 @@ export const wrapRootElement = ({ element }) => {
         audience={process.env.GATSBY_AUTH0_AUDIENCE}
         responseType="token id_token"
         scope="openid profile email offline_access"
-        useRefreshTokens={true}
+        useRefreshTokens
         cacheLocation="localstorage"
         redirectUri={process.env.GATSBY_AUTH0_CALLBACK}
         onRedirectCallback={onRedirectCallback}>
@@ -54,7 +54,7 @@ export const wrapRootElement = ({ element }) => {
                   {element}
                 </AuthWrapper>
               );
-            else return element;
+            return element;
           }}
         </Auth0Context.Consumer>
       </Auth0Provider>

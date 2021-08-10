@@ -47,8 +47,8 @@ const RolePermissions = ({
               ))}
           </Table.Head>
           <Table.Body>
-            {policies.map((policy, index) => (
-              <Table.Row key={index}>
+            {policies.map(policy => (
+              <Table.Row key={policy}>
                 <Table.TextCell flexBasis={250} flexShrink={0} flexGrow={0}>
                   {p[policy].description}
                 </Table.TextCell>

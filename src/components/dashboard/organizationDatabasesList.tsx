@@ -6,13 +6,17 @@ import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import { FaCog } from 'react-icons/fa';
 import { actions } from '../../state/actions';
-import { OrganizationItemType, SchemaItemType } from '@/types';
+import { OrganizationItemType, SchemaItemType } from '../../types';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
   schemas: Array<SchemaItemType>;
   actions: any;
   renderTitle?: boolean;
+};
+
+const defaultProps = {
+  renderTitle: true,
 };
 
 const OrganizationDatabasesList = ({
@@ -27,6 +31,7 @@ const OrganizationDatabasesList = ({
         <div className="card-header d-flex justify-content-between align-items-center">
           <h6>{organization.label}</h6>
           <button
+            type="submit"
             className="btn btn-sm btn-light"
             onClick={() => navigate(`/${organization.name}`)}>
             <FaCog />
@@ -68,6 +73,7 @@ const OrganizationDatabasesList = ({
   );
 };
 
+OrganizationDatabasesList.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   schemas: state.schemas,
 });

@@ -37,19 +37,18 @@ const ViewForeignKeyData = ({
 
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
 
-  const fetchSchemaTable = async table => {
-    const { data } = await fetchSchemaTableByName({
-      variables: {
-        schemaName: schema.name,
-        tableName: table,
-        withColumns: true,
-        withSettings: true,
-      },
-    });
-    return data;
-  };
-
   useEffect(() => {
+    const fetchSchemaTable = async table => {
+      const { data } = await fetchSchemaTableByName({
+        variables: {
+          schemaName: schema.name,
+          tableName: table,
+          withColumns: true,
+          withSettings: true,
+        },
+      });
+      return data;
+    };
     if (tables && tables.length > 0) {
       const fields = [];
       const fetchTableDataWithColumn = async (table, column) => {
@@ -63,7 +62,9 @@ const ViewForeignKeyData = ({
             where: {
               value: {
                 [column]: {
-                  _eq: parseInt(cellValue) ? parseInt(cellValue) : cellValue,
+                  _eq: parseInt(cellValue, 10)
+                    ? parseInt(cellValue, 10)
+                    : cellValue,
                 },
               },
               type: `${`${schema.name}_${table}`}_bool_exp`,
@@ -71,7 +72,7 @@ const ViewForeignKeyData = ({
           },
           fields,
         });
-        const fetchData = async () => await client.request(operation);
+        const fetchData = async () => client.request(operation);
         fetchData().then(({ data }) =>
           setData(data[`${schema.name}_${table}`][0]),
         );
@@ -83,7 +84,15 @@ const ViewForeignKeyData = ({
         c.foreignKeys[0].relColumnName,
       );
     }
-  }, [columns, column, cellValue, tables, schema]);
+  }, [
+    columns,
+    column,
+    cellValue,
+    tables,
+    schema,
+    client,
+    fetchSchemaTableByName,
+  ]);
 
   return (
     <SidePanel

@@ -18,10 +18,14 @@ type LayoutPropsType = {
   schemas: SchemaItemType[];
   table: TableItemType;
   schema: SchemaItemType;
-  children?: React.ReactNode;
+  children: React.ReactNode;
   actions: any;
   cloudContext: any;
   hideSidebar?: boolean;
+};
+
+const defaultProps = {
+  hideSidebar: false,
 };
 
 const Layout = ({
@@ -37,14 +41,13 @@ const Layout = ({
   const [fetchCloudContext] = useManualQuery(`{ wbCloudContext }`);
   const [fetchSchemaTable] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
 
-  const fetchSchemasData = async () => {
-    const { data } = await fetchSchemas();
-    actions.setSchemas(data.wbMySchemas);
-  };
-
   useEffect(() => {
+    const fetchSchemasData = async () => {
+      const { data } = await fetchSchemas();
+      actions.setSchemas(data.wbMySchemas);
+    };
     if (schemas.length < 1) fetchSchemasData();
-  }, []);
+  }, [actions, fetchSchemas, schemas.length]);
 
   useEffect(() => {
     const fetchCloud = async () => {
@@ -53,7 +56,7 @@ const Layout = ({
     };
     if (isObjectEmpty(cloudContext))
       fetchCloud().then(data => actions.setCloudContext(data.wbCloudContext));
-  }, []);
+  }, [actions, cloudContext, fetchCloudContext]);
 
   const fetchTableAndColumns = async () => {
     const { data } = await fetchSchemaTable({
@@ -100,6 +103,8 @@ const Layout = ({
     </>
   );
 };
+
+Layout.defaultProps = defaultProps;
 
 const mapStateToProps = state => ({
   schemas: state.schemas,

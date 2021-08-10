@@ -116,23 +116,24 @@ const OrganizationLayout = ({
                 <UserSearchInput data={data} setData={setData} />
               </div>
               <div className="mt-3">
-                <label htmlFor="role">Role</label>
-                <select
-                  className="form-control"
-                  value={data.role}
-                  onBlur={() => {}}
-                  onChange={e => setData({ ...data, role: e.target.value })}>
-                  <option selected disabled>
-                    Select role
-                  </option>
-                  <option value="organization_administrator">
-                    Organization Administrator
-                  </option>
-                  <option value="organization_user">Organization User</option>
-                  <option value="organization_external_user">
-                    Organization External User
-                  </option>
-                </select>
+                <label htmlFor="role">
+                  Role
+                  <select
+                    className="form-control"
+                    value={data.role}
+                    onChange={e => setData({ ...data, role: e.target.value })}>
+                    <option selected disabled>
+                      Select role
+                    </option>
+                    <option value="organization_administrator">
+                      Organization Administrator
+                    </option>
+                    <option value="organization_user">Organization User</option>
+                    <option value="organization_external_user">
+                      Organization External User
+                    </option>
+                  </select>
+                </label>
               </div>
             </div>
           )}
@@ -144,6 +145,8 @@ const OrganizationLayout = ({
 
 const mapStateToProps = state => ({
   organization: state.organization,
+  show: state.show,
+  type: state.type,
 });
 
 const mapDispatchToProps = dispatch => ({

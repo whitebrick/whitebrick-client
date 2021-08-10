@@ -13,9 +13,17 @@ module.exports = {
     node: true,
   },
   rules: {
+    'no-console': 'off',
+    'no-shadow': 'off',
+    'no-underscore-dangle': 'off',
+    'import/extensions': 'off',
+    'import/no-unresolved': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/prefer-default-export': 'off',
-    'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
+    'react/jsx-filename-extension': [
+      'error',
+      { extensions: ['.jsx', '.tsx', '.js'] },
+    ],
     'react/jsx-one-expression-per-line': 'off',
     'react/jsx-props-no-spreading': 'off',
   },

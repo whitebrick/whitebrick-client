@@ -13,6 +13,10 @@ type MyDatabasesPropsType = {
   name?: string;
 };
 
+const defaultProps = {
+  name: 'My Databases',
+};
+
 const MyDatabases = ({
   schemas,
   user,
@@ -63,6 +67,7 @@ const MyDatabases = ({
   );
 };
 
+MyDatabases.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   schemas: state.schemas,
   user: state.user,
