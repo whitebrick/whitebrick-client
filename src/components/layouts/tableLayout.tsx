@@ -406,7 +406,7 @@ const TableLayout = ({
                       size="15px"
                       aria-hidden
                       onClick={() => {
-                        actions.setType('updateTable');
+                        actions.setType('editTable');
                         actions.setFormData(table);
                         actions.setShow(true);
                       }}

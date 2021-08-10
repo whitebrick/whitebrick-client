@@ -138,17 +138,17 @@ const LayoutSidePanel = ({
     { name: 'label', label: 'Table Label', type: 'text', required: true },
   ];
 
-  const newDataBaseFormFields: any[] = [
-    { name: 'name', label: 'Name', type: 'text', required: true },
+  const updateTableFields: any[] = [
     {
-      name: 'label',
-      label: 'Label',
+      name: 'name',
+      label: 'Name',
       type: 'text',
       required: true,
     },
+    { name: 'label', label: 'Label', type: 'text', required: true },
   ];
 
-  const editDataBaseFormFields: any[] = [
+  const dataBaseFormFields: any[] = [
     { name: 'name', label: 'Name', type: 'text', required: true },
     {
       name: 'label',
@@ -241,16 +241,6 @@ const LayoutSidePanel = ({
       nestedValue: 'name',
       render: formData.displayForeignKey === true,
     },
-  ];
-
-  const updateTableFields: any[] = [
-    {
-      name: 'name',
-      label: 'Name',
-      type: 'text',
-      required: true,
-    },
-    { name: 'label', label: 'Label', type: 'text', required: true },
   ];
 
   const fetchSchemasData = async () => {
@@ -383,7 +373,7 @@ const LayoutSidePanel = ({
       });
       variables._set = formData;
       doMutation(variables);
-    } else if (type === 'updateTable') {
+    } else if (type === 'editTable') {
       const variables: any = {
         schemaName: schema.name,
         tableName: table.name,
@@ -518,58 +508,46 @@ const LayoutSidePanel = ({
     }
   };
 
-  return (
-    <SidePanel
-      show={show}
-      renderSaveButton={type !== 'token'}
-      setShow={actions.setShow}
-      onSave={onSave}
-      name={
-        type === 'token'
-          ? 'Access Token'
-          : type === 'editDatabase'
-          ? `${schema.label} settings`
-          : type === 'createOrganization'
-          ? `Create a new organization`
-          : type === 'editOrganization'
-          ? `Update ${organization.label}`
-          : type === 'createDatabase'
-          ? `Create a new database`
-          : type === 'createTable'
-          ? `Create a new table`
-          : type === 'newRow'
-          ? `Add new row to '${table.name}'`
-          : type === 'editRow'
-          ? `Edit row in '${table.name}'`
-          : type === 'addColumn'
-          ? `Add column to '${table.name}'`
-          : type === 'editColumn'
-          ? `Edit column '${column}'`
-          : type === 'view'
-          ? `Create a new view`
-          : type === 'updateTable' && `${table.label} Table Settings`
-      }>
-      {type === 'createDatabase' ? (
-        <FormMaker fields={newDataBaseFormFields} />
-      ) : type === 'createTable' ? (
-        <FormMaker fields={newTableFormFields} />
-      ) : type === 'createOrganization' || type === 'editOrganization' ? (
-        <FormMaker fields={newOrganizationFormFields} />
-      ) : type === 'token' ? (
-        <>
-          <code
-            className="w-100 p-4"
-            aria-hidden="true"
-            style={{ cursor: 'pointer' }}
-            onClick={() =>
-              navigator.clipboard.writeText(`Bearer ${accessToken}`)
-            }>
-            Bearer {accessToken}
-          </code>
-        </>
-      ) : type === 'editDatabase' ? (
-        <FormMaker fields={editDataBaseFormFields} />
-      ) : type === 'newRow' || type === 'editRow' ? (
+  const getName = (type: string) => {
+    if (type === 'token') return 'Access Token';
+    if (type === 'createOrganization') return 'Create a new organization';
+    if (type === 'editOrganization') return `Edit ${organization.label}`;
+    if (type === 'createDatabase') return 'Create a new database';
+    if (type === 'editDatabase') return `Edit ${schema.label}`;
+    if (type === 'createTable') return 'Create a new table';
+    if (type === 'editTable') return `Edit ${table.label}`;
+    if (type === 'addColumn') return `Add column to ${table.label}`;
+    if (type === 'editColumn') return `Edit column ${column}`;
+    if (type === 'newRow') return `Add new row to ${table.label}`;
+    if (type === 'editRow') return `Edit row in ${table.label}`;
+    if (type === 'view') return `Create a new view in ${table.label}`;
+    return null;
+  };
+
+  const getChildren = (type: string) => {
+    if (type === 'token')
+      return (
+        <code
+          className="w-100 p-4"
+          aria-hidden="true"
+          style={{ cursor: 'pointer' }}
+          onClick={() =>
+            navigator.clipboard.writeText(`Bearer ${accessToken}`)
+          }>
+          Bearer {accessToken}
+        </code>
+      );
+    if (type === 'createOrganization' || type === 'editOrganization')
+      return <FormMaker fields={newOrganizationFormFields} />;
+    if (type === 'createDatabase' || type === 'editDatabase')
+      return <FormMaker fields={dataBaseFormFields} />;
+    if (type === 'createTable')
+      return <FormMaker fields={newTableFormFields} />;
+    if (type === 'editTable') return <FormMaker fields={updateTableFields} />;
+    if (type === 'addColumn' || type === 'editColumn')
+      return <FormMaker fields={newTableColumnFields} />;
+    if (type === 'newRow' || type === 'editRow')
+      return (
         <>
           {columns.map(c => (
             <div className="mt-3">
@@ -625,9 +603,9 @@ const LayoutSidePanel = ({
             </div>
           ))}
         </>
-      ) : type === 'editColumn' || type === 'addColumn' ? (
-        <FormMaker fields={newTableColumnFields} />
-      ) : type === 'view' ? (
+      );
+    if (type === 'view')
+      return (
         <FormMaker
           fields={[
             {
@@ -638,9 +616,18 @@ const LayoutSidePanel = ({
             },
           ]}
         />
-      ) : (
-        type === 'updateTable' && <FormMaker fields={updateTableFields} />
-      )}
+      );
+    return null;
+  };
+
+  return (
+    <SidePanel
+      show={show}
+      renderSaveButton={type !== 'token'}
+      setShow={actions.setShow}
+      onSave={onSave}
+      name={getName(type)}>
+      {getChildren(type)}
     </SidePanel>
   );
 };
