@@ -24,6 +24,7 @@
     "gatsby-transformer-sharp": "^3.4.0",
     "gql-query-builder": "^3.5.5",
     "graphql-hooks": "^5.1.1",
+    "gravatar": "^1.8.1",
     "isomorphic-fetch": "^3.0.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",

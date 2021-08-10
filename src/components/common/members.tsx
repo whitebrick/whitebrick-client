@@ -32,6 +32,7 @@ import {
 import { isObjectEmpty } from '../../utils/objectEmpty';
 import InviteUserModal from './inviteUserModal';
 import RolePermissions from './rolePermissions';
+import gravatar from 'gravatar'
 
 type MembersType = {
   user: any;
@@ -239,7 +240,7 @@ const Members = ({
                 <Table.TextCell>
                   <div className="d-flex align-items-center items-center">
                     <img
-                      src="https://www.gravatar.com/avatar/HASH"
+                      src={gravatar.url(user.userEmail)}
                       className="rounded-circle"
                       alt="image"
                     />
