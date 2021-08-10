@@ -32,7 +32,7 @@ import {
 import { isObjectEmpty } from '../../utils/objectEmpty';
 import InviteUserModal from './inviteUserModal';
 import RolePermissions from './rolePermissions';
-import gravatar from 'gravatar'
+import gravatar from 'gravatar';
 
 type MembersType = {
   user: any;

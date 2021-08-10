@@ -5,10 +5,7 @@ import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { useMutation } from 'graphql-hooks';
-import {
-  SET_USERS_ROLE_MUTATION,
-  UPDATE_ORGANIZATION_MUTATION,
-} from '../../graphql/mutations/wb';
+import { SET_USERS_ROLE_MUTATION } from '../../graphql/mutations/wb';
 import SidePanel from '../common/sidePanel';
 import UserSearchInput from '../common/userInput';
 import Tabs from '../elements/tabs';
@@ -32,9 +29,6 @@ const OrganizationLayout = ({
   actions,
 }: OrganizationLayoutPropsType) => {
   const [updateUserRoleMutation] = useMutation(SET_USERS_ROLE_MUTATION);
-  const [updateOrganizationMutation] = useMutation(
-    UPDATE_ORGANIZATION_MUTATION,
-  );
   const [data, setData] = useState<any>({});
 
   const inviteUserOrUpdateRole = async (role, userEmails) => {
@@ -53,17 +47,6 @@ const OrganizationLayout = ({
       const { loading, error } = await inviteUserOrUpdateRole(data.role, [
         data.user[0].email,
       ]);
-      if (!loading && !error) {
-        refetch();
-        actions.setShow(false);
-      }
-    } else {
-      let variables: any = { name: organization.name };
-      if (organization.name !== data.name) variables.newName = data.name;
-      if (organization.label !== data.label) variables.newLabel = data.label;
-      const { loading, error } = await updateOrganizationMutation({
-        variables,
-      });
       if (!loading && !error) {
         refetch();
         actions.setShow(false);
@@ -91,7 +74,7 @@ const OrganizationLayout = ({
                   size="14px"
                   aria-hidden="true"
                   onClick={() => {
-                    setData(organization);
+                    actions.setFormData(organization);
                     actions.setShow(true);
                     actions.setType('editOrganization');
                   }}
@@ -129,12 +112,8 @@ const OrganizationLayout = ({
           show={show}
           setShow={actions.setShow}
           onSave={onSave}
-          name={
-            type === 'invite'
-              ? `Invite user to ${organization.label}`
-              : `Update '${organization.label}'`
-          }>
-          {type === 'invite' ? (
+          name={type === 'invite' && `Invite user to ${organization.label}`}>
+          {type === 'invite' && (
             <div className="form-group">
               <div className="mt-3">
                 <UserSearchInput data={data} setData={setData} />
@@ -157,25 +136,6 @@ const OrganizationLayout = ({
                     Organization External User
                   </option>
                 </select>
-              </div>
-            </div>
-          ) : (
-            <div className="form-group">
-              <div className="mt-3">
-                <label htmlFor="name">Name</label>
-                <input
-                  className="form-control"
-                  value={data.name}
-                  onChange={e => setData({ ...data, name: e.target.value })}
-                />
-              </div>
-              <div className="mt-3">
-                <label htmlFor="name">Label</label>
-                <input
-                  className="form-control"
-                  value={data.label}
-                  onChange={e => setData({ ...data, label: e.target.value })}
-                />
               </div>
             </div>
           )}

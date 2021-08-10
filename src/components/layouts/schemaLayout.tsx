@@ -68,7 +68,8 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
                 actions.setType('editDatabase');
                 actions.setFormData(schema);
                 actions.setShow(true);
-              }}/>
+              }}
+            />
           </span>
         </h3>
         <div className="mt-4">

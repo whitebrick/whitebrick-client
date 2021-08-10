@@ -60,12 +60,12 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
                 </div>
               ))}
             <div
-            className="col-md-2 text-center btn"
-            onClick={() => {
-              actions.setFormData({ schema });
-              actions.setType('createTable');
-              actions.setShow(true);
-            }}>
+              className="col-md-2 text-center btn"
+              onClick={() => {
+                actions.setFormData({ schema });
+                actions.setType('createTable');
+                actions.setShow(true);
+              }}>
               <Avatar name="+" size="75" round="12px" color="#4B5563" />
               <p className="mt-2">Add table</p>
             </div>

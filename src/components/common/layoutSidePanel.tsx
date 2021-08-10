@@ -5,7 +5,12 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
+import {
+  ColumnItemType,
+  OrganizationItemType,
+  SchemaItemType,
+  TableItemType,
+} from '../../types';
 import { useManualQuery, useMutation } from 'graphql-hooks';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
@@ -17,6 +22,7 @@ import {
   REMOVE_OR_DELETE_FOREIGN_KEY,
   SAVE_TABLE_USER_SETTINGS,
   UPDATE_COLUMN_MUTATION,
+  UPDATE_ORGANIZATION_MUTATION,
 } from '../../graphql/mutations/wb';
 import { SCHEMAS_QUERY } from '../../graphql/queries/wb';
 import { ColumnApi, GridApi } from 'ag-grid-community';
@@ -48,6 +54,7 @@ type LayoutSidePanelPropsType = {
   offset: number;
   views: any[];
   defaultView: string;
+  organization: OrganizationItemType;
 };
 
 const LayoutSidePanel = ({
@@ -71,6 +78,7 @@ const LayoutSidePanel = ({
   offset,
   views,
   defaultView,
+  organization,
   actions,
 }: LayoutSidePanelPropsType) => {
   const newTableFormFields: any[] = [
@@ -203,6 +211,10 @@ const LayoutSidePanel = ({
   const [createOrDeletePrimaryKeys] = useMutation(
     CREATE_OR_DELETE_PRIMARY_KEYS,
   );
+  const [updateOrganizationMutation] = useMutation(
+    UPDATE_ORGANIZATION_MUTATION,
+  );
+
   const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
 
   const deleteForeignKey = async () => {
@@ -402,6 +414,16 @@ const LayoutSidePanel = ({
       fetchTables();
       gridAPI.refreshCells({ force: true });
       actions.setShow(false);
+    } else if (type === 'editOrganization') {
+      let variables: any = { name: organization.name };
+      if (organization.name !== formData.name)
+        variables.newName = formData.name;
+      if (organization.label !== formData.label)
+        variables.newLabel = formData.label;
+      const { loading, error } = await updateOrganizationMutation({
+        variables,
+      });
+      if (!loading && !error) actions.setShow(false);
     } else {
       const { loading, error } = await addOrCreateColumnMutation({
         variables: {
@@ -473,6 +495,8 @@ const LayoutSidePanel = ({
           ? `${schema.label} settings`
           : type === 'createOrganization'
           ? `Create a new organization`
+          : type === 'editOrganization'
+          ? `Update ${organization.label}`
           : type === 'createDatabase'
           ? `Create a new database`
           : type === 'createTable'
@@ -493,7 +517,7 @@ const LayoutSidePanel = ({
         <FormMaker fields={newDataBaseFormFields} />
       ) : type === 'createTable' ? (
         <FormMaker fields={newTableFormFields} />
-      ) : type === 'createOrganization' ? (
+      ) : type === 'createOrganization' || type === 'editOrganization' ? (
         <FormMaker fields={newOrganizationFormFields} />
       ) : type === 'token' ? (
         <React.Fragment>
@@ -604,6 +628,7 @@ const mapStateToProps = state => ({
   offset: state.offset,
   views: state.views,
   defaultView: state.defaultView,
+  organization: state.organization,
 });
 
 const mapDispatchToProps = dispatch => ({
