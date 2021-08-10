@@ -56,7 +56,8 @@ const InviteUserModal = ({
       setOptions(opts);
       setData({ ...data, role: Object.keys(roles)[0] });
     }
-  }, [data, name, roles]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, roles]);
 
   const onSave = async () => {
     if (name === 'schema') {

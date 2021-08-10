@@ -33,7 +33,6 @@ const UserSearchInput = ({ data, setData }: UserSearchInputType) => {
     }));
   };
 
-  // eslint-disable-next-line consistent-return
   const promiseOptions = debounce((inputValue, callback) => {
     if (!inputValue) {
       return callback([]);
@@ -43,10 +42,11 @@ const UserSearchInput = ({ data, setData }: UserSearchInputType) => {
     }).then(({ data }) =>
       callback(mapOptionsToValues(data.wbUsersBySearchPattern)),
     );
+    return null;
   }, 400);
 
   const CustomOption = props => {
-    const data = props;
+    const { data } = props;
     return (
       <components.Option {...props}>
         <>
