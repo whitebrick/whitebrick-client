@@ -179,6 +179,7 @@ const Grid = ({
                 field={column.name}
                 key={column.name}
                 headerName={column.label}
+                headerTooltip={column.label}
                 cellRenderer="foreignKeyRenderer"
               />
             );
@@ -188,6 +189,7 @@ const Grid = ({
                 field={column.name}
                 key={column.name}
                 headerName={column.label}
+                headerTooltip={column.label}
               />
             );
           }
