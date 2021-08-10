@@ -16,20 +16,28 @@ import {
   UserIcon,
 } from 'evergreen-ui';
 
-// @ts-ignore
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+// @ts-ignore
 import WhitebrickLogo from '../../images/whitebrick-logo.svg';
 import { actions } from '../../state/actions';
+import { SchemaItemType } from '../../types';
 
 type HeaderPropsType = {
   user: any;
+  schema: SchemaItemType;
   setType: (value: string) => void;
   setShow: (value: boolean) => void;
   setFormData: (value: any) => void;
 };
 
-const Header = ({ user, setType, setShow, setFormData }: HeaderPropsType) => {
+const Header = ({
+  user,
+  schema,
+  setType,
+  setShow,
+  setFormData,
+}: HeaderPropsType) => {
   const { logout } = useAuth0();
 
   return (
@@ -54,7 +62,7 @@ const Header = ({ user, setType, setShow, setFormData }: HeaderPropsType) => {
                   <Menu.Item
                     icon={PanelTableIcon}
                     onClick={() => {
-                      setFormData({});
+                      setFormData({ schema });
                       setType('createTable');
                       setShow(true);
                     }}>
@@ -124,6 +132,7 @@ const Header = ({ user, setType, setShow, setFormData }: HeaderPropsType) => {
 
 const mapStateToProps = state => ({
   user: state.user,
+  schema: state.schema,
 });
 
 const mapDispatchToProps = dispatch => ({

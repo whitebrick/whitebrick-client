@@ -21,7 +21,7 @@ const Home = ({ organizations }: HomePropsType) => (
       {organizations &&
         organizations.length > 0 &&
         organizations.map(org => (
-          <OrganizationDatabasesList organization={org} />
+          <OrganizationDatabasesList organization={org} key={org.name} />
         ))}
       <MyDatabases />
       <MyDatabases name="Databases shared with me" />

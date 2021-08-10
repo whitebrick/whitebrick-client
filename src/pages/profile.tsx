@@ -33,7 +33,11 @@ const Profile = ({ user }: ProfileType) => {
 
   const onSave = async () => {
     delete data.email;
-    const { loading, data: me, error } = await updateBasicDetails({
+    const {
+      loading,
+      data: me,
+      error,
+    } = await updateBasicDetails({
       variables: data,
     });
     if (!loading && !error) {

@@ -467,17 +467,15 @@ const LayoutSidePanel = ({
           .filter(column => column.isPrimaryKey === true)
           .map(c => columnNames.push(c.name));
         if (formData.isPrimaryKey) {
-          const {
-            loading: deleteLoading,
-            error: deleteError,
-          } = await createOrDeletePrimaryKeys({
-            variables: {
-              schemaName: schema.name,
-              tableName: table.name,
-              del: true,
-              columnNames,
-            },
-          });
+          const { loading: deleteLoading, error: deleteError } =
+            await createOrDeletePrimaryKeys({
+              variables: {
+                schemaName: schema.name,
+                tableName: table.name,
+                del: true,
+                columnNames,
+              },
+            });
           if (!deleteLoading && !deleteError) {
             await createOrDeletePrimaryKeys({
               variables: {
@@ -511,11 +509,12 @@ const LayoutSidePanel = ({
   const getName = (type: string) => {
     if (type === 'token') return 'Access Token';
     if (type === 'createOrganization') return 'Create a new organization';
-    if (type === 'editOrganization') return `Edit ${organization.label}`;
+    if (type === 'editOrganization')
+      return `Edit organization ${organization.label}`;
     if (type === 'createDatabase') return 'Create a new database';
-    if (type === 'editDatabase') return `Edit ${schema.label}`;
+    if (type === 'editDatabase') return `Edit database  ${schema.label}`;
     if (type === 'createTable') return 'Create a new table';
-    if (type === 'editTable') return `Edit ${table.label}`;
+    if (type === 'editTable') return `Edit table ${table.label}`;
     if (type === 'addColumn') return `Add column to ${table.label}`;
     if (type === 'editColumn') return `Edit column ${column}`;
     if (type === 'newRow') return `Add new row to ${table.label}`;

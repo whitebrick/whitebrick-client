@@ -81,7 +81,8 @@
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
-      "eslint --ignore-path .gitignore . --ext js --ext ts --ext tsx --fix", "git add"
+      "eslint --ignore-path .gitignore . --ext js --ext ts --ext tsx --fix",
+      "git add"
     ]
   },
   "husky": {
