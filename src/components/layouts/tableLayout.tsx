@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import * as gql from 'gql-query-builder';
 import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 
-import { useManualQuery, useMutation } from 'graphql-hooks';
+import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
 
-import graphQLFetch from '../../utils/GraphQLFetch';
 import Grid from '../grid';
 import {
   REMOVE_OR_DELETE_COLUMN_MUTATION,
@@ -57,6 +56,8 @@ const TableLayout = ({
   gridAPI,
   columnAPI,
 }: TableLayoutPropsType) => {
+  const client = useContext(ClientContext);
+
   const [changedValues, setChangedValues] = useState([]);
   const [removeOrDeleteColumnMutation] = useMutation(
     REMOVE_OR_DELETE_COLUMN_MUTATION,
@@ -97,11 +98,7 @@ const TableLayout = ({
       },
       fields: ['affected_rows'],
     });
-    const fetchData = async () =>
-      await graphQLFetch({
-        query: operation.query,
-        variables: operation.variables,
-      });
+    const fetchData = async () => await client.request(operation);
     fetchData().finally(() => actions.setShow(false));
   };
 
@@ -294,11 +291,7 @@ const TableLayout = ({
       },
       fields: ['affected_rows'],
     });
-    const fetchData = async () =>
-      await graphQLFetch({
-        query: operation.query,
-        variables: operation.variables,
-      });
+    const fetchData = async () => await client.request(operation);
     fetchData().finally(() => console.log('deleted row'));
   };
 

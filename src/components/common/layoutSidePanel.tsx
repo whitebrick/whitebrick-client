@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import FormMaker from '../common/formMaker';
 import SidePanel from '../common/sidePanel';
 import { bindActionCreators } from 'redux';
@@ -11,7 +11,7 @@ import {
   SchemaItemType,
   TableItemType,
 } from '../../types';
-import { useManualQuery, useMutation } from 'graphql-hooks';
+import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
   ADD_OR_REMOVE_COLUMN_SEQUENCE,
@@ -29,7 +29,6 @@ import { SCHEMAS_QUERY } from '../../graphql/queries/wb';
 import { ColumnApi, GridApi } from 'ag-grid-community';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import * as gql from 'gql-query-builder';
-import graphQLFetch from '../../utils/GraphQLFetch';
 import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
 import { toaster } from 'evergreen-ui';
 
@@ -82,6 +81,9 @@ const LayoutSidePanel = ({
   organization,
   actions,
 }: LayoutSidePanelPropsType) => {
+  const client = useContext(ClientContext);
+
+  const col = column && columns.filter(c => c.name === column)[0];
   const newTableFormFields: any[] = [
     {
       name: 'schema',
@@ -144,10 +146,7 @@ const LayoutSidePanel = ({
       name: 'autoIncrement',
       label: 'Auto Increase value?',
       type: 'checkbox',
-      render:
-        column && columns
-          ? columns.filter(c => c.name === column)[0].type === 'integer'
-          : null,
+      render: col?.type === 'integer',
     },
     {
       name: 'startSequenceNumber',
@@ -276,11 +275,7 @@ const LayoutSidePanel = ({
       },
       fields: ['affected_rows'],
     });
-    const fetchData = async () =>
-      await graphQLFetch({
-        query: operation.query,
-        variables: operation.variables,
-      });
+    const fetchData = async () => await client.request(operation);
     fetchData().finally(() => actions.setShow(false));
   };
 
@@ -374,11 +369,7 @@ const LayoutSidePanel = ({
         },
         fields: ['affected_rows'],
       });
-      const fetchData = async () =>
-        await graphQLFetch({
-          query: operation.query,
-          variables: operation.variables,
-        });
+      const fetchData = async () => await client.request(operation);
       await fetchData();
       actions.setShow(false);
     } else if (type === 'editRow') {

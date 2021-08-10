@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import SidePanel from './sidePanel';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import * as gql from 'gql-query-builder';
-import graphQLFetch from '../../utils/GraphQLFetch';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { TextInputField } from 'evergreen-ui';
+import { ClientContext, useManualQuery } from 'graphql-hooks';
+import { SCHEMA_TABLE_BY_NAME_QUERY } from '../../graphql/queries/wb';
 
 type ViewForeignKeyDataPropsType = {
   show: boolean;
   setShow: (value: boolean) => void;
-  tables: Array<TableItemType>;
-  columns: Array<ColumnItemType>;
+  tables: TableItemType[];
+  columns: ColumnItemType[];
   cellValue: string;
   column: any;
   schema: SchemaItemType;
@@ -28,17 +29,34 @@ const ViewForeignKeyData = ({
   column,
   schema,
 }: ViewForeignKeyDataPropsType) => {
+  const client = useContext(ClientContext);
+
   const [newColumns, setNewColumns] = useState([]);
   const [data, setData] = useState({});
   const [relTable, setRelTable] = useState('');
 
+  const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
+
+  const fetchSchemaTable = async table => {
+    const { data } = await fetchSchemaTableByName({
+      variables: {
+        schemaName: schema.name,
+        tableName: table,
+        withColumns: true,
+        withSettings: true,
+      },
+    });
+    return data;
+  };
+
   useEffect(() => {
     if (tables && tables.length > 0) {
-      const fetchTableDataWithColumn = (table, column) => {
-        let tableColumns = tables.filter(t => t.name === table)[0].columns;
-        setNewColumns(tableColumns);
-        let fields = [];
-        tableColumns.map(column => fields.push(column.name));
+      let fields = [];
+      const fetchTableDataWithColumn = async (table, column) => {
+        await fetchSchemaTable(table).then(t => {
+          setNewColumns(t.wbMyTableByName.columns);
+          t.wbMyTableByName.columns.map(column => fields.push(column.name));
+        });
         const operation = gql.query({
           operation: schema.name + '_' + table,
           variables: {
@@ -53,10 +71,10 @@ const ViewForeignKeyData = ({
           },
           fields,
         });
-        const fetchData = async () => await graphQLFetch(operation);
-        fetchData().then(({ data }) => {
-          setData(data[schema.name + '_' + table][0]);
-        });
+        const fetchData = async () => await client.request(operation);
+        fetchData().then(({ data }) =>
+          setData(data[schema.name + '_' + table][0]),
+        );
       };
       let c = columns.filter(obj => obj.name === column.colId)[0];
       setRelTable(c.foreignKeys[0].relTableName);
