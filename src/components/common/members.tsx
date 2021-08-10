@@ -13,9 +13,10 @@ import {
   Tooltip,
 } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { useMutation } from 'graphql-hooks';
+import gravatar from 'gravatar';
+import { actions } from '../../state/actions';
 import {
   SCHEMA_SET_USER_ROLE_MUTATION,
   SET_USERS_ROLE_MUTATION,
@@ -32,7 +33,6 @@ import {
 import { isObjectEmpty } from '../../utils/objectEmpty';
 import InviteUserModal from './inviteUserModal';
 import RolePermissions from './rolePermissions';
-import gravatar from 'gravatar';
 
 type MembersType = {
   user: any;
@@ -119,7 +119,7 @@ const Members = ({
     if (userRole === 'administrator' || userRole === 'owner') {
       if (user.userEmail === u.email)
         return (
-          <React.Fragment>
+          <>
             {roles[user.role.name].label}
             <IconButton
               icon={LogOutIcon}
@@ -127,11 +127,11 @@ const Members = ({
               intent="danger"
               marginLeft={105}
             />
-          </React.Fragment>
+          </>
         );
       if (user.role.impliedFrom) return roles[user.role.name].label;
       return (
-        <React.Fragment>
+        <>
           <Select
             width="70%"
             value={user.role.name}
@@ -149,11 +149,10 @@ const Members = ({
             marginLeft={10}
             onClick={() => removeUser(user.userEmail)}
           />
-        </React.Fragment>
+        </>
       );
-    } else {
-      return roles && roles[user.role.name].label;
     }
+    return roles && roles[user.role.name].label;
   };
 
   const handleUserRole = async (role, email) => {

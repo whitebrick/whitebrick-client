@@ -1,7 +1,7 @@
 import React from 'react';
-import Loading from '../components/loading';
 import { useAuth0 } from '@auth0/auth0-react';
 import { navigate } from 'gatsby';
+import Loading from '../components/loading';
 
 const SignUp = () => {
   const { isLoading, isAuthenticated, loginWithRedirect } = useAuth0();

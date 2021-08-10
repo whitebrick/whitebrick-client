@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import Layout from '../../../components/layouts/layout';
 import { useManualQuery } from 'graphql-hooks';
-import { SCHEMA_BY_NAME_QUERY } from '../../../graphql/queries/wb';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
+import { actions } from '../../../state/actions';
+import { SCHEMA_BY_NAME_QUERY } from '../../../graphql/queries/wb';
+import Layout from '../../../components/layouts/layout';
 import Loading from '../../../components/loading';
 import NotFound from '../../../components/notFound';
 import { SchemaItemType } from '../../../types';
@@ -44,7 +44,7 @@ const OrgSchema = ({
   };
 
   useEffect(() => {
-    if (params['databaseName'] && params['databaseName'])
+    if (params.databaseName && params.databaseName)
       fetchSchema().finally(() => setLoading(false));
   }, [params]);
 
@@ -56,12 +56,12 @@ const OrgSchema = ({
         name={
           error?.graphQLErrors[0].originalError.wbCode ===
           'WB_ORGANIZATION_NOT_FOUND'
-            ? cloudContext.userMessages['WB_ORGANIZATION_URL_NOT_FOUND'][0]
+            ? cloudContext.userMessages.WB_ORGANIZATION_URL_NOT_FOUND[0]
             : error?.graphQLErrors[0].originalError.wbCode === 'WB_FORBIDDEN'
-            ? cloudContext.userMessages['WB_SCHEMA_URL_FORBIDDEN'][0]
+            ? cloudContext.userMessages.WB_SCHEMA_URL_FORBIDDEN[0]
             : error?.graphQLErrors[0].originalError.wbCode ===
               'WB_SCHEMA_NOT_FOUND'
-            ? cloudContext.userMessages['WB_SCHEMA_URL_NOT_FOUND'][0]
+            ? cloudContext.userMessages.WB_SCHEMA_URL_NOT_FOUND[0]
             : cloudContext.userMessages[
                 error?.graphQLErrors[0].originalError.wbCode
               ][0]
@@ -69,12 +69,12 @@ const OrgSchema = ({
       />
     </Layout>
   ) : (
-    <React.Fragment>
+    <>
       <Seo title={schema.label} />
       <Layout>
         <SchemaLayout />
       </Layout>
-    </React.Fragment>
+    </>
   );
 };
 

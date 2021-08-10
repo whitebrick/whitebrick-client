@@ -1,6 +1,6 @@
 import React from 'react';
-import Modal from '../elements/modal';
 import { Table, TickCircleIcon, CrossIcon } from 'evergreen-ui';
+import Modal from '../elements/modal';
 import { isObjectEmpty } from '../../utils/objectEmpty';
 
 type rolePermissionsType = {
@@ -27,7 +27,7 @@ const RolePermissions = ({
     <Modal
       isShown={show}
       setIsShown={setShow}
-      title={`Role Permissions`}
+      title="Role Permissions"
       width={1200}
       hasFooter={false}>
       <div className="pb-4 px-2">
@@ -63,14 +63,13 @@ const RolePermissions = ({
                           </div>
                         </Table.TextCell>
                       );
-                    else
-                      return (
-                        <Table.TextCell>
-                          <div className="d-flex justify-content-center align-items-center">
-                            <CrossIcon color="danger" />
-                          </div>
-                        </Table.TextCell>
-                      );
+                    return (
+                      <Table.TextCell>
+                        <div className="d-flex justify-content-center align-items-center">
+                          <CrossIcon color="danger" />
+                        </div>
+                      </Table.TextCell>
+                    );
                   })}
               </Table.Row>
             ))}

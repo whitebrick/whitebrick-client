@@ -27,7 +27,7 @@ const Tabs = ({ items }: TabsType) => {
           </Tab>
         ))}
       </Tablist>
-      <React.Fragment>
+      <>
         {items.map((tab, index) => (
           <Pane
             key={tab.title}
@@ -39,7 +39,7 @@ const Tabs = ({ items }: TabsType) => {
             {tab.element}
           </Pane>
         ))}
-      </React.Fragment>
+      </>
     </Pane>
   );
 };

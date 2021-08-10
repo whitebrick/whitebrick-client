@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ColumnItemType, SchemaItemType } from '../../types';
 import * as gql from 'gql-query-builder';
 import { ClientContext } from 'graphql-hooks';
 import { AgGridReact, AgGridColumn } from 'ag-grid-react';
+import { ColumnItemType, SchemaItemType } from '../../types';
 
 type SelectGridType = {
   tableName: string;
@@ -22,10 +22,10 @@ const SelectGrid = ({
 
   useEffect(() => {
     const fetchTableData = async table => {
-      let fields = [];
+      const fields = [];
       columns.map(column => fields.push(column.name));
       const operation = gql.query({
-        operation: schema.name + '_' + table,
+        operation: `${schema.name}_${table}`,
         fields,
       });
       const { data: t } = await client.request(operation);
@@ -33,7 +33,7 @@ const SelectGrid = ({
     };
     if (tableName) {
       fetchTableData(tableName).then(r =>
-        setData(r[schema.name + '_' + tableName]),
+        setData(r[`${schema.name}_${tableName}`]),
       );
     }
   }, [tableName]);
@@ -54,10 +54,10 @@ const SelectGrid = ({
           sortable: true,
           filter: true,
         }}
-        rowSelection={'single'}
+        rowSelection="single"
         sortingOrder={['desc', 'asc', null]}
-        domLayout={'autoHeight'}
-        animateRows={true}
+        domLayout="autoHeight"
+        animateRows
         onSelectionChanged={onSelectionChanged}
         popupParent={document.querySelector('body')}
         rowData={data}>

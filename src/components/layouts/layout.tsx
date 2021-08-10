@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
+import { actions } from '../../state/actions';
 import Sidebar from '../sidebar';
 import {
   SCHEMAS_QUERY,
@@ -12,7 +12,7 @@ import {
 import Header from '../elements/header';
 import { SchemaItemType, TableItemType } from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
-import LayoutSidePanel from '../../components/common/layoutSidePanel';
+import LayoutSidePanel from '../common/layoutSidePanel';
 
 type LayoutPropsType = {
   schemas: SchemaItemType[];
@@ -52,9 +52,7 @@ const Layout = ({
       return data;
     };
     if (isObjectEmpty(cloudContext))
-      fetchCloud().then(data =>
-        actions.setCloudContext(data['wbCloudContext']),
-      );
+      fetchCloud().then(data => actions.setCloudContext(data.wbCloudContext));
   }, []);
 
   const fetchTableAndColumns = async () => {

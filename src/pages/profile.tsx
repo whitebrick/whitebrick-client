@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { Card, Pane, TextInputField, Button, toaster } from 'evergreen-ui';
-import Layout from '../components/layouts/layout';
 import { useManualQuery, useMutation } from 'graphql-hooks';
+import Layout from '../components/layouts/layout';
+import { actions } from '../state/actions';
 import { UPDATE_USER_DETAILS_MUTATION } from '../graphql/mutations/wb';
 import { USER_BY_EMAIL } from '../graphql/queries/wb';
 import ResetPassword from '../utils/resetPassword';

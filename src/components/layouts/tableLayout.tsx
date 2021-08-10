@@ -3,9 +3,11 @@ import * as gql from 'gql-query-builder';
 import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
-
 import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
+import { Link } from 'gatsby';
+import { toaster } from 'evergreen-ui';
+import { GridApi, ColumnApi } from 'ag-grid-community';
+import { actions } from '../../state/actions';
 
 import Grid from '../grid';
 import {
@@ -13,11 +15,8 @@ import {
   SAVE_TABLE_USER_SETTINGS,
 } from '../../graphql/mutations/wb';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
-import { Link } from 'gatsby';
-import { toaster } from 'evergreen-ui';
 import Seo from '../seo';
 
-import { GridApi, ColumnApi } from 'ag-grid-community';
 import Tabs from '../elements/tabs';
 import Members from '../common/members';
 import { TABLE_USERS_QUERY } from '../../graphql/queries/wb';
@@ -84,16 +83,16 @@ const TableLayout = ({
 
   const doMutation = variables => {
     const operation = gql.mutation({
-      operation: ''.concat('update_', schema.name + '_' + table.name),
+      operation: ''.concat('update_', `${schema.name}_${table.name}`),
       variables: {
         where: {
           value: variables.where,
-          type: `${schema.name + '_' + table.name}_bool_exp`,
+          type: `${`${schema.name}_${table.name}`}_bool_exp`,
           required: true,
         },
         _set: {
-          value: variables['_set'],
-          type: `${schema.name + '_' + table.name}_set_input`,
+          value: variables._set,
+          type: `${`${schema.name}_${table.name}`}_set_input`,
         },
       },
       fields: ['affected_rows'],
@@ -105,27 +104,27 @@ const TableLayout = ({
   const editValues = values => {
     values = [...Array.from(new Set(values))];
     values.forEach((params, index) => {
-      let filteredParams = values.filter(
+      const filteredParams = values.filter(
         value => params.rowIndex === value.rowIndex,
       );
-      let data = params.data;
+      const { data } = params;
       data[params.colDef?.field] = params.oldValue;
       filteredParams.forEach(param => {
         data[param.colDef?.field] = param.oldValue;
       });
-      let variables = { where: {}, _set: {} };
-      for (let key in data) {
+      const variables = { where: {}, _set: {} };
+      for (const key in data) {
         if (data[key]) {
           variables.where[key] = {
             _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
           };
         }
       }
-      variables['_set'][params.colDef.field] = parseInt(params.newValue)
+      variables._set[params.colDef.field] = parseInt(params.newValue)
         ? parseInt(params.newValue)
         : params.newValue;
       filteredParams.forEach(param => {
-        variables['_set'][param.colDef.field] = parseInt(param.newValue)
+        variables._set[param.colDef.field] = parseInt(param.newValue)
           ? parseInt(param.newValue)
           : param.newValue;
       });
@@ -137,7 +136,7 @@ const TableLayout = ({
   };
 
   const onCellValueChanged = params => {
-    let values = changedValues;
+    const values = changedValues;
     values.push(params);
     setChangedValues(values);
     setTimeout(() => editValues(values), 500);
@@ -163,7 +162,7 @@ const TableLayout = ({
   const saveView = (toView = null) => {
     if (toView) {
       let viewObj = views.filter(view => view.name === toView)[0];
-      let index = views.indexOf(viewObj);
+      const index = views.indexOf(viewObj);
       if (index !== -1) {
         viewObj = {
           name: toView,
@@ -176,7 +175,7 @@ const TableLayout = ({
         actions.setViews(views);
       }
     } else {
-      let viewObj = {
+      const viewObj = {
         name: formData.name,
         state: columnAPI.getColumnState(),
         orderBy,
@@ -205,7 +204,7 @@ const TableLayout = ({
         action: () => {
           actions.setType('editColumn');
           actions.setShow(true);
-          let column: any = columns.filter(
+          const column: any = columns.filter(
             column => column.name === params.column.colId,
           )[0];
           if (column.default) {
@@ -251,8 +250,8 @@ const TableLayout = ({
       },
     });
     if (!loading && !error) {
-      let col = columns.filter(c => c.name === colID)[0];
-      let index = columns.indexOf(col);
+      const col = columns.filter(c => c.name === colID)[0];
+      const index = columns.indexOf(col);
       columns.splice(index, 1);
       fields.splice(index, 1);
       actions.setColumns(columns);
@@ -273,19 +272,19 @@ const TableLayout = ({
   };
 
   const onDeleteRow = params => {
-    let variables = { where: {} };
-    let data = params.node.data;
-    for (let key in data) {
+    const variables = { where: {} };
+    const { data } = params.node;
+    for (const key in data) {
       variables.where[key] = {
         _eq: parseInt(data[key]) ? parseInt(data[key]) : data[key],
       };
     }
     const operation = gql.mutation({
-      operation: ''.concat('delete_', schema.name + '_' + table.name),
+      operation: ''.concat('delete_', `${schema.name}_${table.name}`),
       variables: {
         where: {
           value: variables.where,
-          type: `${schema.name + '_' + table.name}_bool_exp`,
+          type: `${`${schema.name}_${table.name}`}_bool_exp`,
           required: true,
         },
       },
@@ -299,7 +298,7 @@ const TableLayout = ({
     {
       title: 'Data',
       element: (
-        <React.Fragment>
+        <>
           <div>
             {views.length > 0 &&
               views.map(view => (
@@ -356,22 +355,22 @@ const TableLayout = ({
               getContextMenuItems={getContextMenuItems}
             />
           </div>
-        </React.Fragment>
+        </>
       ),
     },
     {
       title: 'Members',
-      element: <Members users={users} refetch={fetchData} name={'table'} />,
+      element: <Members users={users} refetch={fetchData} name="table" />,
       noPane: true,
     },
   ];
 
   return (
-    <React.Fragment>
+    <>
       <Seo title={`${table.label} | ${schema.label}`} />
       <div className="ag-theme-alpine">
         {table.name !== '' && (
-          <React.Fragment>
+          <>
             <div className="my-3">
               <div style={{ padding: `1rem` }}>
                 <p>
@@ -400,7 +399,7 @@ const TableLayout = ({
                     <FaPen
                       className="ml-1"
                       size="15px"
-                      aria-hidden={true}
+                      aria-hidden
                       onClick={() => {
                         actions.setType('updateTable');
                         actions.setFormData(table);
@@ -413,10 +412,10 @@ const TableLayout = ({
                 <Tabs items={tabs} />
               </div>
             </div>
-          </React.Fragment>
+          </>
         )}
       </div>
-    </React.Fragment>
+    </>
   );
 };
 

@@ -3,14 +3,14 @@ import store from '../state/store';
 
 const ResetPassword = () => {
   const state = store.getState();
-  const email: string = state.user.email;
+  const { email } = state.user;
 
   const apiConfig: any = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       client_id: process.env.GATSBY_AUTH0_CLIENTID,
-      email: email,
+      email,
       connection: 'Username-Password-Authentication',
     }),
   };

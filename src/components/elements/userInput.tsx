@@ -1,10 +1,10 @@
 import React from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { Text } from 'evergreen-ui';
-import { USERS_SEARCH_PATTERN } from '../../graphql/queries/wb';
 import AsyncSelect from 'react-select/async';
 import { components } from 'react-select';
 import { debounce } from 'lodash';
+import { USERS_SEARCH_PATTERN } from '../../graphql/queries/wb';
 
 type UserSearchInputType = {
   data: any;
@@ -28,7 +28,7 @@ const UserSearchInput = ({ data, setData }: UserSearchInputType) => {
   const mapOptionsToValues = options => {
     return options.map(option => ({
       value: option.email,
-      label: option.firstName + ' ' + option.lastName,
+      label: `${option.firstName} ${option.lastName}`,
       ...option,
     }));
   };
@@ -38,7 +38,7 @@ const UserSearchInput = ({ data, setData }: UserSearchInputType) => {
       return callback([]);
     }
     fetchUserSearchPattern({
-      variables: { searchPattern: inputValue + '*' },
+      variables: { searchPattern: `${inputValue}*` },
     }).then(({ data }) =>
       callback(mapOptionsToValues(data.wbUsersBySearchPattern)),
     );
@@ -47,12 +47,12 @@ const UserSearchInput = ({ data, setData }: UserSearchInputType) => {
   const CustomOption = props => {
     return (
       <components.Option {...props}>
-        <React.Fragment>
+        <>
           <div>
             {props.data.firstName} {props.data.lastName}
           </div>
           <small>{props.data.email}</small>
-        </React.Fragment>
+        </>
       </components.Option>
     );
   };

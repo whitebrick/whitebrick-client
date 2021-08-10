@@ -28,37 +28,34 @@ const IndexPage = ({ actions }: IndexPageProps) => {
   if (isAuthenticated) {
     navigate('/home');
     return <Loading />;
-  } else {
-    if (process.env.GATSBY_URL_ROOT_REDIRECT) {
-      navigate(process.env.GATSBY_URL_ROOT_REDIRECT);
-      return <Loading />;
-    }
-    return (
-      <div className="d-flex align-items-center min-vh-100">
-        <Seo title="Whitebrick" />
-        <div className="container text-center">
-          <div className="logo">
-            <img
-              src={WhitebrickLogo}
-              alt="Logo"
-              style={{ maxWidth: '220px' }}
-            />
-            <h1 style={{ fontSize: '4rem' }}>whitebrick</h1>
-          </div>
-          <button
-            className="btn btn-outline-primary mr-2"
-            onClick={loginWithRedirect}>
-            Log in
-          </button>
-          <button
-            className="btn btn-outline-dark mr-2"
-            onClick={() => loginWithRedirect({ screen_hint: 'signup' })}>
-            Sign up
-          </button>
-        </div>
-      </div>
-    );
   }
+  if (process.env.GATSBY_URL_ROOT_REDIRECT) {
+    navigate(process.env.GATSBY_URL_ROOT_REDIRECT);
+    return <Loading />;
+  }
+  return (
+    <div className="d-flex align-items-center min-vh-100">
+      <Seo title="Whitebrick" />
+      <div className="container text-center">
+        <div className="logo">
+          <img src={WhitebrickLogo} alt="Logo" style={{ maxWidth: '220px' }} />
+          <h1 style={{ fontSize: '4rem' }}>whitebrick</h1>
+        </div>
+        <button
+          type="submit"
+          className="btn btn-outline-primary mr-2"
+          onClick={loginWithRedirect}>
+          Log in
+        </button>
+        <button
+          type="submit"
+          className="btn btn-outline-dark mr-2"
+          onClick={() => loginWithRedirect({ screen_hint: 'signup' })}>
+          Sign up
+        </button>
+      </div>
+    </div>
+  );
 };
 
 const mapStateToProps = state => ({

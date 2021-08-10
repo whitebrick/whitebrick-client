@@ -1,17 +1,14 @@
 import React, { useContext } from 'react';
-import FormMaker from '../elements/formMaker';
-import SidePanel from '../elements/sidePanel';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import {
-  ColumnItemType,
-  OrganizationItemType,
-  SchemaItemType,
-  TableItemType,
-} from '../../types';
 import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
+import { ColumnApi, GridApi } from 'ag-grid-community';
+import { FaExternalLinkAlt } from 'react-icons/fa';
+import * as gql from 'gql-query-builder';
+import { toaster } from 'evergreen-ui';
+import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
+import { SCHEMAS_QUERY } from '../../graphql/queries/wb';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
   ADD_OR_REMOVE_COLUMN_SEQUENCE,
@@ -25,12 +22,15 @@ import {
   UPDATE_COLUMN_MUTATION,
   UPDATE_ORGANIZATION_MUTATION,
 } from '../../graphql/mutations/wb';
-import { SCHEMAS_QUERY } from '../../graphql/queries/wb';
-import { ColumnApi, GridApi } from 'ag-grid-community';
-import { FaExternalLinkAlt } from 'react-icons/fa';
-import * as gql from 'gql-query-builder';
-import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
-import { toaster } from 'evergreen-ui';
+import {
+  ColumnItemType,
+  OrganizationItemType,
+  SchemaItemType,
+  TableItemType,
+} from '../../types';
+import { actions } from '../../state/actions';
+import SidePanel from '../elements/sidePanel';
+import FormMaker from '../elements/formMaker';
 
 type LayoutSidePanelPropsType = {
   show: boolean;
@@ -242,13 +242,13 @@ const LayoutSidePanel = ({
         tableName: table.name,
         columnNames: [formData.name],
         del: true,
-        parentTableName: formData['foreignKeys'][0]['relTableName'],
+        parentTableName: formData.foreignKeys[0].relTableName,
       },
     });
     if (!loading && !error) {
       actions.setShow(false);
       await fetchTables();
-      let column = columns.filter(column => column.name === formData.name)[0];
+      const column = columns.filter(column => column.name === formData.name)[0];
       actions.setFormData(column);
       gridAPI.refreshCells({ force: true });
     }
@@ -261,16 +261,16 @@ const LayoutSidePanel = ({
 
   const doMutation = variables => {
     const operation = gql.mutation({
-      operation: ''.concat('update_', schema.name + '_' + table.name),
+      operation: ''.concat('update_', `${schema.name}_${table.name}`),
       variables: {
         where: {
           value: variables.where,
-          type: `${schema.name + '_' + table.name}_bool_exp`,
+          type: `${`${schema.name}_${table.name}`}_bool_exp`,
           required: true,
         },
         _set: {
-          value: variables['_set'],
-          type: `${schema.name + '_' + table.name}_set_input`,
+          value: variables._set,
+          type: `${`${schema.name}_${table.name}`}_set_input`,
         },
       },
       fields: ['affected_rows'],
@@ -299,7 +299,7 @@ const LayoutSidePanel = ({
   const saveView = (toView = null) => {
     if (toView) {
       let viewObj = views.filter(view => view.name === toView)[0];
-      let index = views.indexOf(viewObj);
+      const index = views.indexOf(viewObj);
       if (index !== -1) {
         viewObj = {
           name: toView,
@@ -312,7 +312,7 @@ const LayoutSidePanel = ({
         actions.setViews(views);
       }
     } else {
-      let viewObj = {
+      const viewObj = {
         name: formData.name,
         state: columnAPI.getColumnState(),
         orderBy,
@@ -359,11 +359,11 @@ const LayoutSidePanel = ({
       // implement the edit schema once we have API
     } else if (type === 'newRow') {
       const operation = gql.mutation({
-        operation: ''.concat('insert_', schema.name + '_' + table.name),
+        operation: ''.concat('insert_', `${schema.name}_${table.name}`),
         variables: {
           objects: {
             value: formData,
-            type: `[${schema.name + '_' + table.name}_insert_input!]`,
+            type: `[${`${schema.name}_${table.name}`}_insert_input!]`,
             required: true,
           },
         },
@@ -373,16 +373,16 @@ const LayoutSidePanel = ({
       await fetchData();
       actions.setShow(false);
     } else if (type === 'editRow') {
-      let variables = { where: {}, _set: {} };
-      for (let key in params) {
+      const variables = { where: {}, _set: {} };
+      for (const key in params) {
         variables.where[key] = {
           _eq: parseInt(params[key]) ? parseInt(params[key]) : params[key],
         };
       }
-      variables['_set'] = formData;
+      variables._set = formData;
       doMutation(variables);
     } else if (type === 'updateTable') {
-      let variables: any = {
+      const variables: any = {
         schemaName: schema.name,
         tableName: table.name,
         newTableLabel: formData.label,
@@ -396,12 +396,12 @@ const LayoutSidePanel = ({
       saveView();
       actions.setShow(false);
     } else if (type === 'editColumn') {
-      let variables: any = {
+      const variables: any = {
         schemaName: schema.name,
         tableName: table.name,
         columnName: column,
       };
-      let col = columns.filter(c => c.name === column)[0];
+      const col = columns.filter(c => c.name === column)[0];
       if (formData.name !== col.name) variables.newColumnName = formData.name;
       if (formData.label !== col.label)
         variables.newColumnLabel = formData.label;
@@ -415,7 +415,7 @@ const LayoutSidePanel = ({
           variables,
         });
       if (formData.autoIncrement) {
-        let vars: any = {
+        const vars: any = {
           schemaName: schema.name,
           tableName: table.name,
           columnName: formData.name,
@@ -423,17 +423,15 @@ const LayoutSidePanel = ({
         if (formData.startSequenceNumber)
           vars.nextSeqNumber = parseInt(formData.startSequenceNumber);
         await addOrRemoveColumnSequenceMutation({ variables: vars });
-      } else {
-        if (formData.default) {
-          await addOrRemoveColumnSequenceMutation({
-            variables: {
-              schemaName: schema.name,
-              tableName: table.name,
-              columnName: formData.name,
-              remove: true,
-            },
-          });
-        }
+      } else if (formData.default) {
+        await addOrRemoveColumnSequenceMutation({
+          variables: {
+            schemaName: schema.name,
+            tableName: table.name,
+            columnName: formData.name,
+            remove: true,
+          },
+        });
       }
       if (formData.table && formData.column) {
         await createOrAddForeignKey({
@@ -451,7 +449,7 @@ const LayoutSidePanel = ({
       gridAPI.refreshCells({ force: true });
       actions.setShow(false);
     } else if (type === 'editOrganization') {
-      let variables: any = { name: organization.name };
+      const variables: any = { name: organization.name };
       if (organization.name !== formData.name)
         variables.newName = formData.name;
       if (organization.label !== formData.label)
@@ -472,11 +470,11 @@ const LayoutSidePanel = ({
         },
       });
       if (!loading && !error) {
-        let columnNames = [];
+        const columnNames = [];
         columns
-          .filter(column => column['isPrimaryKey'] === true)
+          .filter(column => column.isPrimaryKey === true)
           .map(c => columnNames.push(c.name));
-        if (formData['isPrimaryKey']) {
+        if (formData.isPrimaryKey) {
           const {
             loading: deleteLoading,
             error: deleteError,
@@ -556,7 +554,7 @@ const LayoutSidePanel = ({
       ) : type === 'createOrganization' || type === 'editOrganization' ? (
         <FormMaker fields={newOrganizationFormFields} />
       ) : type === 'token' ? (
-        <React.Fragment>
+        <>
           <code
             className="w-100 p-4"
             aria-hidden="true"
@@ -566,11 +564,11 @@ const LayoutSidePanel = ({
             }>
             Bearer {accessToken}
           </code>
-        </React.Fragment>
+        </>
       ) : type === 'editDatabase' ? (
         <FormMaker fields={editDataBaseFormFields} />
       ) : type === 'newRow' || type === 'editRow' ? (
-        <React.Fragment>
+        <>
           {columns.map(c => (
             <div className="mt-3">
               <label>
@@ -623,7 +621,7 @@ const LayoutSidePanel = ({
               )}
             </div>
           ))}
-        </React.Fragment>
+        </>
       ) : type === 'editColumn' || type === 'addColumn' ? (
         <FormMaker fields={newTableColumnFields} />
       ) : type === 'view' ? (

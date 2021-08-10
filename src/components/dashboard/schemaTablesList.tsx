@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import Skeleton from 'react-loading-skeleton';
-import { SchemaItemType, TableItemType } from '../../types';
 import { Pane } from 'evergreen-ui';
 import { useManualQuery } from 'graphql-hooks';
+import { SchemaItemType, TableItemType } from '../../types';
+import { actions } from '../../state/actions';
 import { SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
 
 type TablesPropsType = {
@@ -40,7 +40,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
     <Pane padding={16} flex={1} background="tint1">
       <div className="row">
         {loaded ? (
-          <React.Fragment>
+          <>
             {tables &&
               tables.length > 0 &&
               tables.map((table, index) => (
@@ -69,7 +69,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
               <Avatar name="+" size="75" round="12px" color="#4B5563" />
               <p className="mt-2">Add table</p>
             </div>
-          </React.Fragment>
+          </>
         ) : (
           [...Array(12)].map((e, i) => (
             <div className="col-md-2 text-center btn" key={i}>

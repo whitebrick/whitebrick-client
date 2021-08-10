@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import Layout from '../../../components/layouts/layout';
 import { useManualQuery } from 'graphql-hooks';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
+import Layout from '../../../components/layouts/layout';
 import {
   SCHEMA_BY_NAME_QUERY,
   SCHEMA_TABLE_BY_NAME_QUERY,
 } from '../../../graphql/queries/wb';
 import Loading from '../../../components/loading';
 import NotFound from '../../../components/notFound';
-import { bindActionCreators } from 'redux';
 import { actions } from '../../../state/actions';
-import { connect } from 'react-redux';
-import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { SchemaItemType, TableItemType } from '../../../types';
 import TableLayout from '../../../components/layouts/tableLayout';
 
@@ -78,12 +78,12 @@ const OrgSchemaTable = ({
   };
 
   useEffect(() => {
-    if (params['databaseName'] && params['databaseName'])
+    if (params.databaseName && params.databaseName)
       fetchSchema().then(() => {
-        if (params['tableName'] && params['tableName'])
+        if (params.tableName && params.tableName)
           fetchSchemaTable().finally(() => setLoading(false));
       });
-    else if (params['tableName'] && params['tableName'])
+    else if (params.tableName && params.tableName)
       fetchSchemaTable().finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
@@ -101,7 +101,7 @@ const OrgSchemaTable = ({
       />
     </Layout>
   ) : (
-    <Layout hideSidebar={true}>
+    <Layout hideSidebar>
       <TableLayout key={schema.name + table.name} />
     </Layout>
   );

@@ -1,21 +1,21 @@
 import React from 'react';
-import Layout from '../components/layouts/layout';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import Layout from '../components/layouts/layout';
 import Seo from '../components/seo';
 import OrganizationDatabasesList from '../components/dashboard/organizationDatabasesList';
 import MyDatabases from '../components/dashboard/MyDatabases';
 import CreateSchema from '../components/dashboard/createSchema';
 import { OrganizationItemType } from '../types';
-import { bindActionCreators } from 'redux';
 import { actions } from '../state/actions';
-import { connect } from 'react-redux';
 
 type HomePropsType = {
   organizations: OrganizationItemType[];
 };
 
 const Home = ({ organizations }: HomePropsType) => (
-  <React.Fragment>
+  <>
     <Seo title="Home" />
     <Layout>
       {organizations &&
@@ -27,7 +27,7 @@ const Home = ({ organizations }: HomePropsType) => (
       <MyDatabases name="Databases shared with me" />
       <CreateSchema />
     </Layout>
-  </React.Fragment>
+  </>
 );
 
 const mapStateToProps = state => ({

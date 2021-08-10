@@ -1,10 +1,10 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
+import { actions } from '../../state/actions';
 
 type MyDatabasesPropsType = {
   schemas: any[];
@@ -19,11 +19,11 @@ const MyDatabases = ({
   actions,
   name = 'My Databases',
 }: MyDatabasesPropsType) => {
-  let filteredSchemas: any[] = schemas.filter(schema =>
+  const filteredSchemas: any[] = schemas.filter(schema =>
     name === 'My Databases'
-      ? schema['userOwnerEmail'] === user.email
-      : schema['userOwnerEmail'] !== user.email &&
-        schema['organizationOwnerName'] === null,
+      ? schema.userOwnerEmail === user.email
+      : schema.userOwnerEmail !== user.email &&
+        schema.organizationOwnerName === null,
   );
   return (
     filteredSchemas.length > 0 && (

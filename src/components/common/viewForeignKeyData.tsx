@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
-import SidePanel from '../elements/sidePanel';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import * as gql from 'gql-query-builder';
-import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { TextInputField } from 'evergreen-ui';
 import { ClientContext, useManualQuery } from 'graphql-hooks';
+import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
+import { actions } from '../../state/actions';
+import SidePanel from '../elements/sidePanel';
 import { SCHEMA_TABLE_BY_NAME_QUERY } from '../../graphql/queries/wb';
 
 type ViewForeignKeyDataPropsType = {
@@ -51,14 +51,14 @@ const ViewForeignKeyData = ({
 
   useEffect(() => {
     if (tables && tables.length > 0) {
-      let fields = [];
+      const fields = [];
       const fetchTableDataWithColumn = async (table, column) => {
         await fetchSchemaTable(table).then(t => {
           setNewColumns(t.wbMyTableByName.columns);
           t.wbMyTableByName.columns.map(column => fields.push(column.name));
         });
         const operation = gql.query({
-          operation: schema.name + '_' + table,
+          operation: `${schema.name}_${table}`,
           variables: {
             where: {
               value: {
@@ -66,17 +66,17 @@ const ViewForeignKeyData = ({
                   _eq: parseInt(cellValue) ? parseInt(cellValue) : cellValue,
                 },
               },
-              type: `${schema.name + '_' + table}_bool_exp`,
+              type: `${`${schema.name}_${table}`}_bool_exp`,
             },
           },
           fields,
         });
         const fetchData = async () => await client.request(operation);
         fetchData().then(({ data }) =>
-          setData(data[schema.name + '_' + table][0]),
+          setData(data[`${schema.name}_${table}`][0]),
         );
       };
-      let c = columns.filter(obj => obj.name === column.colId)[0];
+      const c = columns.filter(obj => obj.name === column.colId)[0];
       setRelTable(c.foreignKeys[0].relTableName);
       fetchTableDataWithColumn(
         c.foreignKeys[0].relTableName,
@@ -93,13 +93,13 @@ const ViewForeignKeyData = ({
       renderSaveButton={false}>
       <div className="w-75">
         {newColumns.map(c => (
-          <React.Fragment>
+          <>
             {c.foreignKeys.length > 0 ? (
               <TextInputField
                 label={`${c.label}: ${c.type}`}
                 value={data[c.name]}
                 contentEditable={false}
-                disabled={true}
+                disabled
                 hint={
                   c.foreignKeys.length > 0
                     ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
@@ -111,11 +111,11 @@ const ViewForeignKeyData = ({
                 label={`${c.label}: ${c.type}`}
                 value={data[c.name]}
                 contentEditable={false}
-                disabled={true}
+                disabled
                 hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
               />
             )}
-          </React.Fragment>
+          </>
         ))}
       </div>
     </SidePanel>

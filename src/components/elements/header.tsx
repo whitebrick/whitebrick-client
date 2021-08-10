@@ -17,10 +17,10 @@ import {
 } from 'evergreen-ui';
 
 // @ts-ignore
-import WhitebrickLogo from '../../images/whitebrick-logo.svg';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
+import WhitebrickLogo from '../../images/whitebrick-logo.svg';
+import { actions } from '../../state/actions';
 
 type HeaderPropsType = {
   user: any;

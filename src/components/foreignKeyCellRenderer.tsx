@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { SmallPlusIcon, ExpandAllIcon, Badge } from 'evergreen-ui';
+import { ColDef } from 'ag-grid-community';
 import ViewForeignKeyData from './common/viewForeignKeyData';
 import LinkForeignKey from './common/linkForeignKey';
-import { ColDef } from 'ag-grid-community';
 
 type ForeignKeyCellRendererPropsType = {
   valueFormatted: string;
@@ -19,13 +19,13 @@ const ForeignKeyCellRenderer = ({
   data,
   colDef,
 }: ForeignKeyCellRendererPropsType) => {
-  const cellValue = valueFormatted ? valueFormatted : value;
+  const cellValue = valueFormatted || value;
 
   const [show, setShow] = useState(false);
   const [link, setLink] = useState(false);
 
   return (
-    <React.Fragment>
+    <>
       <span>
         {cellValue ? (
           <div>
@@ -61,7 +61,7 @@ const ForeignKeyCellRenderer = ({
           column={column}
         />
       )}
-    </React.Fragment>
+    </>
   );
 };
 

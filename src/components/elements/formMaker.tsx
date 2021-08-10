@@ -1,8 +1,8 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { TextInputField, SelectField } from 'evergreen-ui';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
+import { actions } from '../../state/actions';
 import { SchemaItemType, TableItemType } from '../../types';
 
 type FormMakerPropsType = {
@@ -16,9 +16,9 @@ type FormMakerPropsType = {
 const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
   const handleSelectChange = (multiple, name, e) => {
     if (multiple) {
-      let values = Array.from(
+      const values = Array.from(
         e.target.selectedOptions,
-        option => option['value'],
+        option => option.value,
       );
       actions.setFormData({ ...formData, [name]: values });
     } else actions.setFormData({ ...formData, [name]: e.target.value });
@@ -56,7 +56,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
             disabled={readOnly}
           />
         );
-      else if (type === 'number' || type === 'integer')
+      if (type === 'number' || type === 'integer')
         return (
           <TextInputField
             label={label}
@@ -70,7 +70,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
             disabled={readOnly}
           />
         );
-      else if (type === 'select') {
+      if (type === 'select') {
         if (nested) {
           return (
             <SelectField
@@ -99,9 +99,10 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
                 ))}
             </SelectField>
           );
-        } else if (keyValuePairs) {
-          let res = [];
-          for (let key in options) res.push({ key, value: options[key] });
+        }
+        if (keyValuePairs) {
+          const res = [];
+          for (const key in options) res.push({ key, value: options[key] });
           return (
             <SelectField
               label={label}
@@ -126,38 +127,38 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
                 ))}
             </SelectField>
           );
-        } else {
-          return (
-            <>
-              <label htmlFor={name}>{label}</label>
-              <select
-                className="form-control"
-                multiple={multiple}
-                value={!formData[name] ? defaultValue : formData[name]}
-                onBlur={() => {}}
-                disabled={readOnly}
-                onChange={e => handleSelectChange(multiple, name, e)}>
-                {!multiple && (
-                  <option disabled selected>
-                    Select {name}
-                  </option>
-                )}
-                {options.map(option => (
+        }
+        return (
+          <>
+            <label htmlFor={name}>{label}</label>
+            <select
+              className="form-control"
+              multiple={multiple}
+              value={!formData[name] ? defaultValue : formData[name]}
+              onBlur={() => {}}
+              disabled={readOnly}
+              onChange={e => handleSelectChange(multiple, name, e)}>
+              {!multiple && (
+                <option disabled selected>
+                  Select {name}
+                </option>
+              )}
+              {options.map(option => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+              {addNewOptions &&
+                addNewOptionsValue.map(option => (
                   <option key={option} value={option}>
                     {option}
                   </option>
                 ))}
-                {addNewOptions &&
-                  addNewOptionsValue.map(option => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-              </select>
-            </>
-          );
-        }
-      } else if (type === 'checkbox') {
+            </select>
+          </>
+        );
+      }
+      if (type === 'checkbox') {
         return (
           <div className="form-check my-2">
             <input
@@ -174,7 +175,8 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
             </label>
           </div>
         );
-      } else if (type === 'button') {
+      }
+      if (type === 'button') {
         return (
           <button
             className="btn btn-outline-primary btn-block mt-5"
@@ -182,14 +184,16 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
             {label}
           </button>
         );
-      } else if (type === 'heading') {
+      }
+      if (type === 'heading') {
         return (
           <div className="mt-5">
             <hr />
             <h5>{label}</h5>
           </div>
         );
-      } else if (type === 'foreignKeys') {
+      }
+      if (type === 'foreignKeys') {
         return (
           <div className="card">
             <div className="card-body">

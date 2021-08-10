@@ -12,10 +12,10 @@ import {
   GetContextMenuItems,
 } from 'ag-grid-community';
 import { connect } from 'react-redux';
+import * as gql from 'gql-query-builder';
 import { actions } from '../state/actions';
 import ForeignKeyCellRenderer from './foreignKeyCellRenderer';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
-import * as gql from 'gql-query-builder';
 
 type GridPropsType = {
   onCellValueChanged: (params: any) => void;
@@ -63,32 +63,32 @@ const Grid = ({
 
   const createServerSideDatasource = () => {
     return {
-      getRows: async function (params: IServerSideGetRowsParams) {
+      async getRows(params: IServerSideGetRowsParams) {
         const subscription = gql.subscription({
-          operation: schema.name + '_' + table.name,
+          operation: `${schema.name}_${table.name}`,
           variables: {
             limit: params.request.endRow,
             offset: params.request.startRow,
             order_by: {
               value: { [orderBy]: `asc` },
-              type: `[${schema.name + '_' + table.name.concat('_order_by!')}]`,
+              type: `[${`${schema.name}_${table.name.concat('_order_by!')}`}]`,
             },
           },
           fields,
         });
         const operationAgg = gql.query({
-          operation: schema.name + '_' + table.name.concat('_aggregate'),
+          operation: `${schema.name}_${table.name.concat('_aggregate')}`,
           fields: [{ aggregate: ['count'] }],
         });
         const { data: c } = await client.request(operationAgg);
         actions.setRowCount(
-          c[schema.name + '_' + table.name + '_aggregate'].aggregate.count,
+          c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
         );
         client.subscriptionClient.request(subscription).subscribe({
           next({ data }) {
             params.successCallback(
-              data[schema.name + '_' + table.name],
-              c[schema.name + '_' + table.name + '_aggregate'].aggregate.count,
+              data[`${schema.name}_${table.name}`],
+              c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
             );
             autoSizeColumns(params.columnApi, params.api);
           },
@@ -107,7 +107,7 @@ const Grid = ({
     const datasource = createServerSideDatasource();
     params.api.setServerSideDatasource(datasource);
     if (views.length <= 0) {
-      let viewObj = {
+      const viewObj = {
         name: 'Default View',
         state: params.columnApi.getColumnState(),
         orderBy,
@@ -116,7 +116,7 @@ const Grid = ({
       };
       actions.setView(viewObj);
     } else {
-      let view = views.filter(view => view.name === defaultView)[0];
+      const view = views.filter(view => view.name === defaultView)[0];
       params.columnApi.applyColumnState({
         state: view.state,
         applyOrder: true,
@@ -125,15 +125,15 @@ const Grid = ({
   };
 
   return (
-    <React.Fragment>
+    <>
       <AgGridReact
         frameworkComponents={{
           foreignKeyRenderer: ForeignKeyCellRenderer,
         }}
-        rowModelType={'serverSide'}
+        rowModelType="serverSide"
         // @ts-ignore
-        serverSideStoreType={'partial'}
-        pagination={true}
+        serverSideStoreType="partial"
+        pagination
         paginationPageSize={limit}
         sideBar={{
           toolPanels: [
@@ -166,9 +166,9 @@ const Grid = ({
         }}
         sortingOrder={['desc', 'asc', null]}
         onCellValueChanged={onCellValueChanged}
-        domLayout={'autoHeight'}
-        animateRows={true}
-        allowContextMenuWithControlKey={true}
+        domLayout="autoHeight"
+        animateRows
+        allowContextMenuWithControlKey
         getContextMenuItems={getContextMenuItems}
         popupParent={document.querySelector('body')}
         onGridReady={onGridReady}>
@@ -183,16 +183,15 @@ const Grid = ({
                 cellRenderer="foreignKeyRenderer"
               />
             );
-          } else {
-            return (
-              <AgGridColumn
-                field={column.name}
-                key={column.name}
-                headerName={column.label}
-                headerTooltip={column.label}
-              />
-            );
           }
+          return (
+            <AgGridColumn
+              field={column.name}
+              key={column.name}
+              headerName={column.label}
+              headerTooltip={column.label}
+            />
+          );
         })}
       </AgGridReact>
       {table.name !== '' && (
@@ -213,7 +212,7 @@ const Grid = ({
           records per page
         </div>
       )}
-    </React.Fragment>
+    </>
   );
 };
 

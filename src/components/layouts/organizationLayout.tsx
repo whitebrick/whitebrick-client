@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { useMutation } from 'graphql-hooks';
+import { Link } from 'gatsby';
+import { actions } from '../../state/actions';
 import { SET_USERS_ROLE_MUTATION } from '../../graphql/mutations/wb';
 import SidePanel from '../elements/sidePanel';
 import UserSearchInput from '../elements/userInput';
 import Tabs from '../elements/tabs';
 import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
 import Members from '../common/members';
-import { Link } from 'gatsby';
 
 type OrganizationLayoutPropsType = {
   organization: any;
@@ -62,10 +62,7 @@ const OrganizationLayout = ({
             <Link to="/">Home</Link> <FaChevronRight />{' '}
             <Link to={`/${organization.name}`}>{organization.label}</Link>
           </p>
-          <h3
-            className="mt-4 w-25"
-            aria-hidden={true}
-            style={{ cursor: 'pointer' }}>
+          <h3 className="mt-4 w-25" aria-hidden style={{ cursor: 'pointer' }}>
             <span>
               {organization.label}
               {organization?.role?.name === 'organization_administrator' && (

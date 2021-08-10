@@ -1,7 +1,7 @@
 import { types } from '../types/gridTypes';
 
 export default function gridReducer(state: any = {}, action) {
-  const payload = action.payload;
+  const { payload } = action;
   switch (action.type) {
     case types.SET_SEND_ADMIN_SECRET:
       return {
@@ -79,7 +79,7 @@ export default function gridReducer(state: any = {}, action) {
         column: payload.column,
       };
     case types.SET_COLUMNS:
-      let f = [];
+      const f = [];
       payload.columns.forEach(column => f.push(column.name));
       return {
         ...state,

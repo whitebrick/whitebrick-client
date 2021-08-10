@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { FaChevronRight, FaPen } from 'react-icons/fa';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { useManualQuery } from 'graphql-hooks';
+import { Link } from 'gatsby';
 import SchemaTablesList from '../dashboard/schemaTablesList';
 import Tabs from '../elements/tabs';
-import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { SchemaItemType } from '../../types';
-import { bindActionCreators } from 'redux';
 import { actions } from '../../state/actions';
-import { connect } from 'react-redux';
-import Members from '../../components/common/members';
-import { useManualQuery } from 'graphql-hooks';
+import Members from '../common/members';
 import { SCHEMA_USERS_QUERY } from '../../graphql/queries/wb';
-import { Link } from 'gatsby';
 
 type SchemaLayoutType = {
   schema: SchemaItemType;
@@ -36,7 +36,7 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
     },
     {
       title: 'Members',
-      element: <Members users={users} refetch={fetchData} name={'schema'} />,
+      element: <Members users={users} refetch={fetchData} name="schema" />,
       noPane: true,
     },
   ];
@@ -55,10 +55,7 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
             {schema.label}
           </Link>
         </p>
-        <h3
-          className="m-0 w-25"
-          aria-hidden={true}
-          style={{ cursor: 'pointer' }}>
+        <h3 className="m-0 w-25" aria-hidden style={{ cursor: 'pointer' }}>
           <span>
             {schema.label}
             <FaPen

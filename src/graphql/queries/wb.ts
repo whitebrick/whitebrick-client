@@ -1,4 +1,4 @@
-export const SCHEMAS_QUERY: string = `query {
+export const SCHEMAS_QUERY = `query {
   wbMySchemas {
     name
     label
@@ -10,7 +10,7 @@ export const SCHEMAS_QUERY: string = `query {
   }
 }`;
 
-export const SCHEMA_BY_NAME_QUERY: string = `query ($name: String!, $organizationName: String) {
+export const SCHEMA_BY_NAME_QUERY = `query ($name: String!, $organizationName: String) {
   wbMySchemaByName(name: $name, organizationName: $organizationName) {
     name
     label
@@ -23,14 +23,14 @@ export const SCHEMA_BY_NAME_QUERY: string = `query ($name: String!, $organizatio
 }
 `;
 
-export const SCHEMA_TABLES_QUERY: string = `query ($schemaName: String!){
+export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
   wbMyTables(schemaName: $schemaName) {
     name
     label
   }
 }`;
 
-export const SCHEMA_TABLE_BY_NAME_QUERY: string = `query ($schemaName: String!, $tableName: String!, $withColumns: Boolean, $withSettings: Boolean) {
+export const SCHEMA_TABLE_BY_NAME_QUERY = `query ($schemaName: String!, $tableName: String!, $withColumns: Boolean, $withSettings: Boolean) {
   wbMyTableByName(schemaName: $schemaName, tableName: $tableName, withColumns: $withColumns, withSettings: $withSettings) {
     name
     label
@@ -60,7 +60,7 @@ export const SCHEMA_TABLE_BY_NAME_QUERY: string = `query ($schemaName: String!, 
 }
 `;
 
-export const ORGANIZATIONS_QUERY: string = `{
+export const ORGANIZATIONS_QUERY = `{
   wbMyOrganizations {
     name
     label
@@ -71,7 +71,7 @@ export const ORGANIZATIONS_QUERY: string = `{
 }
 `;
 
-export const ORGANIZATION_QUERY: string = `query ($name: String!) {
+export const ORGANIZATION_QUERY = `query ($name: String!) {
   wbMyOrganizationByName(name: $name) {
     name
     label
@@ -128,7 +128,7 @@ export const USERS_SEARCH_PATTERN = `query ($searchPattern: String!){
   }
 }`;
 
-export const USER_BY_EMAIL: string = `query ($email: String!) {
+export const USER_BY_EMAIL = `query ($email: String!) {
   wbUserByEmail(email: $email) {
     firstName
     lastName

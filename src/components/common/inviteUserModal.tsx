@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { RadioGroup } from 'evergreen-ui';
-import Modal from '../elements/modal';
-import UserSearchInput from '../elements/userInput';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { useMutation } from 'graphql-hooks';
+import Modal from '../elements/modal';
+import UserSearchInput from '../elements/userInput';
+import { actions } from '../../state/actions';
 import {
   SCHEMA_SET_USER_ROLE_MUTATION,
   SET_USERS_ROLE_MUTATION,
@@ -49,7 +49,7 @@ const InviteUserModal = ({
 
   useEffect(() => {
     if (name !== '') {
-      let opts = [];
+      const opts = [];
       Object.keys(roles).map((role: string) =>
         opts.push({ label: roles[role].label, value: role }),
       );
@@ -93,8 +93,8 @@ const InviteUserModal = ({
     <Modal
       isShown={show}
       setIsShown={setShow}
-      title={`Invite User`}
-      label={`Invite`}
+      title="Invite User"
+      label="Invite"
       onSave={onSave}>
       <div className="p-2" style={{ minHeight: '30vh' }}>
         <UserSearchInput data={data} setData={setData} />

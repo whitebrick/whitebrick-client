@@ -1,9 +1,9 @@
 import React from 'react';
 import Avatar from 'react-avatar';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
+import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
 
 type CreateSchemaType = {

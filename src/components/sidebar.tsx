@@ -10,9 +10,9 @@ import {
 import { navigate } from 'gatsby';
 import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../state/actions';
 import { connect } from 'react-redux';
 import { useManualQuery, useMutation } from 'graphql-hooks';
+import { actions } from '../state/actions';
 import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../graphql/mutations/wb';
 import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
 import { ORGANIZATIONS_QUERY } from '../graphql/queries/wb';
@@ -66,7 +66,7 @@ const Sidebar = ({
   const handleRefreshToken = async () => {
     await getAccessTokenSilently({ ignoreCache: true });
     const tokenClaims = await getIdTokenClaims();
-    actions.setAccessToken(tokenClaims['__raw']);
+    actions.setAccessToken(tokenClaims.__raw);
     actions.setTokenClaims(tokenClaims);
   };
 
@@ -80,7 +80,7 @@ const Sidebar = ({
               <div
                 onClick={() => navigate(`/${organization.name}`)}
                 aria-hidden="true"
-                className={`list-group-item py-1`}
+                className="list-group-item py-1"
                 key={organization.name}>
                 <FaUsers /> {organization.label.toLowerCase()}
               </div>
@@ -100,7 +100,7 @@ const Sidebar = ({
         )}
         <div className="list-group">
           {Object.keys(schema).length > 0 && (
-            <React.Fragment>
+            <>
               <div className="sidebar-heading mt-2 list-group-item">
                 Database Settings
               </div>
@@ -132,10 +132,10 @@ const Sidebar = ({
                   </div>
                 </div>
               )}
-            </React.Fragment>
+            </>
           )}
           {process.env.NODE_ENV === 'development' && (
-            <React.Fragment>
+            <>
               <div className="sidebar-heading list-group-item mt-2">
                 Debug Settings
               </div>
@@ -167,7 +167,7 @@ const Sidebar = ({
                 />
                 <span className="ml-2">Send Admin Secret</span>
               </div>
-            </React.Fragment>
+            </>
           )}
         </div>
       </aside>

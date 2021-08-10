@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
-import Loading from '../loading';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
+import Loading from '../loading';
+import { actions } from '../../state/actions';
 
 type AuthWrapper = {
   actions: any;
@@ -37,10 +37,10 @@ const AuthWrapper = ({
       (async () => {
         await getAccessTokenSilently({ ignoreCache: true });
         const tokenClaims = await getIdTokenClaims();
-        actions.setAccessToken(tokenClaims['__raw']);
+        actions.setAccessToken(tokenClaims.__raw);
         actions.setTokenClaims(tokenClaims);
         actions.setUser(user);
-        client.setHeader('Authorization', `Bearer ${tokenClaims['__raw']}`);
+        client.setHeader('Authorization', `Bearer ${tokenClaims.__raw}`);
         setLoading(false);
       })();
     } else setLoading(false);

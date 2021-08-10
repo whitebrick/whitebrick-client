@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
-import Modal from '../elements/modal';
 import { bindActionCreators } from 'redux';
-import { actions } from '../../state/actions';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
-import SelectGrid from '../common/selectGrid';
 import * as gql from 'gql-query-builder';
 import { ClientContext } from 'graphql-hooks';
 import { ColDef } from 'ag-grid-community';
+import SelectGrid from './selectGrid';
+import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
+import { actions } from '../../state/actions';
+import Modal from '../elements/modal';
 
 type LinkForeignKey = {
   show: boolean;
@@ -38,8 +38,8 @@ const LinkForeignKey = ({
   const [tableColumns, setTableColumns] = useState([]);
 
   useEffect(() => {
-    let c = columns.filter(obj => obj.name === column.colId)[0];
-    let tableColumns = tables.filter(
+    const c = columns.filter(obj => obj.name === column.colId)[0];
+    const tableColumns = tables.filter(
       t => t.name === c.foreignKeys[0].relTableName,
     )[0].columns;
     setRelTable(c.foreignKeys[0].relTableName);
@@ -47,27 +47,27 @@ const LinkForeignKey = ({
   }, [tables, columns, column]);
 
   const updateValue = async (row, relData) => {
-    let variables = { where: {}, _set: {} };
-    for (let key in row) {
+    const variables = { where: {}, _set: {} };
+    for (const key in row) {
       if (row[key]) {
         variables.where[key] = {
           _eq: parseInt(row[key]) ? parseInt(row[key]) : row[key],
         };
       }
     }
-    variables['_set'][colDef.field] =
+    variables._set[colDef.field] =
       relData[colDef.field.split('_').reverse()[0]];
     const operation = gql.mutation({
-      operation: ''.concat('update_', schema.name + '_' + table.name),
+      operation: ''.concat('update_', `${schema.name}_${table.name}`),
       variables: {
         where: {
           value: variables.where,
-          type: `${schema.name + '_' + table.name}_bool_exp`,
+          type: `${`${schema.name}_${table.name}`}_bool_exp`,
           required: true,
         },
         _set: {
-          value: variables['_set'],
-          type: `${schema.name + '_' + table.name}_set_input`,
+          value: variables._set,
+          type: `${`${schema.name}_${table.name}`}_set_input`,
         },
       },
       fields: ['affected_rows'],
