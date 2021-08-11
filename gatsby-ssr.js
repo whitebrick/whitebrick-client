@@ -12,7 +12,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from './src/components/loading';
 
-const onRedirectCallback = appState => navigate(appState.returnTo || '/');
+const onRedirectCallback = appState => navigate(appState?.returnTo || '/');
 
 export const wrapRootElement = ({ element }) => {
   return (

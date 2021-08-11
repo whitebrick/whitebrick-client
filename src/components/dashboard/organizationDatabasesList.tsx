@@ -5,9 +5,9 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import { FaCog } from 'react-icons/fa';
+import { AddIcon } from 'evergreen-ui';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
-import { AddIcon } from 'evergreen-ui';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -40,54 +40,58 @@ const OrganizationDatabasesList = ({
         </div>
       )}
       <div className="card-body">
-        {schemas.filter(schema => schema.organizationOwnerName === organization.name).length == 0
-        ?
-        <div className="row">
-          <div className="col-md-6 offset-md-4">
-            <div className="text-center rounded p-2" style={{backgroundColor: "#ececec", width: "60%"}}>
-              <p>You do not have any databases yet.</p>
+        {schemas.filter(
+          schema => schema.organizationOwnerName === organization.name,
+        ).length === 0 ? (
+          <div className="row">
+            <div className="col-md-6 offset-md-4">
               <div
-              onClick={() => {
-                actions.setFormData({})
-                actions.setType('createDatabase');
-                actions.setShow(true);
-              }}>
-              <AddIcon color="info" />
+                className="text-center rounded p-2"
+                style={{ backgroundColor: '#ececec', width: '60%' }}>
+                <p>You do not have any databases yet.</p>
+                <div
+                  aria-hidden
+                  onClick={() => {
+                    actions.setFormData({});
+                    actions.setType('createDatabase');
+                    actions.setShow(true);
+                  }}>
+                  <AddIcon color="info" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        :
-        <div className="row">
-          {schemas
-            .filter(
-              schema => schema.organizationOwnerName === organization.name,
-            )
-            .map(schema => (
-              <div
-                key={schema.name}
-                className="col-md-2 col-sm-6 text-center btn"
-                aria-hidden="true"
-                onClick={() =>
-                  navigate(`/${organization.name}/${schema.name}`)
-                }>
-                <Avatar name={schema.label} size="75" round="12px" />
-                <p className="mt-2">{schema.label}</p>
-              </div>
-            ))}
-          <div
-            className="col-md-2 col-sm-6 text-center btn"
-            aria-hidden="true"
-            onClick={() => {
-              actions.setFormData({});
-              actions.setType('createDatabase');
-              actions.setShow(true);
-            }}>
-            <Avatar name="+" size="75" round="12px" color="#4B5563" />
-            <p className="mt-2">Add database</p>
+        ) : (
+          <div className="row">
+            {schemas
+              .filter(
+                schema => schema.organizationOwnerName === organization.name,
+              )
+              .map(schema => (
+                <div
+                  key={schema.name}
+                  className="col-md-2 col-sm-6 text-center btn"
+                  aria-hidden="true"
+                  onClick={() =>
+                    navigate(`/${organization.name}/${schema.name}`)
+                  }>
+                  <Avatar name={schema.label} size="75" round="12px" />
+                  <p className="mt-2">{schema.label}</p>
+                </div>
+              ))}
+            <div
+              className="col-md-2 col-sm-6 text-center btn"
+              aria-hidden="true"
+              onClick={() => {
+                actions.setFormData({});
+                actions.setType('createDatabase');
+                actions.setShow(true);
+              }}>
+              <Avatar name="+" size="75" round="12px" color="#4B5563" />
+              <p className="mt-2">Add database</p>
+            </div>
           </div>
-        </div>
-        }
+        )}
       </div>
     </div>
   );

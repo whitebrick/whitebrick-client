@@ -71,8 +71,8 @@
     "develop": "gatsby develop",
     "develop:staging": "ACTIVE_ENV='staging' gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "lint": "eslint --ignore-path .gitignore . --ext js --ext ts --ext tsx",
-    "lint:fix": "eslint --ignore-path .gitignore . --ext js --ext ts --ext tsx --fix",
+    "lint": "eslint --ignore-path .eslintignore . --ext js --ext ts --ext tsx",
+    "lint:fix": "eslint --ignore-path .eslintignore . --ext js --ext ts --ext tsx --fix",
     "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
@@ -82,7 +82,7 @@
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
-      "eslint --ignore-path .gitignore . --ext js --ext ts --ext tsx --fix"
+      "eslint --ignore-path .eslintignore . --ext js --ext ts --ext tsx --fix"
     ]
   },
   "husky": {

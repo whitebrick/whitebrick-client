@@ -5,12 +5,11 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import Skeleton from 'react-loading-skeleton';
-import { Pane } from 'evergreen-ui';
+import { Pane, AddIcon } from 'evergreen-ui';
 import { useManualQuery } from 'graphql-hooks';
 import { SchemaItemType, TableItemType } from '../../types';
 import { actions } from '../../state/actions';
 import { SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
-import { AddIcon } from 'evergreen-ui';
 
 type TablesPropsType = {
   schema: SchemaItemType;
@@ -40,63 +39,67 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
   return (
     <Pane padding={16} flex={1} background="tint1">
       <div className="row">
-        {tables && tables.length == 0 ?
-        <div className="col-md-6 offset-md-4">
-        <div className="text-center rounded p-2" style={{backgroundColor: "#ececec", width: "60%"}}>
-          <p>You do not have any tables yet.</p>
-          <div
-          onClick={() => {
-            actions.setFormData({schema})
-            actions.setType('createTable');
-            actions.setShow(true);
-          }}>
-          <AddIcon color="info" />
+        {tables && tables.length === 0 ? (
+          <div className="col-md-6 offset-md-4">
+            <div
+              className="text-center rounded p-2"
+              style={{ backgroundColor: '#ececec', width: '60%' }}>
+              <p>You do not have any tables yet.</p>
+              <div
+                aria-hidden
+                onClick={() => {
+                  actions.setFormData({ schema });
+                  actions.setType('createTable');
+                  actions.setShow(true);
+                }}>
+                <AddIcon color="info" />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-        :
-      <div>
-        {loaded ? (
-          <>
-            {tables &&
-              tables.length > 0 &&
-              tables.map(table => (
+        ) : (
+          <div>
+            {loaded ? (
+              <>
+                {tables &&
+                  tables.length > 0 &&
+                  tables.map(table => (
+                    <div
+                      key={table.name}
+                      className="col-md-2 col-sm-6 text-center btn"
+                      aria-hidden="true"
+                      onClick={() => {
+                        if (schema.organizationOwnerName)
+                          navigate(
+                            `/${schema.organizationOwnerName}/${schema.name}/${table.name}`,
+                          );
+                        else navigate(`/db/${schema.name}/table/${table.name}`);
+                      }}>
+                      <Avatar name={table.label} size="75" round="12px" />
+                      <p className="mt-2">{table.label}</p>
+                    </div>
+                  ))}
                 <div
-                  key={table.name}
-                  className="col-md-2 col-sm-6 text-center btn"
+                  className="col-md-2 text-center btn"
                   aria-hidden="true"
                   onClick={() => {
-                    if (schema.organizationOwnerName)
-                      navigate(
-                        `/${schema.organizationOwnerName}/${schema.name}/${table.name}`,
-                      );
-                    else navigate(`/db/${schema.name}/table/${table.name}`);
+                    actions.setFormData({ schema });
+                    actions.setType('createTable');
+                    actions.setShow(true);
                   }}>
-                  <Avatar name={table.label} size="75" round="12px" />
-                  <p className="mt-2">{table.label}</p>
+                  <Avatar name="+" size="75" round="12px" color="#4B5563" />
+                  <p className="mt-2">Add table</p>
                 </div>
-              ))}
-            <div
-              className="col-md-2 text-center btn"
-              aria-hidden="true"
-              onClick={() => {
-                actions.setFormData({ schema });
-                actions.setType('createTable');
-                actions.setShow(true);
-              }}>
-              <Avatar name="+" size="75" round="12px" color="#4B5563" />
-              <p className="mt-2">Add table</p>
-            </div>
-          </>
-        ) : (
-          [...Array(12)].map(e => (
-            <div className="col-md-2 text-center btn" key={e}>
-              <Skeleton height="100px" />
-            </div>
-          ))
+              </>
+            ) : (
+              [...Array(12)].map(e => (
+                <div className="col-md-2 text-center btn" key={e}>
+                  <Skeleton height="100px" />
+                </div>
+              ))
+            )}
+          </div>
         )}
-      </div>}
-    </div>
+      </div>
     </Pane>
   );
 };
