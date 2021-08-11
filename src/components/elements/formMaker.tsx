@@ -29,6 +29,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
     required = false,
     nested = false,
     nestedValue,
+    nestedLabel = nestedValue,
     options,
     selected = null,
     readOnly = false,
@@ -73,7 +74,9 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
           return (
             <SelectField
               label={label}
-              value={!formData[name] ? defaultValue : formData[name]}
+              value={
+                !formData[name] ? defaultValue : formData[name][nestedValue]
+              }
               required={required}
               onChange={e => handleSelectChange(multiple, name, e)}>
               {!multiple && (
@@ -86,7 +89,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
                   key={option[nestedValue]}
                   value={option[nestedValue]}
                   selected={selected && option[selected] === true}>
-                  {option[nestedValue]}
+                  {option[nestedLabel]}
                 </option>
               ))}
               {addNewOptions &&

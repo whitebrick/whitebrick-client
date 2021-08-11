@@ -133,6 +133,7 @@ const LayoutSidePanel = ({
       options: schemas,
       nested: true,
       nestedValue: 'name',
+      nestedLabel: 'label',
     },
     { name: 'name', label: 'Name', type: 'text', required: true },
     { name: 'label', label: 'Table Label', type: 'text', required: true },
