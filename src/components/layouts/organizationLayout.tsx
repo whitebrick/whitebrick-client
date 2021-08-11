@@ -1,22 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FaChevronRight, FaPen } from 'react-icons/fa';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import { useMutation } from 'graphql-hooks';
 import { Link } from 'gatsby';
 import { actions } from '../../state/actions';
-import { SET_USERS_ROLE_MUTATION } from '../../graphql/mutations/wb';
-import SidePanel from '../elements/sidePanel';
-import UserSearchInput from '../elements/userInput';
 import Tabs from '../elements/tabs';
 import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
 import Members from '../common/members';
 
 type OrganizationLayoutPropsType = {
   organization: any;
-  show: boolean;
-  type: string;
   refetch: () => void;
   actions: any;
 };
@@ -24,36 +18,8 @@ type OrganizationLayoutPropsType = {
 const OrganizationLayout = ({
   organization,
   refetch,
-  show,
-  type,
   actions,
 }: OrganizationLayoutPropsType) => {
-  const [updateUserRoleMutation] = useMutation(SET_USERS_ROLE_MUTATION);
-  const [data, setData] = useState<any>({});
-
-  const inviteUserOrUpdateRole = async (role, userEmails) => {
-    const { loading, error } = await updateUserRoleMutation({
-      variables: {
-        organizationName: organization.name,
-        role,
-        userEmails,
-      },
-    });
-    return { loading, error };
-  };
-
-  const onSave = async () => {
-    if (type === 'invite') {
-      const { loading, error } = await inviteUserOrUpdateRole(data.role, [
-        data.user[0].email,
-      ]);
-      if (!loading && !error) {
-        refetch();
-        actions.setShow(false);
-      }
-    }
-  };
-
   return (
     <div className="ag-theme-alpine">
       <div className="my-3">
@@ -112,8 +78,6 @@ const OrganizationLayout = ({
 
 const mapStateToProps = state => ({
   organization: state.organization,
-  show: state.show,
-  type: state.type,
 });
 
 const mapDispatchToProps = dispatch => ({

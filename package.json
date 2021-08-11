@@ -77,12 +77,12 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "type-check": "tsc",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
+    "prepare": "husky install"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
-      "eslint --ignore-path .gitignore . --ext js --ext ts --ext tsx --fix",
-      "git add"
+      "eslint --ignore-path .gitignore . --ext js --ext ts --ext tsx --fix"
     ]
   },
   "husky": {
