@@ -7,6 +7,7 @@ import { navigate } from 'gatsby';
 import { FaCog } from 'react-icons/fa';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
+import { AddIcon } from 'evergreen-ui';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -39,6 +40,24 @@ const OrganizationDatabasesList = ({
         </div>
       )}
       <div className="card-body">
+        {schemas.filter(schema => schema.organizationOwnerName === organization.name).length == 0
+        ?
+        <div className="row">
+          <div className="col-md-6 offset-md-4">
+            <div className="text-center rounded p-2" style={{backgroundColor: "#ececec", width: "60%"}}>
+              <p>You do not have any databases yet.</p>
+              <div
+              onClick={() => {
+                actions.setFormData({})
+                actions.setType('createDatabase');
+                actions.setShow(true);
+              }}>
+              <AddIcon color="info" />
+              </div>
+            </div>
+          </div>
+        </div>
+        :
         <div className="row">
           {schemas
             .filter(
@@ -68,6 +87,7 @@ const OrganizationDatabasesList = ({
             <p className="mt-2">Add database</p>
           </div>
         </div>
+        }
       </div>
     </div>
   );

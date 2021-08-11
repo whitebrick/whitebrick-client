@@ -10,6 +10,7 @@ import { useManualQuery } from 'graphql-hooks';
 import { SchemaItemType, TableItemType } from '../../types';
 import { actions } from '../../state/actions';
 import { SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
+import { AddIcon } from 'evergreen-ui';
 
 type TablesPropsType = {
   schema: SchemaItemType;
@@ -39,6 +40,22 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
   return (
     <Pane padding={16} flex={1} background="tint1">
       <div className="row">
+        {tables && tables.length == 0 ?
+        <div className="col-md-6 offset-md-4">
+        <div className="text-center rounded p-2" style={{backgroundColor: "#ececec", width: "60%"}}>
+          <p>You do not have any tables yet.</p>
+          <div
+          onClick={() => {
+            actions.setFormData({schema})
+            actions.setType('createTable');
+            actions.setShow(true);
+          }}>
+          <AddIcon color="info" />
+          </div>
+        </div>
+      </div>
+        :
+      <div>
         {loaded ? (
           <>
             {tables &&
@@ -78,7 +95,8 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
             </div>
           ))
         )}
-      </div>
+      </div>}
+    </div>
     </Pane>
   );
 };
