@@ -105,39 +105,6 @@ const OrganizationLayout = ({
             />
           </div>
         </div>
-        <SidePanel
-          show={show}
-          setShow={actions.setShow}
-          onSave={onSave}
-          name={type === 'invite' && `Invite user to ${organization.label}`}>
-          {type === 'invite' && (
-            <div className="form-group">
-              <div className="mt-3">
-                <UserSearchInput data={data} setData={setData} />
-              </div>
-              <div className="mt-3">
-                <label htmlFor="role">
-                  Role
-                  <select
-                    className="form-control"
-                    value={data.role}
-                    onChange={e => setData({ ...data, role: e.target.value })}>
-                    <option selected disabled>
-                      Select role
-                    </option>
-                    <option value="organization_administrator">
-                      Organization Administrator
-                    </option>
-                    <option value="organization_user">Organization User</option>
-                    <option value="organization_external_user">
-                      Organization External User
-                    </option>
-                  </select>
-                </label>
-              </div>
-            </div>
-          )}
-        </SidePanel>
       </div>
     </div>
   );
