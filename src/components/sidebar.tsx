@@ -7,7 +7,6 @@ import {
   FaSync,
   FaKeycdn,
 } from 'react-icons/fa';
-import { navigate } from 'gatsby';
 import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -79,7 +78,7 @@ const Sidebar = ({
             <div className="sidebar-heading list-group-item">Organizations</div>
             {organizations.map(organization => (
               <div
-                onClick={() => navigate(`/${organization.name}`)}
+                onClick={() => window.location.replace(`/${organization.name}`)}
                 aria-hidden="true"
                 className="list-group-item py-1"
                 key={organization.name}>
