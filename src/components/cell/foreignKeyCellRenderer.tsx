@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { SmallPlusIcon, Badge } from 'evergreen-ui';
 import { ColDef } from 'ag-grid-community';
-import ViewForeignKeyData from './common/viewForeignKeyData';
-import LinkForeignKey from './common/linkForeignKey';
+import ViewForeignKeyData from '../common/viewForeignKeyData';
+import LinkForeignKey from '../common/linkForeignKey';
 
 type ForeignKeyCellRendererPropsType = {
   valueFormatted: string;

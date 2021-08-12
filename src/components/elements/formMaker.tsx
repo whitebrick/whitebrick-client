@@ -22,6 +22,12 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
     } else actions.setFormData({ ...formData, [name]: e.target.value });
   };
 
+  const getDefaultTextValue = (value, defaultValue) => {
+    if (value) return value;
+    if (defaultValue) return defaultValue;
+    return '';
+  };
+
   const renderField = ({
     type,
     name,
@@ -39,7 +45,6 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
     addNewOptionsValue = null,
     onClick = null,
     defaultValue = null,
-    defaultTextField = '',
     render = true,
   }) => {
     if (render) {
@@ -49,7 +54,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
             key={label}
             label={label}
             placeholder={`Enter ${label}`}
-            value={!formData[name] ? defaultTextField : formData[name]}
+            value={getDefaultTextValue(formData[name], defaultValue)}
             onChange={e =>
               actions.setFormData({ ...formData, [name]: e.target.value })
             }

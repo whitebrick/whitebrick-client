@@ -14,7 +14,8 @@ import {
 import { connect } from 'react-redux';
 import * as gql from 'gql-query-builder';
 import { actions } from '../state/actions';
-import ForeignKeyCellRenderer from './foreignKeyCellRenderer';
+import ForeignKeyCellRenderer from './cell/foreignKeyCellRenderer';
+import PrimaryKeyCellRenderer from './cell/primaryKeyCellRenderer';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
 
 type GridPropsType = {
@@ -69,7 +70,7 @@ const Grid = ({
             offset: params.request.startRow,
             order_by: {
               value: { [orderBy]: `asc` },
-              type: `[${`${schema.name}_${table.name.concat('_order_by!')}`}]`,
+              type: `[${schema.name}_${table.name.concat('_order_by!')}]`,
             },
           },
           fields,
@@ -127,6 +128,7 @@ const Grid = ({
       <AgGridReact
         frameworkComponents={{
           foreignKeyRenderer: ForeignKeyCellRenderer,
+          primaryKeyRenderer: PrimaryKeyCellRenderer,
         }}
         rowModelType="serverSide"
         // @ts-ignore
@@ -179,6 +181,17 @@ const Grid = ({
                 headerName={column.label}
                 headerTooltip={column.label}
                 cellRenderer="foreignKeyRenderer"
+              />
+            );
+          }
+          if (column.isPrimaryKey) {
+            return (
+              <AgGridColumn
+                field={column.name}
+                key={column.name}
+                headerName={column.label}
+                headerTooltip={column.label}
+                cellRenderer="primaryKeyRenderer"
               />
             );
           }
