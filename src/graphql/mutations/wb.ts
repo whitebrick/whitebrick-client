@@ -1,11 +1,15 @@
-export const CREATE_SCHEMA_MUTATION = `mutation ($name: String!, $label: String!){
-  wbCreateSchema(name: $name, label: $label){
+export const CREATE_SCHEMA_MUTATION = `mutation ($name: String!, $label: String!, $organizationOwnerName: String, $create: Boolean) {
+  wbAddOrCreateSchema(name: $name, label: $label, organizationOwnerName: $organizationOwnerName, create: $create) {
+    id
     name
   }
 }`;
 
 export const CREATE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $tableLabel: String!, $create: Boolean){
-  wbAddOrCreateTable(schemaName: $schemaName, tableName: $tableName, tableLabel: $tableLabel, create: $create)
+  wbAddOrCreateTable(schemaName: $schemaName, tableName: $tableName, tableLabel: $tableLabel, create: $create) {
+    id
+    name
+  }
 }`;
 
 export const REMOVE_OR_DELETE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $del: Boolean) {

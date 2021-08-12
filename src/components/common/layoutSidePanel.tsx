@@ -298,12 +298,12 @@ const LayoutSidePanel = ({
 
   const onSave = async () => {
     if (type === 'createDatabase') {
-      const { error, loading } = await createSchema({
-        variables: {
-          name: formData.name,
-          label: formData.label,
-        },
-      });
+      const variables = {
+        name: formData.name,
+        label: formData.label,
+        create: true,
+      };
+      const { error, loading } = await createSchema({ variables });
       if (!loading && !error) {
         fetchSchemasData();
         actions.setShow(false);
