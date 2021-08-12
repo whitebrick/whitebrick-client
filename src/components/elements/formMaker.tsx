@@ -88,7 +88,11 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
               }
               required={required}
               onChange={e => handleSelectChange(multiple, name, e)}>
-              {!multiple && <option disabled>Select {label}</option>}
+              {!multiple && (
+                <option disabled selected={!selected}>
+                  Select {label}
+                </option>
+              )}
               {options.map(option => (
                 <option
                   key={option[nestedValue]}

@@ -55,6 +55,7 @@ type LayoutSidePanelPropsType = {
   views: any[];
   defaultView: string;
   organization: OrganizationItemType;
+  organizations: OrganizationItemType[];
 };
 
 const LayoutSidePanel = ({
@@ -79,6 +80,7 @@ const LayoutSidePanel = ({
   views,
   defaultView,
   organization,
+  organizations,
   actions,
 }: LayoutSidePanelPropsType) => {
   const client = useContext(ClientContext);
@@ -150,6 +152,15 @@ const LayoutSidePanel = ({
   ];
 
   const dataBaseFormFields: any[] = [
+    {
+      name: 'organization',
+      label: 'Organization Name',
+      type: 'select',
+      options: organizations,
+      nested: true,
+      nestedValue: 'name',
+      nestedLabel: 'label',
+    },
     { name: 'name', label: 'Name', type: 'text', required: true },
     {
       name: 'label',
@@ -298,11 +309,13 @@ const LayoutSidePanel = ({
 
   const onSave = async () => {
     if (type === 'createDatabase') {
-      const variables = {
+      const variables: any = {
         name: formData.name,
         label: formData.label,
         create: true,
       };
+      if (formData.organization)
+        variables.organizationOwnerName = formData.organization;
       const { error, loading } = await createSchema({ variables });
       if (!loading && !error) {
         fetchSchemasData();
@@ -601,6 +614,7 @@ const mapStateToProps = state => ({
   views: state.views,
   defaultView: state.defaultView,
   organization: state.organization,
+  organizations: state.organizations,
 });
 
 const mapDispatchToProps = dispatch => ({
