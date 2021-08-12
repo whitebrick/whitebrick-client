@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaChevronRight, FaPen } from 'react-icons/fa';
+import { ChevronRightIcon, EditIcon } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
@@ -25,16 +25,15 @@ const OrganizationLayout = ({
       <div className="my-3">
         <div style={{ padding: `1rem` }}>
           <p>
-            <Link to="/">Home</Link> <FaChevronRight />{' '}
+            <Link to="/">Home</Link> <ChevronRightIcon />{' '}
             <Link to={`/${organization.name}`}>{organization.label}</Link>
           </p>
           <h3 className="mt-4 w-25" aria-hidden style={{ cursor: 'pointer' }}>
             <span>
               {organization.label}
               {organization?.role?.name === 'organization_administrator' && (
-                <FaPen
+                <EditIcon
                   className="ml-1"
-                  size="14px"
                   aria-hidden="true"
                   onClick={() => {
                     actions.setFormData(organization);

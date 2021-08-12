@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import * as gql from 'gql-query-builder';
-import { FaChevronRight, FaPen } from 'react-icons/fa';
+import { ChevronRightIcon, EditIcon, toaster } from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
 import { Link } from 'gatsby';
-import { toaster } from 'evergreen-ui';
 import { GridApi, ColumnApi } from 'ag-grid-community';
 import { actions } from '../../state/actions';
 
@@ -360,7 +359,7 @@ const TableLayout = ({
             <div className="my-3">
               <div style={{ padding: `1rem` }}>
                 <p>
-                  <Link to="/">Home</Link> <FaChevronRight />{' '}
+                  <Link to="/">Home</Link> <ChevronRightIcon />{' '}
                   <Link
                     to={
                       schema.organizationOwnerName
@@ -369,7 +368,7 @@ const TableLayout = ({
                     }>
                     {schema.label}
                   </Link>{' '}
-                  <FaChevronRight />
+                  <ChevronRightIcon />
                   <Link
                     to={
                       schema.organizationOwnerName
@@ -382,9 +381,8 @@ const TableLayout = ({
                 <h3 className="m-0 w-25" style={{ cursor: 'pointer' }}>
                   <span>
                     {table.label}
-                    <FaPen
+                    <EditIcon
                       className="ml-1"
-                      size="15px"
                       aria-hidden
                       onClick={() => {
                         actions.setType('editTable');

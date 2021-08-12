@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import {
-  FaUsers,
-  FaCog,
-  FaPlus,
-  FaTrash,
-  FaSync,
-  FaKeycdn,
-} from 'react-icons/fa';
+  ApplicationIcon,
+  RefreshIcon,
+  KeyIcon,
+  PlusIcon,
+  CogIcon,
+  TrashIcon,
+  NewPersonIcon,
+} from 'evergreen-ui';
 import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -82,7 +83,7 @@ const Sidebar = ({
                 aria-hidden="true"
                 className="list-group-item py-1"
                 key={organization.name}>
-                <FaUsers /> {organization.label.toLowerCase()}
+                <ApplicationIcon /> {organization.label.toLowerCase()}
               </div>
             ))}
             <div
@@ -93,7 +94,7 @@ const Sidebar = ({
                 setShow(true);
                 setType('createOrganization');
               }}>
-              <FaPlus size="14px" />
+              <PlusIcon />
               <span className="ml-2">Add an organization</span>
             </div>
           </div>
@@ -112,21 +113,20 @@ const Sidebar = ({
                 }}
                 aria-hidden="true"
                 className="list-group-item py-1 d-flex align-items-center">
-                <FaPlus size="14px" /> <span className="ml-2">New table</span>
+                <PlusIcon /> <span className="ml-2">New table</span>
               </div>
               <div className="list-group-item py-1 d-flex align-items-center">
-                <FaCog size="14px" /> <span className="ml-2">Settings</span>
+                <CogIcon /> <span className="ml-2">Settings</span>
               </div>
               <div className="list-group-item py-1 d-flex align-items-center">
-                <FaUsers size="14px" />{' '}
-                <span className="ml-2">Invite others</span>
+                <NewPersonIcon /> <span className="ml-2">Invite others</span>
               </div>
               {table.name && (
                 <div
                   className="list-group-item py-1 d-flex align-items-center"
                   aria-hidden="true"
                   onClick={deleteTable}>
-                  <FaTrash size="14px" />{' '}
+                  <TrashIcon />{' '}
                   <div className="ml-2">Delete {table.label.toLowerCase()}</div>
                 </div>
               )}
@@ -144,14 +144,14 @@ const Sidebar = ({
                   setShow(true);
                   setType('token');
                 }}>
-                <FaKeycdn size="14px" />{' '}
+                <KeyIcon />
                 <span className="ml-2">Display Token</span>
               </div>
               <div
                 className="list-group-item btn py-1 d-flex align-items-center"
                 aria-hidden="true"
                 onClick={handleRefreshToken}>
-                <FaSync size="14px" />{' '}
+                <RefreshIcon />
                 <span className="ml-2">Refresh Token</span>
               </div>
               <div

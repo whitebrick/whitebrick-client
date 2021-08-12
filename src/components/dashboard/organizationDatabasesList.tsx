@@ -4,8 +4,7 @@ import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
-import { FaCog } from 'react-icons/fa';
-import { AddIcon } from 'evergreen-ui';
+import { AddIcon, CogIcon } from 'evergreen-ui';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
 
@@ -35,7 +34,7 @@ const OrganizationDatabasesList = ({
             type="submit"
             className="btn btn-sm btn-light"
             onClick={() => navigate(`/${organization.name}`)}>
-            <FaCog />
+            <CogIcon />
           </button>
         </div>
       )}
