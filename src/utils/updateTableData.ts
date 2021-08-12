@@ -23,5 +23,7 @@ export const updateTableData = (
     fields: ['affected_rows'],
   });
   const fetchData = async () => client.request(operation);
-  fetchData().finally(() => actions.setShow(false));
+  fetchData().finally(() => {
+    if (actions) actions.setShow(false);
+  });
 };

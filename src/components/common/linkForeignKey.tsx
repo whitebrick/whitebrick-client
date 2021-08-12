@@ -2,13 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import * as gql from 'gql-query-builder';
-import { ClientContext } from 'graphql-hooks';
+import { ClientContext, useManualQuery } from 'graphql-hooks';
 import { ColDef } from 'ag-grid-community';
 import SelectGrid from './selectGrid';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { actions } from '../../state/actions';
 import Modal from '../elements/modal';
+import { updateTableData } from '../../utils/updateTableData';
+import { SCHEMA_TABLE_BY_NAME_QUERY } from '../../graphql/queries/wb';
 
 type LinkForeignKey = {
   show: boolean;
@@ -36,15 +37,26 @@ const LinkForeignKey = ({
   const client = useContext(ClientContext);
   const [relTable, setRelTable] = useState('');
   const [tableColumns, setTableColumns] = useState([]);
+  const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
 
   useEffect(() => {
+    const fetchSchemaTable = async table => {
+      const { data } = await fetchSchemaTableByName({
+        variables: {
+          schemaName: schema.name,
+          tableName: table,
+          withColumns: true,
+          withSettings: true,
+        },
+      });
+      return data;
+    };
     const c = columns.filter(obj => obj.name === column.colId)[0];
-    const tableColumns = tables.filter(
-      t => t.name === c.foreignKeys[0].relTableName,
-    )[0].columns;
-    setRelTable(c.foreignKeys[0].relTableName);
-    setTableColumns(tableColumns);
-  }, [tables, columns, column]);
+    fetchSchemaTable(c.foreignKeys[0].relTableName).then(t => {
+      setRelTable(c.foreignKeys[0].relTableName);
+      setTableColumns(t.wbMyTableByName.columns);
+    });
+  }, [tables, columns, column, fetchSchemaTableByName, schema.name]);
 
   const updateValue = async (row, relData) => {
     const variables = { where: {}, _set: {} };
@@ -57,22 +69,7 @@ const LinkForeignKey = ({
     });
     variables._set[colDef.field] =
       relData[colDef.field.split('_').reverse()[0]];
-    const operation = gql.mutation({
-      operation: ''.concat('update_', `${schema.name}_${table.name}`),
-      variables: {
-        where: {
-          value: variables.where,
-          type: `${`${schema.name}_${table.name}`}_bool_exp`,
-          required: true,
-        },
-        _set: {
-          value: variables._set,
-          type: `${`${schema.name}_${table.name}`}_set_input`,
-        },
-      },
-      fields: ['affected_rows'],
-    });
-    await client.request(operation);
+    updateTableData(schema.name, table.name, variables, client, null);
   };
 
   const onRowClick = relData =>

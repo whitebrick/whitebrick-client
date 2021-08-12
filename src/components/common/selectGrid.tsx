@@ -31,7 +31,7 @@ const SelectGrid = ({
       const { data: t } = await client.request(operation);
       return t;
     };
-    if (tableName) {
+    if (tableName && columns.length > 0) {
       fetchTableData(tableName).then(r =>
         setData(r[`${schema.name}_${tableName}`]),
       );
