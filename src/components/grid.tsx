@@ -57,7 +57,7 @@ const Grid = ({
     columnAPI.getAllColumns().forEach(function ids(column) {
       allColumnIds.push(column.colId);
     });
-    if (allColumnIds.length > 4) columnAPI.autoSizeColumns(allColumnIds, true);
+    if (allColumnIds.length > 4) columnAPI.autoSizeColumns(allColumnIds, false);
     else gridAPI.sizeColumnsToFit();
   };
 
