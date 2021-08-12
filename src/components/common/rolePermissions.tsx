@@ -39,7 +39,7 @@ const RolePermissions = ({
             {Object.keys(roles)
               .reverse()
               .map(role => (
-                <Table.TextHeaderCell>
+                <Table.TextHeaderCell key={role}>
                   <div className="d-flex justify-content-center align-items-center">
                     {roles[role].label}
                   </div>
@@ -49,7 +49,11 @@ const RolePermissions = ({
           <Table.Body>
             {policies.map(policy => (
               <Table.Row key={policy}>
-                <Table.TextCell flexBasis={250} flexShrink={0} flexGrow={0}>
+                <Table.TextCell
+                  flexBasis={250}
+                  flexShrink={0}
+                  flexGrow={0}
+                  key={policy}>
                   {p[policy].description}
                 </Table.TextCell>
                 {Object.keys(roles)
@@ -57,14 +61,14 @@ const RolePermissions = ({
                   .map(role => {
                     if (p[policy].permittedRoles.includes(role))
                       return (
-                        <Table.TextCell>
+                        <Table.TextCell key={role}>
                           <div className="d-flex justify-content-center align-items-center">
                             <TickCircleIcon color="success" />
                           </div>
                         </Table.TextCell>
                       );
                     return (
-                      <Table.TextCell>
+                      <Table.TextCell key={role}>
                         <div className="d-flex justify-content-center align-items-center">
                           <CrossIcon color="danger" />
                         </div>

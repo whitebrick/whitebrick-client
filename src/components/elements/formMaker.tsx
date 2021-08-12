@@ -39,15 +39,17 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
     addNewOptionsValue = null,
     onClick = null,
     defaultValue = null,
+    defaultTextField = '',
     render = true,
   }) => {
     if (render) {
       if (type === 'text' || type === 'string')
         return (
           <TextInputField
+            key={label}
             label={label}
             placeholder={`Enter ${label}`}
-            value={!formData[name] ? defaultValue : formData[name]}
+            value={!formData[name] ? defaultTextField : formData[name]}
             onChange={e =>
               actions.setFormData({ ...formData, [name]: e.target.value })
             }
@@ -58,6 +60,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
       if (type === 'number' || type === 'integer')
         return (
           <TextInputField
+            key={label}
             label={label}
             placeholder={`Enter ${label}`}
             value={!formData[name] ? defaultValue : formData[name]}
@@ -73,17 +76,14 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
         if (nested) {
           return (
             <SelectField
+              key={label}
               label={label}
               value={
                 !formData[name] ? defaultValue : formData[name][nestedValue]
               }
               required={required}
               onChange={e => handleSelectChange(multiple, name, e)}>
-              {!multiple && (
-                <option disabled selected={!selected}>
-                  Select {label}
-                </option>
-              )}
+              {!multiple && <option disabled>Select {label}</option>}
               {options.map(option => (
                 <option
                   key={option[nestedValue]}
@@ -140,11 +140,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
               value={!formData[name] ? defaultValue : formData[name]}
               disabled={readOnly}
               onChange={e => handleSelectChange(multiple, name, e)}>
-              {!multiple && (
-                <option disabled selected>
-                  Select {name}
-                </option>
-              )}
+              {!multiple && <option disabled>Select {name}</option>}
               {options.map(option => (
                 <option key={option} value={option}>
                   {option}

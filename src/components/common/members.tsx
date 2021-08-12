@@ -238,7 +238,7 @@ const Members = ({
             users.length > 0 &&
             filteredUsers.map(user => (
               <Table.Row key={user.userId}>
-                <Table.TextCell>
+                <Table.TextCell key={user.userId}>
                   <div className="d-flex align-items-center items-center">
                     <img
                       src={gravatar.url(user.userEmail)}
