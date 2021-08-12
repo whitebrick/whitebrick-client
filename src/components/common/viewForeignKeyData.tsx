@@ -53,41 +53,39 @@ const ViewForeignKeyData = ({
       });
       return data;
     };
-    if (tables && tables.length > 0) {
-      const fields = [];
-      const fetchTableDataWithColumn = async (table, column) => {
-        await fetchSchemaTable(table).then(t => {
-          setNewColumns(t.wbMyTableByName.columns);
-          t.wbMyTableByName.columns.map(column => fields.push(column.name));
-        });
-        const operation = gql.query({
-          operation: `${schema.name}_${table}`,
-          variables: {
-            where: {
-              value: {
-                [column]: {
-                  _eq: parseInt(cellValue, 10)
-                    ? parseInt(cellValue, 10)
-                    : cellValue,
-                },
+    const fields = [];
+    const fetchTableDataWithColumn = async (table, column) => {
+      await fetchSchemaTable(table).then(t => {
+        setNewColumns(t.wbMyTableByName.columns);
+        t.wbMyTableByName.columns.map(column => fields.push(column.name));
+      });
+      const operation = gql.query({
+        operation: `${schema.name}_${table}`,
+        variables: {
+          where: {
+            value: {
+              [column]: {
+                _eq: parseInt(cellValue, 10)
+                  ? parseInt(cellValue, 10)
+                  : cellValue,
               },
-              type: `${schema.name}_${table}_bool_exp`,
             },
+            type: `${schema.name}_${table}_bool_exp`,
           },
-          fields,
-        });
-        const fetchData = async () => client.request(operation);
-        fetchData().then(({ data }) =>
-          setData(data[`${schema.name}_${table}`][0]),
-        );
-      };
-      const c = columns.filter(obj => obj.name === column.colId)[0];
-      setRelTable(c.foreignKeys[0].relTableName);
-      fetchTableDataWithColumn(
-        c.foreignKeys[0].relTableName,
-        c.foreignKeys[0].relColumnName,
+        },
+        fields,
+      });
+      const fetchData = async () => client.request(operation);
+      fetchData().then(({ data }) =>
+        setData(data[`${schema.name}_${table}`][0]),
       );
-    }
+    };
+    const c = columns.filter(obj => obj.name === column.colId)[0];
+    setRelTable(c.foreignKeys[0].relTableName);
+    fetchTableDataWithColumn(
+      c.foreignKeys[0].relTableName,
+      c.foreignKeys[0].relColumnName,
+    );
   }, [
     columns,
     column,
