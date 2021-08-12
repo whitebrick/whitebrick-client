@@ -41,26 +41,7 @@ const OrganizationDatabasesList = ({
       <div className="card-body">
         {schemas.filter(
           schema => schema.organizationOwnerName === organization.name,
-        ).length === 0 ? (
-          <div className="row">
-            <div className="col-md-6 offset-md-4">
-              <div
-                className="text-center rounded p-2"
-                style={{ backgroundColor: '#ececec', width: '60%' }}>
-                <p>You do not have any databases yet.</p>
-                <div
-                  aria-hidden
-                  onClick={() => {
-                    actions.setFormData({});
-                    actions.setType('createDatabase');
-                    actions.setShow(true);
-                  }}>
-                  <AddIcon color="info" />
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
+        ).length > 0 ? (
           <div className="row">
             {schemas
               .filter(
@@ -88,6 +69,25 @@ const OrganizationDatabasesList = ({
               }}>
               <Avatar name="+" size="75" round="12px" color="#4B5563" />
               <p className="mt-2">Add database</p>
+            </div>
+          </div>
+        ) : (
+          <div className="row">
+            <div className="col-md-6 offset-md-4">
+              <div
+                className="text-center rounded p-2"
+                style={{ backgroundColor: '#ececec', width: '60%' }}>
+                <p>You do not have any databases yet.</p>
+                <div
+                  aria-hidden
+                  onClick={() => {
+                    actions.setFormData({});
+                    actions.setType('createDatabase');
+                    actions.setShow(true);
+                  }}>
+                  <AddIcon color="info" />
+                </div>
+              </div>
             </div>
           </div>
         )}

@@ -10,6 +10,7 @@ import {
   GridReadyEvent,
   GridApi,
   GetContextMenuItems,
+  GridSizeChangedEvent,
 } from 'ag-grid-community';
 import { connect } from 'react-redux';
 import * as gql from 'gql-query-builder';
@@ -123,6 +124,9 @@ const Grid = ({
     }
   };
 
+  const onGridSizeChanged = (params: GridSizeChangedEvent) =>
+    autoSizeColumns(params.columnApi, params.api);
+
   return (
     <>
       <AgGridReact
@@ -171,6 +175,7 @@ const Grid = ({
         allowContextMenuWithControlKey
         getContextMenuItems={getContextMenuItems}
         popupParent={document.querySelector('body')}
+        onGridSizeChanged={onGridSizeChanged}
         onGridReady={onGridReady}>
         {columns.map(column => {
           if (column.foreignKeys.length > 0) {
