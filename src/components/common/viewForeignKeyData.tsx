@@ -34,6 +34,7 @@ const ViewForeignKeyData = ({
 }: ViewForeignKeyDataPropsType) => {
   const client = useContext(ClientContext);
 
+  const [label, setLabel] = useState('');
   const [newColumns, setNewColumns] = useState([]);
   const [data, setData] = useState({});
   const [changedData, setChangedData] = useState({});
@@ -56,6 +57,7 @@ const ViewForeignKeyData = ({
     const fields = [];
     const fetchTableDataWithColumn = async (table, column) => {
       await fetchSchemaTable(table).then(t => {
+        setLabel(t.wbMyTableByName.label);
         setNewColumns(t.wbMyTableByName.columns);
         t.wbMyTableByName.columns.map(column => fields.push(column.name));
       });
@@ -110,7 +112,7 @@ const ViewForeignKeyData = ({
 
   return (
     <SidePanel
-      name={`Viewing data from '${relTable}'`}
+      name={`Viewing data from '${label}' table`}
       show={show}
       setShow={setShow}
       onSave={onSave}>
