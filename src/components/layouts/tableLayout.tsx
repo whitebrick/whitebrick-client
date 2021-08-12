@@ -20,6 +20,7 @@ import Seo from '../seo';
 import Tabs from '../elements/tabs';
 import Members from '../common/members';
 import { TABLE_USERS_QUERY } from '../../graphql/queries/wb';
+import { updateTableData } from '../../utils/updateTableData';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -80,26 +81,6 @@ const TableLayout = ({
     actions.setCurrent(1);
   }, [table, actions]);
 
-  const doMutation = variables => {
-    const operation = gql.mutation({
-      operation: ''.concat('update_', `${schema.name}_${table.name}`),
-      variables: {
-        where: {
-          value: variables.where,
-          type: `${`${schema.name}_${table.name}`}_bool_exp`,
-          required: true,
-        },
-        _set: {
-          value: variables._set,
-          type: `${schema.name}_${table.name}_set_input`,
-        },
-      },
-      fields: ['affected_rows'],
-    });
-    const fetchData = async () => client.request(operation);
-    fetchData().finally(() => actions.setShow(false));
-  };
-
   const editValues = val => {
     let values = val;
     values = [...Array.from(new Set(values))];
@@ -131,7 +112,7 @@ const TableLayout = ({
       values.splice(index, 1);
       values = values.filter(el => !filteredParams.includes(el));
       setChangedValues(values);
-      doMutation(variables);
+      updateTableData(schema.name, table.name, variables, client, actions);
     });
   };
 

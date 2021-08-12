@@ -57,7 +57,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
             </div>
           </div>
         ) : (
-          <div>
+          <>
             {loaded ? (
               <>
                 {tables &&
@@ -97,7 +97,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
                 </div>
               ))
             )}
-          </div>
+          </>
         )}
       </div>
     </Pane>

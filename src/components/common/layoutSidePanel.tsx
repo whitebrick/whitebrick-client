@@ -31,6 +31,7 @@ import {
 import { actions } from '../../state/actions';
 import SidePanel from '../elements/sidePanel';
 import FormMaker from '../elements/formMaker';
+import { updateTableData } from '../../utils/updateTableData';
 
 type LayoutSidePanelPropsType = {
   show: boolean;
@@ -249,26 +250,6 @@ const LayoutSidePanel = ({
     actions.setSchemas(data.wbMySchemas);
   };
 
-  const doMutation = variables => {
-    const operation = gql.mutation({
-      operation: ''.concat('update_', `${schema.name}_${table.name}`),
-      variables: {
-        where: {
-          value: variables.where,
-          type: `${`${schema.name}_${table.name}`}_bool_exp`,
-          required: true,
-        },
-        _set: {
-          value: variables._set,
-          type: `${`${schema.name}_${table.name}`}_set_input`,
-        },
-      },
-      fields: ['affected_rows'],
-    });
-    const fetchData = async () => client.request(operation);
-    fetchData().finally(() => actions.setShow(false));
-  };
-
   const saveSettingsToDB = async () => {
     const { loading, error } = await saveUserTableSettings({
       variables: {
@@ -373,7 +354,7 @@ const LayoutSidePanel = ({
         };
       });
       variables._set = formData;
-      doMutation(variables);
+      updateTableData(schema.name, table.name, variables, client, actions);
     } else if (type === 'editTable') {
       const variables: any = {
         schemaName: schema.name,

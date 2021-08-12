@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SmallPlusIcon, ExpandAllIcon, Badge } from 'evergreen-ui';
+import { SmallPlusIcon, Badge } from 'evergreen-ui';
 import { ColDef } from 'ag-grid-community';
 import ViewForeignKeyData from './common/viewForeignKeyData';
 import LinkForeignKey from './common/linkForeignKey';
@@ -29,15 +29,13 @@ const ForeignKeyCellRenderer = ({
       <span>
         {cellValue ? (
           <div>
-            <Badge color="blue">{cellValue}</Badge>
-            <div className="float-right d-flex align-items-center">
-              <button
-                type="submit"
-                className="btn"
-                onClick={() => setShow(true)}>
-                <ExpandAllIcon />
-              </button>
-            </div>
+            <Badge
+              aria-hidden
+              color="blue"
+              style={{ cursor: 'pointer' }}
+              onClick={() => setShow(true)}>
+              {cellValue}
+            </Badge>
           </div>
         ) : (
           <div className="float-right d-flex align-items-center">

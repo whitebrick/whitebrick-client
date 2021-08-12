@@ -9,6 +9,7 @@ import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { actions } from '../../state/actions';
 import SidePanel from '../elements/sidePanel';
 import { SCHEMA_TABLE_BY_NAME_QUERY } from '../../graphql/queries/wb';
+import { updateTableData } from '../../utils/updateTableData';
 
 type ViewForeignKeyDataPropsType = {
   show: boolean;
@@ -18,6 +19,7 @@ type ViewForeignKeyDataPropsType = {
   cellValue: string;
   column: any;
   schema: SchemaItemType;
+  actions: any;
 };
 
 const ViewForeignKeyData = ({
@@ -28,11 +30,13 @@ const ViewForeignKeyData = ({
   cellValue,
   column,
   schema,
+  actions,
 }: ViewForeignKeyDataPropsType) => {
   const client = useContext(ClientContext);
 
   const [newColumns, setNewColumns] = useState([]);
   const [data, setData] = useState({});
+  const [changedData, setChangedData] = useState({});
   const [relTable, setRelTable] = useState('');
 
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
@@ -67,7 +71,7 @@ const ViewForeignKeyData = ({
                     : cellValue,
                 },
               },
-              type: `${`${schema.name}_${table}`}_bool_exp`,
+              type: `${schema.name}_${table}_bool_exp`,
             },
           },
           fields,
@@ -94,21 +98,34 @@ const ViewForeignKeyData = ({
     fetchSchemaTableByName,
   ]);
 
+  const onSave = () => {
+    const variables = { where: {}, _set: {} };
+    Object.keys(data).forEach(key => {
+      variables.where[key] = {
+        _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
+      };
+    });
+    variables._set = changedData;
+    updateTableData(schema.name, relTable, variables, client, actions);
+    setShow(false);
+  };
+
   return (
     <SidePanel
       name={`Viewing data from '${relTable}'`}
       show={show}
       setShow={setShow}
-      renderSaveButton={false}>
+      onSave={onSave}>
       <div className="w-75">
         {newColumns.map(c => (
           <>
             {c.foreignKeys.length > 0 ? (
               <TextInputField
-                label={`${c.label}: ${c.type}`}
-                value={data[c.name]}
-                contentEditable={false}
-                disabled
+                label={c.label}
+                value={changedData[c.name] ? changedData[c.name] : data[c.name]}
+                onChange={e =>
+                  setChangedData({ ...changedData, [c.name]: e.target.value })
+                }
                 hint={
                   c.foreignKeys.length > 0
                     ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
@@ -117,10 +134,11 @@ const ViewForeignKeyData = ({
               />
             ) : (
               <TextInputField
-                label={`${c.label}: ${c.type}`}
-                value={data[c.name]}
-                contentEditable={false}
-                disabled
+                label={c.label}
+                value={changedData[c.name] ? changedData[c.name] : data[c.name]}
+                onChange={e =>
+                  setChangedData({ ...changedData, [c.name]: e.target.value })
+                }
                 hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
               />
             )}
