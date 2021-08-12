@@ -4,9 +4,8 @@ import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
 import { ColumnApi, GridApi } from 'ag-grid-community';
-import { FaExternalLinkAlt } from 'react-icons/fa';
 import * as gql from 'gql-query-builder';
-import { toaster } from 'evergreen-ui';
+import { TextInputField, toaster } from 'evergreen-ui';
 import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
 import { SCHEMAS_QUERY } from '../../graphql/queries/wb';
 import {
@@ -529,61 +528,29 @@ const LayoutSidePanel = ({
       return <FormMaker fields={newTableColumnFields} />;
     if (type === 'newRow' || type === 'editRow')
       return (
-        <>
+        <div className="w-75">
           {columns.map(c => (
-            <div className="mt-3">
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-              <label>
-                {c.label}: <span className="text-small">{c.type}</span>
-              </label>
+            <>
               {c.foreignKeys.length > 0 ? (
-                <div className="input-group">
-                  <div className="input-group-prepend">
-                    <span className="input-group-text bg-light">
-                      <FaExternalLinkAlt />
-                    </span>
-                  </div>
-                  <input
-                    className="form-control"
-                    value={formData ? formData[c.name] : ''}
-                    type={c.type === 'integer' ? 'number' : c.type}
-                    onChange={e =>
-                      actions.setFormData({
-                        ...formData,
-                        [c.name]: parseInt(e.target.value, 10)
-                          ? parseInt(e.target.value, 10)
-                          : e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              ) : (
-                <input
-                  className="form-control"
+                <TextInputField
+                  label={c.label}
                   value={formData ? formData[c.name] : ''}
-                  type={c.type === 'integer' ? 'number' : c.type}
-                  onChange={e =>
-                    actions.setFormData({
-                      ...formData,
-                      [c.name]: parseInt(e.target.value, 10)
-                        ? parseInt(e.target.value, 10)
-                        : e.target.value,
-                    })
+                  hint={
+                    c.foreignKeys.length > 0
+                      ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
+                      : null
                   }
                 />
+              ) : (
+                <TextInputField
+                  label={c.label}
+                  value={formData ? formData[c.name] : ''}
+                  hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
+                />
               )}
-              {c.isPrimaryKey && (
-                <p className="text-small p-1">Note: This is a Primary Key</p>
-              )}
-              {c.foreignKeys.length > 0 && (
-                <p className="text-small p-1">
-                  Note: This is a Foreign Key to `
-                  {c.foreignKeys[0].relTableName}`
-                </p>
-              )}
-            </div>
+            </>
           ))}
-        </>
+        </div>
       );
     if (type === 'view')
       return (

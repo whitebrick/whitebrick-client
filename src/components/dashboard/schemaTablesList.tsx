@@ -38,68 +38,66 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
 
   return (
     <Pane padding={16} flex={1} background="tint1">
-      <div className="row">
-        {tables && tables.length === 0 ? (
-          <div className="col-md-6 offset-md-4">
-            <div
-              className="text-center rounded p-2"
-              style={{ backgroundColor: '#ececec', width: '60%' }}>
-              <p>You do not have any tables yet.</p>
+      {loaded ? (
+        <div className="row">
+          {tables && tables.length > 0 ? (
+            tables.map(table => (
               <div
-                aria-hidden
+                key={table.name}
+                className="col-md-2 col-sm-6 text-center btn"
+                aria-hidden="true"
                 onClick={() => {
-                  actions.setFormData({ schema });
-                  actions.setType('createTable');
-                  actions.setShow(true);
+                  if (schema.organizationOwnerName)
+                    navigate(
+                      `/${schema.organizationOwnerName}/${schema.name}/${table.name}`,
+                    );
+                  else navigate(`/db/${schema.name}/table/${table.name}`);
                 }}>
-                <AddIcon color="info" />
+                <Avatar name={table.label} size="75" round="12px" />
+                <p className="mt-2">{table.label}</p>
               </div>
-            </div>
-          </div>
-        ) : (
-          <>
-            {loaded ? (
-              <>
-                {tables &&
-                  tables.length > 0 &&
-                  tables.map(table => (
-                    <div
-                      key={table.name}
-                      className="col-md-2 col-sm-6 text-center btn"
-                      aria-hidden="true"
-                      onClick={() => {
-                        if (schema.organizationOwnerName)
-                          navigate(
-                            `/${schema.organizationOwnerName}/${schema.name}/${table.name}`,
-                          );
-                        else navigate(`/db/${schema.name}/table/${table.name}`);
-                      }}>
-                      <Avatar name={table.label} size="75" round="12px" />
-                      <p className="mt-2">{table.label}</p>
-                    </div>
-                  ))}
+            ))
+          ) : (
+            <div className="col-md-6 offset-md-4">
+              <div
+                className="text-center rounded p-2"
+                style={{ backgroundColor: '#ececec', width: '60%' }}>
+                <p>You do not have any tables yet.</p>
                 <div
-                  className="col-md-2 text-center btn"
-                  aria-hidden="true"
+                  aria-hidden
                   onClick={() => {
                     actions.setFormData({ schema });
                     actions.setType('createTable');
                     actions.setShow(true);
                   }}>
-                  <Avatar name="+" size="75" round="12px" color="#4B5563" />
-                  <p className="mt-2">Add table</p>
+                  <AddIcon color="info" />
                 </div>
-              </>
-            ) : (
-              [...Array(12)].map(e => (
-                <div className="col-md-2 text-center btn" key={e}>
-                  <Skeleton height="100px" />
-                </div>
-              ))
-            )}
-          </>
-        )}
-      </div>
+              </div>
+            </div>
+          )}
+          {tables.length > 0 && (
+            <div
+              className="col-md-2 text-center btn"
+              aria-hidden="true"
+              onClick={() => {
+                actions.setFormData({ schema });
+                actions.setType('createTable');
+                actions.setShow(true);
+              }}>
+              <Avatar name="+" size="75" round="12px" color="#4B5563" />
+              <p className="mt-2">Add table</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="row">
+          {[...Array(12)].map(e => (
+            <div className="col-md-2 text-center btn" key={e}>
+              <Skeleton height="100px" />
+            </div>
+          ))}
+        </div>
+      )}
     </Pane>
   );
 };
