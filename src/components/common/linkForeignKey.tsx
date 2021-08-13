@@ -1,14 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import { ClientContext, useManualQuery } from 'graphql-hooks';
+import { useManualQuery } from 'graphql-hooks';
 import { ColDef } from 'ag-grid-community';
 import SelectGrid from './selectGrid';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { actions } from '../../state/actions';
 import Modal from '../elements/modal';
-import { updateTableData } from '../../utils/updateTableData';
 import { SCHEMA_TABLE_BY_NAME_QUERY } from '../../graphql/queries/wb';
 
 type LinkForeignKey = {
@@ -21,6 +20,7 @@ type LinkForeignKey = {
   columns: ColumnItemType[];
   schema: SchemaItemType;
   colDef: ColDef;
+  updateData: (row, relData, colDef, schemaName, tableName) => any;
 };
 
 const LinkForeignKey = ({
@@ -33,8 +33,8 @@ const LinkForeignKey = ({
   tables,
   schema,
   colDef,
+  updateData,
 }: LinkForeignKey) => {
-  const client = useContext(ClientContext);
   const [relTable, setRelTable] = useState('');
   const [tableColumns, setTableColumns] = useState([]);
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
@@ -58,22 +58,10 @@ const LinkForeignKey = ({
     });
   }, [tables, columns, column, fetchSchemaTableByName, schema.name]);
 
-  const updateValue = async (row, relData) => {
-    const variables = { where: {}, _set: {} };
-    Object.keys(row).forEach(key => {
-      if (row[key]) {
-        variables.where[key] = {
-          _eq: parseInt(row[key], 10) ? parseInt(row[key], 10) : row[key],
-        };
-      }
-    });
-    variables._set[colDef.field] =
-      relData[colDef.field.split('_').reverse()[0]];
-    updateTableData(schema.name, table.name, variables, client, null);
-  };
-
   const onRowClick = relData =>
-    updateValue(row, relData).finally(() => setShow(false));
+    updateData(row, relData, colDef, schema.name, table.name).finally(() =>
+      setShow(false),
+    );
 
   return (
     <Modal

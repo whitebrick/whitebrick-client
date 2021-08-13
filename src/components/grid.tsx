@@ -17,6 +17,7 @@ import * as gql from 'gql-query-builder';
 import { actions } from '../state/actions';
 import ForeignKeyCellRenderer from './cell/foreignKeyCellRenderer';
 import PrimaryKeyCellRenderer from './cell/primaryKeyCellRenderer';
+import ForeignKeyEditor from './cell/foreignKeyEditor';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
 
 type GridPropsType = {
@@ -131,6 +132,7 @@ const Grid = ({
     <>
       <AgGridReact
         frameworkComponents={{
+          foreignKeyEditor: ForeignKeyEditor,
           foreignKeyRenderer: ForeignKeyCellRenderer,
           primaryKeyRenderer: PrimaryKeyCellRenderer,
         }}
@@ -185,6 +187,7 @@ const Grid = ({
                 key={column.name}
                 headerName={column.label}
                 headerTooltip={column.label}
+                cellEditor="foreignKeyEditor"
                 cellRenderer="foreignKeyRenderer"
               />
             );
