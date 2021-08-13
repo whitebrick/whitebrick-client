@@ -5,6 +5,14 @@ export const CREATE_SCHEMA_MUTATION = `mutation ($name: String!, $label: String!
   }
 }`;
 
+export const UPDATE_SCHEMA_MUTATION = `mutation ($name: String!, $newSchemaName: String, $newSchemaLabel: String, $newOrganizationOwnerName: String) {
+  wbUpdateSchema(name: $name, newSchemaName: $newSchemaName, newSchemaLabel: $newSchemaLabel, newOrganizationOwnerName: $newOrganizationOwnerName) {
+    id
+    name
+    label
+  }
+}`;
+
 export const CREATE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $tableLabel: String!, $create: Boolean){
   wbAddOrCreateTable(schemaName: $schemaName, tableName: $tableName, tableLabel: $tableLabel, create: $create) {
     id

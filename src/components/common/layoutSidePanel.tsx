@@ -20,6 +20,7 @@ import {
   SAVE_TABLE_USER_SETTINGS,
   UPDATE_COLUMN_MUTATION,
   UPDATE_ORGANIZATION_MUTATION,
+  UPDATE_SCHEMA_MUTATION,
 } from '../../graphql/mutations/wb';
 import {
   ColumnItemType,
@@ -85,6 +86,7 @@ const LayoutSidePanel = ({
 }: LayoutSidePanelPropsType) => {
   const client = useContext(ClientContext);
   const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
+  const [updateSchema] = useMutation(UPDATE_SCHEMA_MUTATION);
   const [createTable] = useMutation(CREATE_TABLE_MUTATION);
   const [createOrganization] = useMutation(CREATE_ORGANIZATION_MUTATION);
   const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
@@ -153,7 +155,7 @@ const LayoutSidePanel = ({
 
   const dataBaseFormFields: any[] = [
     {
-      name: 'organization',
+      name: 'organizationOwnerName',
       label: 'Organization Name',
       type: 'select',
       options: organizations,
@@ -314,8 +316,8 @@ const LayoutSidePanel = ({
         label: formData.label,
         create: true,
       };
-      if (formData.organization)
-        variables.organizationOwnerName = formData.organization;
+      if (formData.organizationOwnerName)
+        variables.organizationOwnerName = formData.organizationOwnerName;
       const { error, loading } = await createSchema({ variables });
       if (!loading && !error) {
         fetchSchemasData();
@@ -340,14 +342,22 @@ const LayoutSidePanel = ({
       });
       if (!loading && !error) actions.setShow(false);
     } else if (type === 'editDatabase') {
-      // implement the edit schema once we have API
+      const variables: any = { name: schema.name };
+      if (formData.name !== schema.name)
+        variables.newSchemaName = formData.name;
+      if (formData.label !== schema.label)
+        variables.newSchemaLabel = formData.label;
+      if (formData.organizationOwnerName !== schema.organizationOwnerName)
+        variables.newOrganizationOwnerName = formData.organizationOwnerName;
+      const { error, loading } = await updateSchema({ variables });
+      if (!loading && !error) actions.setShow(false);
     } else if (type === 'newRow') {
       const operation = gql.mutation({
         operation: ''.concat('insert_', `${schema.name}_${table.name}`),
         variables: {
           objects: {
             value: formData,
-            type: `[${`${schema.name}_${table.name}`}_insert_input!]`,
+            type: `[${schema.name}_${table.name}_insert_input!]`,
             required: true,
           },
         },
