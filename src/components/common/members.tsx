@@ -152,7 +152,7 @@ const Members = ({
       if (user.userEmail === u.email)
         return (
           <>
-            {roles[user.role.name].label}
+            {roles[user.role.name]?.label}
             <IconButton
               icon={LogOutIcon}
               appearance="primary"
