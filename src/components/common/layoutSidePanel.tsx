@@ -162,6 +162,8 @@ const LayoutSidePanel = ({
       nested: true,
       nestedValue: 'name',
       nestedLabel: 'label',
+      addNewOptions: true,
+      addNewOptionsValue: ['--'],
     },
     { name: 'name', label: 'Name', type: 'text', required: true },
     {
@@ -316,7 +318,10 @@ const LayoutSidePanel = ({
         label: formData.label,
         create: true,
       };
-      if (formData.organizationOwnerName)
+      if (
+        formData.organizationOwnerName &&
+        formData.organizationOwnerName !== '--'
+      )
         variables.organizationOwnerName = formData.organizationOwnerName;
       const { error, loading } = await createSchema({ variables });
       if (!loading && !error) {
@@ -347,7 +352,10 @@ const LayoutSidePanel = ({
         variables.newSchemaName = formData.name;
       if (formData.label !== schema.label)
         variables.newSchemaLabel = formData.label;
-      if (formData.organizationOwnerName !== schema.organizationOwnerName)
+      if (
+        formData.organizationOwnerName !== schema.organizationOwnerName &&
+        formData.organizationOwnerName !== '--'
+      )
         variables.newOrganizationOwnerName = formData.organizationOwnerName;
       const { error, loading } = await updateSchema({ variables });
       if (!loading && !error) actions.setShow(false);
@@ -363,8 +371,7 @@ const LayoutSidePanel = ({
         },
         fields: ['affected_rows'],
       });
-      const fetchData = async () => client.request(operation);
-      await fetchData();
+      await client.request(operation);
       actions.setShow(false);
     } else if (type === 'editRow') {
       const variables = { where: {}, _set: {} };
