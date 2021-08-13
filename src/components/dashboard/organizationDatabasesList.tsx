@@ -4,9 +4,10 @@ import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
-import { AddIcon, CogIcon } from 'evergreen-ui';
+import { CogIcon } from 'evergreen-ui';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
+import NoData from '../common/noData';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -72,24 +73,7 @@ const OrganizationDatabasesList = ({
             </div>
           </div>
         ) : (
-          <div className="row">
-            <div className="col-md-6 offset-md-4">
-              <div
-                className="text-center rounded p-2"
-                style={{ backgroundColor: '#ececec', width: '60%' }}>
-                <p>You do not have any databases yet.</p>
-                <div
-                  aria-hidden
-                  onClick={() => {
-                    actions.setFormData({});
-                    actions.setType('createDatabase');
-                    actions.setShow(true);
-                  }}>
-                  <AddIcon color="info" />
-                </div>
-              </div>
-            </div>
-          </div>
+          <NoData type="createDatabase" name="database" />
         )}
       </div>
     </div>

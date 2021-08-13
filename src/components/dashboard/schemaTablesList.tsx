@@ -5,11 +5,12 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import Skeleton from 'react-loading-skeleton';
-import { Pane, AddIcon } from 'evergreen-ui';
+import { Pane } from 'evergreen-ui';
 import { useManualQuery } from 'graphql-hooks';
 import { SchemaItemType, TableItemType } from '../../types';
 import { actions } from '../../state/actions';
 import { SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
+import NoData from '../common/noData';
 
 type TablesPropsType = {
   schema: SchemaItemType;
@@ -58,22 +59,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
               </div>
             ))
           ) : (
-            <div className="col-md-6 offset-md-4">
-              <div
-                className="text-center rounded p-2"
-                style={{ backgroundColor: '#ececec', width: '60%' }}>
-                <p>You do not have any tables yet.</p>
-                <div
-                  aria-hidden
-                  onClick={() => {
-                    actions.setFormData({ schema });
-                    actions.setType('createTable');
-                    actions.setShow(true);
-                  }}>
-                  <AddIcon color="info" />
-                </div>
-              </div>
-            </div>
+            <NoData type="createTable" name="table" />
           )}
           {tables.length > 0 && (
             <div
