@@ -82,22 +82,34 @@ const Grid = ({
           fields: [{ aggregate: ['count'] }],
         });
         const { data: c } = await client.request(operationAgg);
-        actions.setRowCount(
-          c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-        );
-        client.subscriptionClient.request(subscription).subscribe({
-          next({ data }) {
-            params.successCallback(
-              data[`${schema.name}_${table.name}`],
-              c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-            );
-            autoSizeColumns(params.columnApi, params.api);
-          },
-          error(error) {
-            console.error(error);
-            params.failCallback();
-          },
-        });
+        if (c && c[`${schema.name}_${table.name}_aggregate`]) {
+          actions.setRowCount(
+            c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
+          );
+          client.subscriptionClient.request(subscription).subscribe({
+            next({ data }) {
+              params.successCallback(
+                data[`${schema.name}_${table.name}`],
+                c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
+              );
+              autoSizeColumns(params.columnApi, params.api);
+            },
+            error(error) {
+              console.error(error);
+              params.failCallback();
+            },
+          });
+        } else {
+          columns.push({
+            default: '',
+            referencedBy: undefined,
+            type: 'string',
+            name: 'welcome',
+            label: 'Welcome',
+            foreignKeys: [],
+            isPrimaryKey: false,
+          });
+        }
       },
     };
   };

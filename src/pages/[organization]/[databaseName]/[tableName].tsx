@@ -61,9 +61,9 @@ const OrgSchemaTable = ({
       if (!loading) {
         if (error) setError(error);
         else {
-          actions.setTable(data.wbMyTableByName);
-          actions.setColumns(data.wbMyTableByName.columns);
-          actions.setOrderBy(data.wbMyTableByName.columns[0].name);
+          actions.setTable(data?.wbMyTableByName);
+          actions.setColumns(data?.wbMyTableByName?.columns);
+          actions.setOrderBy(data?.wbMyTableByName?.columns[0]?.name);
           if (data.wbMyTableByName.settings) {
             if (
               data.wbMyTableByName.settings.views &&
