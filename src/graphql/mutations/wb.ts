@@ -60,6 +60,11 @@ export const CREATE_ORGANIZATION_MUTATION = `mutation ($name: String!, $label: S
   }
 }`;
 
+export const DELETE_ORGANIZATION_MUTATION = `mutation ($name: String!) {
+  wbDeleteOrganization(name: $name)
+}
+`;
+
 export const SET_USERS_ROLE_MUTATION = `mutation ($organizationName: String!, $roleName: String!, $userEmails: [String]!) {
   wbSetOrganizationUsersRole(organizationName: $organizationName, roleName: $roleName, userEmails: $userEmails)
 }`;

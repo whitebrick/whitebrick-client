@@ -45,6 +45,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
     addNewOptionsValue = null,
     onClick = null,
     defaultValue = null,
+    buttonStyle = 'btn-outline-primary',
     render = true,
   }) => {
     if (render) {
@@ -183,7 +184,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
         return (
           <button
             type="submit"
-            className="btn btn-outline-primary btn-block mt-5"
+            className={`btn ${buttonStyle} btn-block mt-5`}
             onClick={onClick}>
             {label}
           </button>

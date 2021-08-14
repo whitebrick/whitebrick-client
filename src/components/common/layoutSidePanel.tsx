@@ -164,6 +164,7 @@ const LayoutSidePanel = ({
       nestedLabel: 'label',
       addNewOptions: true,
       addNewOptionsValue: ['--'],
+      defaultValue: '--',
     },
     { name: 'name', label: 'Name', type: 'text', required: true },
     {

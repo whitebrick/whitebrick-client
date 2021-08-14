@@ -4,10 +4,12 @@ import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
-import { CogIcon } from 'evergreen-ui';
+import { TrashIcon, IconButton } from 'evergreen-ui';
+import { useMutation } from 'graphql-hooks';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
 import NoData from '../common/noData';
+import { DELETE_ORGANIZATION_MUTATION } from '../../graphql/mutations/wb';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -26,17 +28,27 @@ const OrganizationDatabasesList = ({
   actions,
   renderTitle = true,
 }: DatabasesPropsType) => {
+  const [deleteOrganizationMutation] = useMutation(
+    DELETE_ORGANIZATION_MUTATION,
+  );
+  const deleteOrganization = async (organizationName: string) => {
+    await deleteOrganizationMutation({
+      variables: { name: organizationName },
+    });
+  };
+
   return (
     <div className="card my-4">
       {renderTitle && (
         <div className="card-header d-flex justify-content-between align-items-center">
           <h6>{organization.label}</h6>
-          <button
-            type="submit"
-            className="btn btn-sm btn-light"
-            onClick={() => navigate(`/${organization.name}`)}>
-            <CogIcon />
-          </button>
+          {organization?.role?.name === 'organization_administrator' && (
+            <IconButton
+              appearance="minimal"
+              icon={TrashIcon}
+              onClick={() => deleteOrganization(organization.name)}
+            />
+          )}
         </div>
       )}
       <div className="card-body">
