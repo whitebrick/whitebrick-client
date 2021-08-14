@@ -13,6 +13,11 @@ export const UPDATE_SCHEMA_MUTATION = `mutation ($name: String!, $newSchemaName:
   }
 }`;
 
+export const REMOVE_OR_DELETE_SCHEMA_MUTATION = `mutation ($name: String!, $del: Boolean) {
+  wbRemoveOrDeleteSchema(name: $name, del: $del)
+}
+`;
+
 export const CREATE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $tableLabel: String!, $create: Boolean){
   wbAddOrCreateTable(schemaName: $schemaName, tableName: $tableName, tableLabel: $tableLabel, create: $create) {
     id

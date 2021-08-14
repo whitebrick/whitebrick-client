@@ -13,7 +13,10 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { useManualQuery, useMutation } from 'graphql-hooks';
 import { actions } from '../state/actions';
-import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../graphql/mutations/wb';
+import {
+  REMOVE_OR_DELETE_SCHEMA_MUTATION,
+  REMOVE_OR_DELETE_TABLE_MUTATION,
+} from '../graphql/mutations/wb';
 import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
 import { ORGANIZATIONS_QUERY } from '../graphql/queries/wb';
 
@@ -42,6 +45,9 @@ const Sidebar = ({
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
+  const [removeOrDeleteSchemaMutation] = useMutation(
+    REMOVE_OR_DELETE_SCHEMA_MUTATION,
+  );
   const [fetchOrganizations] = useManualQuery(ORGANIZATIONS_QUERY);
 
   useEffect(() => {
@@ -53,7 +59,6 @@ const Sidebar = ({
   }, [actions, fetchOrganizations]);
 
   const deleteTable = async () => {
-    actions.setTable('');
     await removeOrDeleteTableMutation({
       variables: {
         schemaName: schema.name,
@@ -61,12 +66,24 @@ const Sidebar = ({
         del: true,
       },
     });
+    actions.setTable('');
+    window.location.replace('/');
+  };
+
+  const deleteSchema = async () => {
+    await removeOrDeleteSchemaMutation({
+      variables: {
+        name: schema.name,
+        del: true,
+      },
+    });
+    actions.setSchema({});
+    window.location.replace('/');
   };
 
   const handleRefreshToken = async () => {
     await getAccessTokenSilently({ ignoreCache: true });
     const tokenClaims = await getIdTokenClaims();
-    // eslint-disable-next-line no-underscore-dangle
     actions.setAccessToken(tokenClaims.__raw);
     actions.setTokenClaims(tokenClaims);
   };
@@ -120,6 +137,13 @@ const Sidebar = ({
               </div>
               <div className="list-group-item py-1 d-flex align-items-center">
                 <NewPersonIcon /> <span className="ml-2">Invite others</span>
+              </div>
+              <div
+                className="list-group-item py-1 d-flex align-items-center text-danger"
+                aria-hidden="true"
+                onClick={deleteSchema}>
+                <TrashIcon />
+                <div className="ml-2">Delete {schema.label}</div>
               </div>
               {table.name && (
                 <div
