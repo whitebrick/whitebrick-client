@@ -7,6 +7,7 @@ type ModalType = {
   title: string;
   label?: string;
   onSave?: () => void;
+  intent?: any;
   hasFooter?: boolean;
   width?: number;
   children: React.ReactNode;
@@ -17,6 +18,7 @@ const defaultProps = {
   onSave: null,
   hasFooter: true,
   width: 560,
+  intent: 'info',
 };
 
 const Modal = ({
@@ -24,6 +26,7 @@ const Modal = ({
   setIsShown,
   title,
   label,
+  intent = 'info',
   width = 560,
   hasFooter = true,
   onSave = null,
@@ -32,6 +35,7 @@ const Modal = ({
   return (
     <Dialog
       isShown={isShown}
+      intent={intent}
       title={title}
       onCloseComplete={() => setIsShown(false)}
       confirmLabel={label}

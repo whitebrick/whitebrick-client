@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ApplicationIcon,
   RefreshIcon,
@@ -19,6 +19,7 @@ import {
 } from '../graphql/mutations/wb';
 import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
 import { ORGANIZATIONS_QUERY } from '../graphql/queries/wb';
+import DeleteModal from './common/deleteModal';
 
 type SidebarPropsType = {
   setFormData: (value: any) => void;
@@ -45,10 +46,9 @@ const Sidebar = ({
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
-  const [removeOrDeleteSchemaMutation] = useMutation(
-    REMOVE_OR_DELETE_SCHEMA_MUTATION,
-  );
   const [fetchOrganizations] = useManualQuery(ORGANIZATIONS_QUERY);
+
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,15 +70,8 @@ const Sidebar = ({
     window.location.replace('/');
   };
 
-  const deleteSchema = async () => {
-    await removeOrDeleteSchemaMutation({
-      variables: {
-        name: schema.name,
-        del: true,
-      },
-    });
-    actions.setSchema({});
-    window.location.replace('/');
+  const deleteSchema = () => {
+    setShowDelete(true);
   };
 
   const handleRefreshToken = async () => {
@@ -145,6 +138,9 @@ const Sidebar = ({
                 <TrashIcon />
                 <div className="ml-2">Delete {schema.label}</div>
               </div>
+              {showDelete && (
+                <DeleteModal show={showDelete} setShow={setShowDelete} />
+              )}
               {table.name && (
                 <div
                   className="list-group-item py-1 d-flex align-items-center"
