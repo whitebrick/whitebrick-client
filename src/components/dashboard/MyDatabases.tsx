@@ -5,6 +5,7 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import { actions } from '../../state/actions';
+import AddData from '../common/addData';
 
 type MyDatabasesPropsType = {
   schemas: any[];
@@ -48,17 +49,7 @@ const MyDatabases = ({
               </div>
             ))}
             {name === 'My Databases' && (
-              <div
-                className="col-md-2 col-sm-6 text-center btn"
-                aria-hidden="true"
-                onClick={() => {
-                  actions.setFormData({});
-                  actions.setType('createDatabase');
-                  actions.setShow(true);
-                }}>
-                <Avatar name="+" size="75" round="12px" color="#4B5563" />
-                <p className="mt-2">Add database</p>
-              </div>
+              <AddData name="database" type="createDatabase" />
             )}
           </div>
         </div>

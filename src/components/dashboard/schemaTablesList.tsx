@@ -11,6 +11,7 @@ import { SchemaItemType, TableItemType } from '../../types';
 import { actions } from '../../state/actions';
 import { SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
 import NoData from '../common/noData';
+import AddData from '../common/addData';
 
 type TablesPropsType = {
   schema: SchemaItemType;
@@ -61,19 +62,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
           ) : (
             <NoData type="createTable" name="table" />
           )}
-          {tables.length > 0 && (
-            <div
-              className="col-md-2 text-center btn"
-              aria-hidden="true"
-              onClick={() => {
-                actions.setFormData({ schema });
-                actions.setType('createTable');
-                actions.setShow(true);
-              }}>
-              <Avatar name="+" size="75" round="12px" color="#4B5563" />
-              <p className="mt-2">Add table</p>
-            </div>
-          )}
+          {tables.length > 0 && <AddData type="createTable" name="table" />}
         </div>
       ) : (
         <div className="row">

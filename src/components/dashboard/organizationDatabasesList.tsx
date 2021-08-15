@@ -10,6 +10,7 @@ import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
 import NoData from '../common/noData';
 import { DELETE_ORGANIZATION_MUTATION } from '../../graphql/mutations/wb';
+import AddData from '../common/addData';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -72,17 +73,7 @@ const OrganizationDatabasesList = ({
                   <p className="mt-2">{schema.label}</p>
                 </div>
               ))}
-            <div
-              className="col-md-2 col-sm-6 text-center btn"
-              aria-hidden="true"
-              onClick={() => {
-                actions.setFormData({});
-                actions.setType('createDatabase');
-                actions.setShow(true);
-              }}>
-              <Avatar name="+" size="75" round="12px" color="#4B5563" />
-              <p className="mt-2">Add database</p>
-            </div>
+            <AddData name="database" type="createDatabase" />
           </div>
         ) : (
           <NoData type="createDatabase" name="database" />
