@@ -5,16 +5,32 @@ import { TextInputField, Dialog } from 'evergreen-ui';
 import { useMutation } from 'graphql-hooks';
 import { SchemaItemType } from '../../types';
 import { actions } from '../../state/actions';
-import { REMOVE_OR_DELETE_SCHEMA_MUTATION } from '../../graphql/mutations/wb';
+import {
+  REMOVE_OR_DELETE_SCHEMA_MUTATION,
+  DELETE_ORGANIZATION_MUTATION,
+} from '../../graphql/mutations/wb';
 
 type DeleteModalType = {
   schema: SchemaItemType;
   actions: any;
   show: boolean;
   setShow: any;
+  type: string;
+  org?: any;
 };
 
-const DeleteModal = ({ schema, actions, show, setShow }: DeleteModalType) => {
+const defaultProps = {
+  org: null,
+};
+
+const DeleteModal = ({
+  schema,
+  actions,
+  show,
+  setShow,
+  type,
+  org = null,
+}: DeleteModalType) => {
   const [value, setValue] = useState('');
   const [error, setError] = useState(false);
 
@@ -22,18 +38,35 @@ const DeleteModal = ({ schema, actions, show, setShow }: DeleteModalType) => {
     REMOVE_OR_DELETE_SCHEMA_MUTATION,
   );
 
+  const [deleteOrganizationMutation] = useMutation(
+    DELETE_ORGANIZATION_MUTATION,
+  );
+
   const onSave = async () => {
-    if (value === schema.name) {
-      await removeOrDeleteSchemaMutation({
-        variables: {
-          name: schema.name,
-          del: true,
-        },
-      });
-      actions.setSchema({});
-      window.location.replace('/');
+    if (type === 'organization') {
+      if (value === org.name) {
+        await deleteOrganizationMutation({
+          variables: { name: org.name },
+        });
+        window.location.replace('/');
+      } else {
+        setError(true);
+      }
+    } else if (type === 'database') {
+      if (value === schema.name) {
+        await removeOrDeleteSchemaMutation({
+          variables: {
+            name: schema.name,
+            del: true,
+          },
+        });
+        actions.setSchema({});
+        window.location.replace('/');
+      } else {
+        setError(true);
+      }
     } else {
-      setError(true);
+      // To be implemented (table section)
     }
   };
 
@@ -44,25 +77,30 @@ const DeleteModal = ({ schema, actions, show, setShow }: DeleteModalType) => {
   return (
     <Dialog
       isShown={show}
-      title={`Delete Database ${schema.name}`}
+      title={`Delete ${type} ${
+        type === 'organization' ? org.name : schema.name
+      }`}
       intent="danger"
       onConfirm={onSave}
       onCancel={onCancel}>
       <TextInputField
         label="Confirm action"
-        description={`Enter ${schema.name} to confirm delete`}
+        description={`Enter ${
+          type === 'organization' ? org.name : schema.name
+        } to confirm delete`}
         value={value}
         onChange={e => setValue(e.target.value)}
       />
       {error && (
         <div className="alert alert-danger" role="alert">
-          Oops, you must have mispelled database name.
+          Oops, you must have mispelled {type} name.
         </div>
       )}
     </Dialog>
   );
 };
 
+DeleteModal.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   schema: state.schema,
 });

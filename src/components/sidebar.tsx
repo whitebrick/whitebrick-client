@@ -139,7 +139,11 @@ const Sidebar = ({
                 <div className="ml-2">Delete {schema.label}</div>
               </div>
               {showDelete && (
-                <DeleteModal show={showDelete} setShow={setShowDelete} />
+                <DeleteModal
+                  show={showDelete}
+                  setShow={setShowDelete}
+                  type="database"
+                />
               )}
               {table.name && (
                 <div

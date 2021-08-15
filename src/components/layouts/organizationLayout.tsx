@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ChevronRightIcon,
   EditIcon,
@@ -9,12 +9,11 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { Link } from 'gatsby';
-import { useMutation } from 'graphql-hooks';
 import { actions } from '../../state/actions';
 import Tabs from '../elements/tabs';
 import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
 import Members from '../common/members';
-import { DELETE_ORGANIZATION_MUTATION } from '../../graphql/mutations/wb';
+import DeleteModal from '../common/deleteModal';
 
 type OrganizationLayoutPropsType = {
   organization: any;
@@ -27,13 +26,10 @@ const OrganizationLayout = ({
   refetch,
   actions,
 }: OrganizationLayoutPropsType) => {
-  const [deleteOrganizationMutation] = useMutation(
-    DELETE_ORGANIZATION_MUTATION,
-  );
-  const deleteOrganization = async () => {
-    await deleteOrganizationMutation({
-      variables: { name: organization.name },
-    });
+  const [showDelete, setShowDelete] = useState(false);
+
+  const deleteOrganization = () => {
+    setShowDelete(true);
   };
 
   return (
@@ -63,12 +59,16 @@ const OrganizationLayout = ({
                     <IconButton
                       appearance="minimal"
                       icon={TrashIcon}
-                      onClick={() =>
-                        deleteOrganization().finally(() =>
-                          window.location.replace('/'),
-                        )
-                      }
+                      onClick={() => deleteOrganization()}
                     />
+                    {showDelete && (
+                      <DeleteModal
+                        show={showDelete}
+                        setShow={setShowDelete}
+                        type="organization"
+                        org={organization}
+                      />
+                    )}
                   </span>
                 )}
               </span>

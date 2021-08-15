@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
@@ -11,6 +11,7 @@ import { OrganizationItemType, SchemaItemType } from '../../types';
 import NoData from '../common/noData';
 import { DELETE_ORGANIZATION_MUTATION } from '../../graphql/mutations/wb';
 import AddData from '../common/addData';
+import DeleteModal from '../common/deleteModal';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -32,10 +33,11 @@ const OrganizationDatabasesList = ({
   const [deleteOrganizationMutation] = useMutation(
     DELETE_ORGANIZATION_MUTATION,
   );
-  const deleteOrganization = async (organizationName: string) => {
-    await deleteOrganizationMutation({
-      variables: { name: organizationName },
-    });
+
+  const [showDelete, setShowDelete] = useState(false);
+
+  const deleteOrganization = () => {
+    setShowDelete(true);
   };
 
   return (
@@ -44,11 +46,21 @@ const OrganizationDatabasesList = ({
         <div className="card-header d-flex justify-content-between align-items-center">
           <h6>{organization.label}</h6>
           {organization?.role?.name === 'organization_administrator' && (
-            <IconButton
-              appearance="minimal"
-              icon={TrashIcon}
-              onClick={() => deleteOrganization(organization.name)}
-            />
+            <div>
+              <IconButton
+                appearance="minimal"
+                icon={TrashIcon}
+                onClick={() => deleteOrganization()}
+              />
+              {showDelete && (
+                <DeleteModal
+                  show={showDelete}
+                  setShow={setShowDelete}
+                  type="organization"
+                  org={organization}
+                />
+              )}
+            </div>
           )}
         </div>
       )}
