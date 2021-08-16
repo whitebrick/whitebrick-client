@@ -208,7 +208,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
                 type="submit"
                 className="btn btn-danger btn-block"
                 onClick={onClick}>
-                Remove Foreignkey relation
+                Remove foreign key relation
               </button>
             </div>
             <div className="card-footer p-2">

@@ -77,7 +77,11 @@ const OrganizationDatabasesList = ({
                   <p className="mt-2">{schema.label}</p>
                 </div>
               ))}
-            <AddData name="database" type="createDatabase" />
+            <AddData
+              name="database"
+              type="createDatabase"
+              extraParams={{ organization }}
+            />
           </div>
         ) : (
           <NoData type="createDatabase" name="database" />

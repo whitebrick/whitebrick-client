@@ -155,7 +155,7 @@ const LayoutSidePanel = ({
 
   const dataBaseFormFields: any[] = [
     {
-      name: 'organizationOwnerName',
+      name: 'organization',
       label: 'Organization Name',
       type: 'select',
       options: organizations,
@@ -319,11 +319,8 @@ const LayoutSidePanel = ({
         label: formData.label,
         create: true,
       };
-      if (
-        formData.organizationOwnerName &&
-        formData.organizationOwnerName !== '--'
-      )
-        variables.organizationOwnerName = formData.organizationOwnerName;
+      if (formData.organization && formData.organization !== '--')
+        variables.organizationOwnerName = formData.organization;
       const { error, loading } = await createSchema({ variables });
       if (!loading && !error) {
         fetchSchemasData();
@@ -354,10 +351,11 @@ const LayoutSidePanel = ({
       if (formData.label !== schema.label)
         variables.newSchemaLabel = formData.label;
       if (
-        formData.organizationOwnerName !== schema.organizationOwnerName &&
-        formData.organizationOwnerName !== '--'
+        typeof formData.organization === 'string' &&
+        formData.organization !== schema.organizationOwnerName &&
+        formData.organization !== '--'
       )
-        variables.newOrganizationOwnerName = formData.organizationOwnerName;
+        variables.newOrganizationOwnerName = formData.organization;
       const { error, loading } = await updateSchema({ variables });
       if (!loading && !error) actions.setShow(false);
     } else if (type === 'newRow') {

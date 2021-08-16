@@ -10,15 +10,29 @@ type AddDataType = {
   type: string;
   name: string;
   schema: SchemaItemType;
+  extraParams?: any;
 };
 
-const AddData = ({ actions, type, name, schema }: AddDataType) => {
+const defaultProps = {
+  extraParams: null,
+};
+
+const AddData = ({
+  actions,
+  type,
+  name,
+  schema,
+  extraParams = null,
+}: AddDataType) => {
+  const organization = extraParams?.organization;
   return (
     <div
       className="col-md-2 col-sm-6 text-center btn"
       aria-hidden="true"
       onClick={() => {
-        actions.setFormData(type === 'createDatabase' ? {} : { schema });
+        actions.setFormData(
+          type === 'createDatabase' ? { organization } : { schema },
+        );
         actions.setType(type);
         actions.setShow(true);
       }}>
@@ -28,6 +42,7 @@ const AddData = ({ actions, type, name, schema }: AddDataType) => {
   );
 };
 
+AddData.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   schema: state.schema,
 });
