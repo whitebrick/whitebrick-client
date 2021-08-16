@@ -74,26 +74,28 @@ const DeleteModal = ({
     setShow(false);
   };
 
+  const name = type === 'organization' ? org.name : schema.name;
+
   return (
     <Dialog
       isShown={show}
-      title={`Delete ${type} ${
-        type === 'organization' ? org.name : schema.name
-      }`}
+      title={`Delete ${type} ${name}`}
       intent="danger"
       onConfirm={onSave}
+      confirmLabel="Delete"
+      isConfirmDisabled={name !== value}
       onCancel={onCancel}>
       <TextInputField
         label="Confirm action"
-        description={`Enter ${
+        description={`Enter '${
           type === 'organization' ? org.name : schema.name
-        } to confirm delete`}
+        }' to confirm delete`}
         value={value}
         onChange={e => setValue(e.target.value)}
       />
       {error && (
         <div className="alert alert-danger" role="alert">
-          Oops, you must have mispelled {type} name.
+          Oops, you must have misspelled {type} name.
         </div>
       )}
     </Dialog>

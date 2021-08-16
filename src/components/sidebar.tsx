@@ -13,10 +13,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { useManualQuery, useMutation } from 'graphql-hooks';
 import { actions } from '../state/actions';
-import {
-  REMOVE_OR_DELETE_SCHEMA_MUTATION,
-  REMOVE_OR_DELETE_TABLE_MUTATION,
-} from '../graphql/mutations/wb';
+import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../graphql/mutations/wb';
 import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
 import { ORGANIZATIONS_QUERY } from '../graphql/queries/wb';
 import DeleteModal from './common/deleteModal';

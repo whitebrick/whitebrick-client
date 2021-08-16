@@ -10,7 +10,6 @@ import AddData from '../common/addData';
 type MyDatabasesPropsType = {
   schemas: any[];
   user: any;
-  actions: any;
   name?: string;
 };
 
@@ -21,7 +20,6 @@ const defaultProps = {
 const MyDatabases = ({
   schemas,
   user,
-  actions,
   name = 'My Databases',
 }: MyDatabasesPropsType) => {
   const filteredSchemas: any[] = schemas.filter(schema =>

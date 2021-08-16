@@ -5,18 +5,15 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Avatar from 'react-avatar';
 import { navigate } from 'gatsby';
 import { TrashIcon, IconButton } from 'evergreen-ui';
-import { useMutation } from 'graphql-hooks';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
 import NoData from '../common/noData';
-import { DELETE_ORGANIZATION_MUTATION } from '../../graphql/mutations/wb';
 import AddData from '../common/addData';
 import DeleteModal from '../common/deleteModal';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
   schemas: Array<SchemaItemType>;
-  actions: any;
   renderTitle?: boolean;
 };
 
@@ -27,13 +24,8 @@ const defaultProps = {
 const OrganizationDatabasesList = ({
   organization,
   schemas,
-  actions,
   renderTitle = true,
 }: DatabasesPropsType) => {
-  const [deleteOrganizationMutation] = useMutation(
-    DELETE_ORGANIZATION_MUTATION,
-  );
-
   const [showDelete, setShowDelete] = useState(false);
 
   const deleteOrganization = () => {
@@ -50,7 +42,7 @@ const OrganizationDatabasesList = ({
               <IconButton
                 appearance="minimal"
                 icon={TrashIcon}
-                onClick={() => deleteOrganization()}
+                onClick={deleteOrganization}
               />
               {showDelete && (
                 <DeleteModal

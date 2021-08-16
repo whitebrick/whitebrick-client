@@ -41,7 +41,7 @@ const OrganizationLayout = ({
             <Link to={`/${organization.name}`}>{organization.label}</Link>
           </p>
           <div className="d-flex mt-4 ml-1">
-            <h3 className="w-25" aria-hidden style={{ cursor: 'pointer' }}>
+            <h3 className="w-50" aria-hidden style={{ cursor: 'pointer' }}>
               <span>
                 {organization.label}
                 {organization?.role?.name === 'organization_administrator' && (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronRightIcon, EditIcon } from 'evergreen-ui';
+import { ChevronRightIcon, EditIcon, IconButton } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { useManualQuery } from 'graphql-hooks';
@@ -55,16 +55,18 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
             {schema.label}
           </Link>
         </p>
-        <h3 className="m-0 w-25" aria-hidden style={{ cursor: 'pointer' }}>
+        <h3 className="m-0 w-50">
           <span>
             {schema.label}
-            <EditIcon
+            <IconButton
+              appearance="minimal"
               className="ml-1"
               onClick={() => {
                 actions.setType('editDatabase');
                 actions.setFormData(schema);
                 actions.setShow(true);
               }}
+              icon={EditIcon}
             />
           </span>
         </h3>
