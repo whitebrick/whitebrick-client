@@ -59,7 +59,7 @@ const OrgSchema = ({
       return cloudContext.userMessages.WB_SCHEMA_URL_NOT_FOUND[0];
     return cloudContext.userMessages[
       error?.graphQLErrors[0].originalError.wbCode
-    ][0];
+    ]?.[0];
   };
 
   if (isLoading) return <Loading />;
