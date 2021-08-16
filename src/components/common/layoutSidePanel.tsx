@@ -333,6 +333,8 @@ const LayoutSidePanel = ({
           label: formData.label,
         },
       });
+      window.location.reload();
+
       if (!loading && !error) actions.setShow(false);
     } else if (type === 'createTable') {
       const { error, loading } = await createTable({
