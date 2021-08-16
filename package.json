@@ -65,10 +65,12 @@
   "license": "0BSD",
   "scripts": {
     "build": "gatsby build",
+    "build:prod": "ACTIVE_ENV='prod' gatsby build",
     "build:staging": "ACTIVE_ENV='staging' gatsby build",
     "build:development": "ACTIVE_ENV='development' gatsby build",
     "develop": "gatsby develop",
     "develop:staging": "ACTIVE_ENV='staging' gatsby develop",
+    "develop:prod": "ACTIVE_ENV='prod' gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "lint": "eslint --ignore-path .eslintignore . --ext js --ext ts --ext tsx",
     "lint:fix": "eslint --ignore-path .eslintignore . --ext js --ext ts --ext tsx --fix",

@@ -3,18 +3,21 @@
 SITE="whitebrick"
 S3_DEV="s3://dev.whitebrick.com"
 S3_STAGING="s3://staging.whitebrick.com"
+S3_PROD="s3://whitebrick.com"
 CLOUDFRONT_DEV="E2SMZQYG45APHN"
 CLOUDFRONT_STAGING="E3TH44CM96PJ5D"
+CLOUDFRONT_PROD="ETADCV7026FAI"
 REDIRECT_DEV="https://hello-dev.whitebrick.com"
 REDIRECT_STAGING="https://hello-staging.whitebrick.com"
+REDIRECT_PROD="https://hello.whitebrick.com"
 
 if [[ $(basename $(pwd)) != "$SITE" ]]; then
   echo -e "\nError: Run this script from the top level '$SITE' directory.\n"
   exit 1
 fi
 
-if [[ "$1" != "dev" && "$1" != "staging" ]]; then
-  echo -e "\nError: Either 'dev' or 'staging' must be passed as the first argument.\n"
+if [[ "$1" != "dev" && "$1" != "staging" && "$1" != "prod" ]]; then
+  echo -e "\nError: Either 'dev' or 'staging' or 'prod' must be passed as the first argument.\n"
   exit 1
 fi
 
@@ -23,16 +26,21 @@ cloudfront=""
 redirect=""
 cmd=""
 
-if [[ "$1" == "dev" ]]; then
-  s3=$S3_DEV
-  cloudfront=$CLOUDFRONT_DEV
-  redirect=$REDIRECT_DEV
-  cmd="npm run build:development"
-else
+if [[ "$1" == "prod" ]]; then
+  s3=$S3_PROD
+  cloudfront=$CLOUDFRONT_PROD
+  redirect=$REDIRECT_PROD
+  cmd="npm run build:prod"
+elif [[ "$1" == "staging" ]]; then
   s3=$S3_STAGING
   cloudfront=$CLOUDFRONT_STAGING
   redirect=$REDIRECT_STAGING
   cmd="npm run build:staging"
+else
+  s3=$S3_DEV
+  cloudfront=$CLOUDFRONT_DEV
+  redirect=$REDIRECT_DEV
+  cmd="npm run build:development"
 fi
 
 if [[ "$2" != "skipBuild" ]]; then
