@@ -1,8 +1,8 @@
 import React from 'react';
-import Avatar from 'react-avatar';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
+import { Button } from 'evergreen-ui';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
 
@@ -31,10 +31,12 @@ const CreateSchema = ({
               aria-hidden="true"
               onClick={() => {
                 actions.setFormData({});
-                actions.setType('database');
+                actions.setType('createDatabase');
                 actions.setShow(true);
               }}>
-              <Avatar name="+" size="75" round="12px" color="#4B5563" />
+              <Button appearance="primary" size="large">
+                + Create new database
+              </Button>
             </div>
           </div>
         </div>
