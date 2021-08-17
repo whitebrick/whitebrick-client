@@ -57,7 +57,7 @@ const DatabaseName = ({
     }
     return cloudContext.userMessages[
       error?.graphQLErrors[0].originalError.wbCode
-    ][0];
+    ]?.[0];
   };
 
   if (isLoading) return <Loading />;

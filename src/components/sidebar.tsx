@@ -81,31 +81,35 @@ const Sidebar = ({
   return (
     <div className="row m-0" id="sidebar">
       <aside className="p-0">
-        {organizations && organizations.length > 0 && (
-          <div className="list-group mt-4">
-            <div className="sidebar-heading list-group-item">Organizations</div>
-            {organizations.map(organization => (
-              <div
-                onClick={() => window.location.replace(`/${organization.name}`)}
-                aria-hidden="true"
-                className="list-group-item py-1"
-                key={organization.name}>
-                <ApplicationIcon /> {organization.label.toLowerCase()}
-              </div>
-            ))}
-            <div
-              className="list-group-item py-1 d-flex align-items-center"
-              aria-hidden="true"
-              style={{ color: '#5E6A7B' }}
-              onClick={() => {
-                setShow(true);
-                setType('createOrganization');
-              }}>
-              <PlusIcon />
-              <span className="ml-2">Add an organization</span>
+        <div className="list-group mt-4">
+          <div className="sidebar-heading list-group-item">Organizations</div>
+          {organizations && organizations.length > 0 && (
+            <div>
+              {organizations.map(organization => (
+                <div
+                  onClick={() =>
+                    window.location.replace(`/${organization.name}`)
+                  }
+                  aria-hidden="true"
+                  className="list-group-item py-1"
+                  key={organization.name}>
+                  <ApplicationIcon /> {organization.label.toLowerCase()}
+                </div>
+              ))}
             </div>
+          )}
+          <div
+            className="list-group-item py-1 d-flex align-items-center"
+            aria-hidden="true"
+            style={{ color: '#5E6A7B' }}
+            onClick={() => {
+              setShow(true);
+              setType('createOrganization');
+            }}>
+            <PlusIcon />
+            <span className="ml-2">Add an organization</span>
           </div>
-        )}
+        </div>
         <div className="list-group">
           {Object.keys(schema).length > 0 && (
             <>
