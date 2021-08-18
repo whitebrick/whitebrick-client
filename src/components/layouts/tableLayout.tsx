@@ -18,8 +18,15 @@ import Seo from '../seo';
 
 import Tabs from '../elements/tabs';
 import Members from '../common/members';
-import { TABLE_USERS_QUERY } from '../../graphql/queries/wb';
+import {
+  SCHEMA_BY_NAME_QUERY,
+  SCHEMA_TABLE_BY_NAME_QUERY,
+  TABLE_USERS_QUERY,
+} from '../../graphql/queries/wb';
 import { updateTableData } from '../../utils/updateTableData';
+import Loading from '../loading';
+import Layout from './layout';
+import NotFound from '../notFound';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -36,6 +43,8 @@ type TableLayoutPropsType = {
   actions: any;
   gridAPI: GridApi;
   columnAPI: ColumnApi;
+  cloudContext: any;
+  params: any;
 };
 
 const TableLayout = ({
@@ -53,8 +62,15 @@ const TableLayout = ({
   actions,
   gridAPI,
   columnAPI,
+  cloudContext,
+  params,
 }: TableLayoutPropsType) => {
   const client = useContext(ClientContext);
+  const [isLoading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
+  const [fetchSchemaByName] = useManualQuery(SCHEMA_BY_NAME_QUERY);
 
   const [changedValues, setChangedValues] = useState([]);
   const [removeOrDeleteColumnMutation] = useMutation(
@@ -73,6 +89,55 @@ const TableLayout = ({
   const fetchData = () => {
     fetchSchemaTableUsers().then(r => setUsers(r?.data?.wbTableUsers));
   };
+
+  useEffect(() => {
+    const fetchSchema = async () => {
+      const variables: any = { name: params.databaseName };
+      if (params.organization) variables.organizationName = params.organization;
+      const { loading, data, error } = await fetchSchemaByName({ variables });
+      if (!loading) {
+        if (error) setError(error);
+        else actions.setSchema(data.wbMySchemaByName);
+      }
+    };
+
+    const fetchSchemaTable = async () => {
+      const { loading, data, error } = await fetchSchemaTableByName({
+        variables: {
+          schemaName: params.databaseName,
+          tableName: params.tableName,
+          withColumns: true,
+          withSettings: true,
+        },
+      });
+      if (!loading) {
+        if (error) setError(error);
+        else {
+          actions.setTable(data?.wbMyTableByName);
+          actions.setColumns(data?.wbMyTableByName?.columns);
+          actions.setOrderBy(data?.wbMyTableByName?.columns[0]?.name);
+          if (data.wbMyTableByName.settings) {
+            if (
+              data.wbMyTableByName.settings.views &&
+              data.wbMyTableByName.settings.views.length > 0
+            ) {
+              actions.setViews(data.wbMyTableByName.settings.views);
+            }
+            if (data.wbMyTableByName.settings.defaultView)
+              actions.setDefaultView(data.wbMyTableByName.settings.defaultView);
+          }
+        }
+      }
+    };
+    if (params.databaseName && params.databaseName)
+      fetchSchema().then(() => {
+        if (params.tableName && params.tableName)
+          fetchSchemaTable().finally(() => setLoading(false));
+      });
+    else if (params.tableName && params.tableName)
+      fetchSchemaTable().finally(() => setLoading(false));
+  }, [actions, fetchSchemaByName, fetchSchemaTableByName, params]);
+
   useEffect(fetchData, [fetchSchemaTableUsers]);
 
   useEffect(() => {
@@ -350,6 +415,20 @@ const TableLayout = ({
     },
   ];
 
+  if (isLoading) return <Loading />;
+  if (error)
+    return (
+      <Layout>
+        <NotFound
+          name={
+            cloudContext.userMessages[
+              error?.graphQLErrors[0].originalError.wbCode
+            ][0]
+          }
+        />
+      </Layout>
+    );
+
   return (
     <>
       <Seo title={`${table.label} | ${schema.label}`} />
@@ -407,7 +486,6 @@ const mapStateToProps = state => ({
   type: state.type,
   table: state.table,
   formData: state.formData,
-  params: state.params,
   column: state.column,
   columns: state.columns,
   fields: state.fields,
@@ -420,6 +498,7 @@ const mapStateToProps = state => ({
   defaultView: state.defaultView,
   columnAPI: state.columnAPI,
   gridAPI: state.gridAPI,
+  cloudContext: state.cloudContext,
 });
 
 const mapDispatchToProps = dispatch => ({
