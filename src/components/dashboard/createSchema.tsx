@@ -19,13 +19,20 @@ const CreateSchema = ({
   schemas,
   organizations,
 }: CreateSchemaType) => {
+  const error = cloudContext?.userMessages?.WB_NO_SCHEMAS_FOUND[0]
+    .replace(/([.?!])\s*(?=[A-Z])/g, '$1|')
+    .split('|');
+
   return (
     schemas.length < 1 &&
     organizations.length < 1 && (
       <div className="d-flex align-items-center" style={{ marginTop: '30vh' }}>
-        <div className="container text-center">
+        <div
+          className="container text-center rounded p-4"
+          style={{ backgroundColor: '#ececec', width: '60%' }}>
           <div>
-            <p>{cloudContext?.userMessages?.WB_NO_SCHEMAS_FOUND}</p>
+            <p style={{ fontSize: '20px' }}>{error?.[0]}</p>
+            <p className="text-muted">{error?.[1]}</p>
             <div
               className="text-center btn"
               aria-hidden="true"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AddIcon } from 'evergreen-ui';
+import { Button } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../../state/actions';
@@ -16,7 +16,7 @@ const NoData = ({ actions, type, name, schema }: NoDataType) => {
   return (
     <div className="col-md-6 offset-md-4">
       <div
-        className="text-center rounded p-2"
+        className="text-center rounded p-3"
         style={{ backgroundColor: '#ececec', width: '60%' }}>
         <p>You do not have any {name} yet.</p>
         <div
@@ -26,7 +26,9 @@ const NoData = ({ actions, type, name, schema }: NoDataType) => {
             actions.setType(type);
             actions.setShow(true);
           }}>
-          <AddIcon color="info" />
+          <Button appearance="primary" size="large">
+            + Add {name}
+          </Button>
         </div>
       </div>
     </div>
