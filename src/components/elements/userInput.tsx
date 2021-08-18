@@ -28,7 +28,11 @@ const UserSearchInput = ({ data, setData }: UserSearchInputType) => {
   const mapOptionsToValues = options => {
     return options.map(option => ({
       value: option.email,
-      label: `${option.firstName} ${option.lastName}`,
+      label: `${
+        (option.firstName || option.lastName) === null
+          ? option.email
+          : `${option.firstName} ${option.lastName}`
+      }`,
       ...option,
     }));
   };
