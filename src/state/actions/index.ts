@@ -73,6 +73,12 @@ export const actions = {
       payload: { columns },
     };
   },
+  setForeignKeyColumns(foreignKeyColumns) {
+    return {
+      type: types.SET_FOREIGN_KEY_COLUMNS,
+      payload: { foreignKeyColumns },
+    };
+  },
   setSchema(schema) {
     return {
       type: types.SET_SCHEMA,
@@ -173,6 +179,12 @@ export const actions = {
     return {
       type: types.SET_PARAMS,
       payload: { params },
+    };
+  },
+  setFields(fields) {
+    return {
+      type: types.SET_FIELDS,
+      payload: { fields },
     };
   },
 };

@@ -12,6 +12,7 @@ const initialState = {
   table: '',
   isNewTable: false,
   columns: [],
+  foreignKeyColumns: [],
   column: {},
   fields: [],
   rowData: [],

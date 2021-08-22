@@ -22,6 +22,7 @@ import {
   SCHEMA_BY_NAME_QUERY,
   SCHEMA_TABLE_BY_NAME_QUERY,
   TABLE_USERS_QUERY,
+  COLUMNS_BY_NAME_QUERY,
 } from '../../graphql/queries/wb';
 import { updateTableData } from '../../utils/updateTableData';
 import Loading from '../loading';
@@ -71,6 +72,7 @@ const TableLayout = ({
 
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
   const [fetchSchemaByName] = useManualQuery(SCHEMA_BY_NAME_QUERY);
+  const [fetchColumnsByName] = useManualQuery(COLUMNS_BY_NAME_QUERY);
 
   const [changedValues, setChangedValues] = useState([]);
   const [removeOrDeleteColumnMutation] = useMutation(
@@ -79,18 +81,55 @@ const TableLayout = ({
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
 
   const [users, setUsers] = useState([]);
-  const [fetchSchemaTableUsers] = useManualQuery(TABLE_USERS_QUERY, {
-    variables: {
-      schemaName: schema.name,
-      tableName: table.name,
-    },
-  });
+  const [fetchSchemaTableUsers] = useManualQuery(TABLE_USERS_QUERY);
 
   const fetchData = () => {
-    fetchSchemaTableUsers().then(r => setUsers(r?.data?.wbTableUsers));
+    if (
+      params &&
+      params.databaseName !== undefined &&
+      params.tableName !== undefined
+    )
+      fetchSchemaTableUsers({
+        variables: {
+          schemaName: params.databaseName,
+          tableName: params.tableName,
+        },
+      }).then(r => setUsers(r?.data?.wbTableUsers));
   };
 
   useEffect(() => {
+    const getTableFields = async (columns: ColumnItemType[]) => {
+      const tableFields = [];
+      const foreignKeyCols = [];
+      for (let i = 0; i < columns.length; i += 1) {
+        tableFields.push(columns[i].name);
+        // eslint-disable-next-line no-await-in-loop
+        await Promise.all(
+          // eslint-disable-next-line array-callback-return
+          columns[i].foreignKeys.map(fkc => {
+            const cols = [];
+            fetchColumnsByName({
+              variables: {
+                schemaName: params.databaseName,
+                tableName: fkc.relTableName,
+              },
+            }).then(r => {
+              foreignKeyCols.push({
+                tableName: fkc.relTableName,
+                cols: r.data.wbColumns,
+              });
+              r.data.wbColumns.forEach(col => cols.push(col.name));
+              tableFields.push({
+                [`obj_${params.tableName}_${fkc.relTableName}`]: cols,
+              });
+            });
+          }),
+        );
+      }
+      actions.setForeignKeyColumns(foreignKeyCols);
+      return tableFields;
+    };
+
     const fetchSchema = async () => {
       const variables: any = { name: params.databaseName };
       if (params.organization) variables.organizationName = params.organization;
@@ -113,6 +152,8 @@ const TableLayout = ({
       if (!loading) {
         if (error) setError(error);
         else {
+          const fields = await getTableFields(data?.wbMyTableByName?.columns);
+          actions.setFields(fields);
           actions.setTable(data?.wbMyTableByName);
           actions.setColumns(data?.wbMyTableByName?.columns);
           actions.setOrderBy(data?.wbMyTableByName?.columns[0]?.name);
@@ -129,16 +170,22 @@ const TableLayout = ({
         }
       }
     };
-    if (params.databaseName && params.databaseName)
+    if (params && params.databaseName)
       fetchSchema().then(() => {
-        if (params.tableName && params.tableName)
+        if (params && params.tableName)
           fetchSchemaTable().finally(() => setLoading(false));
       });
-    else if (params.tableName && params.tableName)
+    else if (params && params.tableName)
       fetchSchemaTable().finally(() => setLoading(false));
-  }, [actions, fetchSchemaByName, fetchSchemaTableByName, params]);
+  }, [
+    actions,
+    fetchColumnsByName,
+    fetchSchemaByName,
+    fetchSchemaTableByName,
+    params,
+  ]);
 
-  useEffect(fetchData, [fetchSchemaTableUsers]);
+  useEffect(fetchData, [fetchSchemaTableUsers, params]);
 
   useEffect(() => {
     actions.setOffset(0);

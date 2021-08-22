@@ -34,6 +34,7 @@ type GridPropsType = {
   schema: SchemaItemType;
   fields: [];
   gridAPI: GridApi;
+  foreignKeyColumns: any;
 };
 
 const Grid = ({
@@ -50,6 +51,7 @@ const Grid = ({
   schema,
   fields,
   gridAPI,
+  foreignKeyColumns,
 }: GridPropsType) => {
   const client = useContext(ClientContext);
 
@@ -117,8 +119,6 @@ const Grid = ({
   const onGridReady = (params: GridReadyEvent) => {
     actions.setGridAPI(params.api);
     actions.setColumnAPI(params.columnApi);
-    const datasource = createServerSideDatasource();
-    params.api.setServerSideDatasource(datasource);
     if (views.length <= 0) {
       const viewObj = {
         name: 'Default View',
@@ -135,10 +135,63 @@ const Grid = ({
         applyOrder: true,
       });
     }
+    setTimeout(function setDatasource() {
+      const datasource = createServerSideDatasource();
+      params.api.setServerSideDatasource(datasource);
+    }, 500);
   };
 
   const onGridSizeChanged = (params: GridSizeChangedEvent) =>
     autoSizeColumns(params.columnApi, params.api);
+
+  const renderColumn = (column: ColumnItemType, tableName = null) => {
+    if (column.foreignKeys.length > 0) {
+      return (
+        <AgGridColumn
+          field={column.name}
+          key={column.name}
+          headerName={column.label}
+          headerTooltip={column.label}
+          cellEditor="foreignKeyEditor"
+          cellRenderer="foreignKeyRenderer"
+          valueGetter={params =>
+            !tableName
+              ? params.data[column.name]
+              : params.data[`obj_${table.name}_${tableName}`][column.name]
+          }
+        />
+      );
+    }
+    if (column.isPrimaryKey) {
+      return (
+        <AgGridColumn
+          field={column.name}
+          key={column.name}
+          headerName={column.label}
+          headerTooltip={column.label}
+          cellRenderer="primaryKeyRenderer"
+          valueGetter={params =>
+            !tableName
+              ? params.data[column.name]
+              : params.data[`obj_${table.name}_${tableName}`][column.name]
+          }
+        />
+      );
+    }
+    return (
+      <AgGridColumn
+        field={column.name}
+        key={column.name}
+        headerName={column.label}
+        headerTooltip={column.label}
+        valueGetter={params =>
+          !tableName
+            ? params.data[column.name]
+            : params.data[`obj_${table.name}_${tableName}`][column.name]
+        }
+      />
+    );
+  };
 
   return (
     <>
@@ -191,39 +244,14 @@ const Grid = ({
         popupParent={document.querySelector('body')}
         onGridSizeChanged={onGridSizeChanged}
         onGridReady={onGridReady}>
-        {columns.map(column => {
-          if (column.foreignKeys.length > 0) {
-            return (
-              <AgGridColumn
-                field={column.name}
-                key={column.name}
-                headerName={column.label}
-                headerTooltip={column.label}
-                cellEditor="foreignKeyEditor"
-                cellRenderer="foreignKeyRenderer"
-              />
-            );
-          }
-          if (column.isPrimaryKey) {
-            return (
-              <AgGridColumn
-                field={column.name}
-                key={column.name}
-                headerName={column.label}
-                headerTooltip={column.label}
-                cellRenderer="primaryKeyRenderer"
-              />
-            );
-          }
-          return (
-            <AgGridColumn
-              field={column.name}
-              key={column.name}
-              headerName={column.label}
-              headerTooltip={column.label}
-            />
-          );
-        })}
+        <AgGridColumn headerName={table.name}>
+          {columns.map(column => renderColumn(column))}
+        </AgGridColumn>
+        {foreignKeyColumns.map(fkc => (
+          <AgGridColumn headerName={fkc.tableName}>
+            {fkc.cols.map(col => renderColumn(col, fkc.tableName))}
+          </AgGridColumn>
+        ))}
       </AgGridReact>
       {table.name !== '' && (
         <div className="p-4">
@@ -261,6 +289,7 @@ const mapStateToProps = state => ({
   schema: state.schema,
   fields: state.fields,
   gridAPI: state.gridAPI,
+  foreignKeyColumns: state.foreignKeyColumns,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -136,3 +136,28 @@ export const USER_BY_EMAIL = `query ($email: String!) {
   }
 }
 `;
+
+export const COLUMNS_BY_NAME_QUERY = `query ($schemaName: String!, $tableName: String!) {
+  wbColumns(schemaName: $schemaName, tableName: $tableName) {
+    name
+    default
+    label
+    type
+    isPrimaryKey
+    foreignKeys {
+      columnName
+      constraintName
+      tableName
+      relColumnName
+      relTableName
+    }
+    referencedBy {
+      columnName
+      constraintName
+      tableName
+      relColumnName
+      relTableName
+    }
+  }
+}
+`;

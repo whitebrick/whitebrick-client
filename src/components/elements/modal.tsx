@@ -26,7 +26,7 @@ const Modal = ({
   setIsShown,
   title,
   label,
-  intent = 'info',
+  intent = 'none',
   width = 560,
   hasFooter = true,
   onSave = null,

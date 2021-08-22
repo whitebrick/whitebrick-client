@@ -1,7 +1,6 @@
 import { types } from '../types/gridTypes';
 
 export default function gridReducer(state: any = {}, action) {
-  const f = [];
   const { payload } = action;
   switch (action.type) {
     case types.SET_SEND_ADMIN_SECRET:
@@ -80,11 +79,14 @@ export default function gridReducer(state: any = {}, action) {
         column: payload.column,
       };
     case types.SET_COLUMNS:
-      payload.columns.forEach(column => f.push(column.name));
       return {
         ...state,
         columns: payload.columns,
-        fields: f,
+      };
+    case types.SET_FOREIGN_KEY_COLUMNS:
+      return {
+        ...state,
+        foreignKeyColumns: payload.foreignKeyColumns,
       };
     case types.SET_ROW_COUNT:
       return {
@@ -150,6 +152,11 @@ export default function gridReducer(state: any = {}, action) {
       return {
         ...state,
         params: payload.params,
+      };
+    case types.SET_FIELDS:
+      return {
+        ...state,
+        fields: payload.fields,
       };
     default:
       return state;
