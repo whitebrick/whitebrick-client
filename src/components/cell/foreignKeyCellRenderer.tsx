@@ -30,7 +30,7 @@ const ForeignKeyCellRenderer = ({
   const updateValue = async (row, relData, colDef, schemaName, tableName) => {
     const variables = { where: {}, _set: {} };
     Object.keys(row).forEach(key => {
-      if (row[key]) {
+      if (!key.startsWith(`obj_${tableName}`) && row[key]) {
         variables.where[key] = {
           _eq: parseInt(row[key], 10) ? parseInt(row[key], 10) : row[key],
         };

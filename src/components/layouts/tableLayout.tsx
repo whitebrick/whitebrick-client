@@ -206,7 +206,7 @@ const TableLayout = ({
       });
       const variables = { where: {}, _set: {} };
       Object.keys(data).forEach(key => {
-        if (data[key]) {
+        if (!key.startsWith(`obj_${table.name}`) && data[key]) {
           variables.where[key] = {
             _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
           };

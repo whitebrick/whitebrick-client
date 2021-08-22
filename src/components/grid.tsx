@@ -159,6 +159,7 @@ const Grid = ({
               ? params.data[column.name]
               : params.data[`obj_${table.name}_${tableName}`][column.name]
           }
+          editable={!!tableName}
         />
       );
     }
@@ -175,6 +176,7 @@ const Grid = ({
               ? params.data[column.name]
               : params.data[`obj_${table.name}_${tableName}`][column.name]
           }
+          editable={!!tableName}
         />
       );
     }
@@ -189,6 +191,7 @@ const Grid = ({
             ? params.data[column.name]
             : params.data[`obj_${table.name}_${tableName}`][column.name]
         }
+        editable={!!tableName}
       />
     );
   };
