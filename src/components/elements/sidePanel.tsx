@@ -38,6 +38,7 @@ const SidePanel = ({
       <SideSheet
         isShown={show}
         onCloseComplete={() => setShow(false)}
+        preventBodyScrolling
         containerProps={{
           display: 'flex',
           flex: '1',
