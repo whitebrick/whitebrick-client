@@ -157,7 +157,7 @@ const Grid = ({
           valueGetter={params =>
             !tableName
               ? params.data[column.name]
-              : params.data[`obj_${table.name}_${tableName}`][column.name]
+              : params.data[`obj_${table.name}_${tableName}`]?.[column.name]
           }
           editable={!!tableName}
         />
@@ -174,7 +174,7 @@ const Grid = ({
           valueGetter={params =>
             !tableName
               ? params.data[column.name]
-              : params.data[`obj_${table.name}_${tableName}`][column.name]
+              : params.data[`obj_${table.name}_${tableName}`]?.[column.name]
           }
           editable={!!tableName}
         />
@@ -189,7 +189,7 @@ const Grid = ({
         valueGetter={params =>
           !tableName
             ? params.data[column.name]
-            : params.data[`obj_${table.name}_${tableName}`][column.name]
+            : params.data[`obj_${table.name}_${tableName}`]?.[column.name]
         }
         editable={!!tableName}
       />
