@@ -75,7 +75,7 @@ Further information from Gatsby [here](https://www.gatsbyjs.com/docs/quick-start
 git clone git@github.com:whitebrick/whitebrick.git
 ```
 
-3. ### Configure the Client
+3. #### Configure the Client
 
 ```
 cp .env.example .env.development
@@ -91,7 +91,7 @@ GATSBY_AUTH0_AUDIENCE=https://production-whitebrick.us.auth0.com/api/v2/
 # GATSBY_HASURA_GRAPHQL_ADMIN_SECRET=MyHasuraSecret
 ```
 
-4. ### Start Gatsby
+4. #### Start Gatsby
 
 ```
 npm run develop
