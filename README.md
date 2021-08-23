@@ -44,7 +44,7 @@ Whitebrick is [licensed](LICENSE) under the Apache License v2.0 however the depe
 
 [//]: # 'END:COMMON_HEADER'
 
-### You are currently viewing the front end repository (whitebrick)
+### You are currently viewing the front end client repository (whitebrick)
 
 - The back end repository can be found [here](https://github.com/whitebrick/whitebrick-cloud)
 
