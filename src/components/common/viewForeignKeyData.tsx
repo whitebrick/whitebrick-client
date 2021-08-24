@@ -83,10 +83,10 @@ const ViewForeignKeyData = ({
       );
     };
     const c = columns.filter(obj => obj.name === column.colId)[0];
-    setRelTable(c.foreignKeys[0].relTableName);
+    setRelTable(c?.foreignKeys[0]?.relTableName);
     fetchTableDataWithColumn(
-      c.foreignKeys[0].relTableName,
-      c.foreignKeys[0].relColumnName,
+      c?.foreignKeys[0]?.relTableName,
+      c?.foreignKeys[0]?.relColumnName,
     );
   }, [
     columns,
