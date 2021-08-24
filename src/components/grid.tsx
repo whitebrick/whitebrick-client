@@ -150,12 +150,17 @@ const Grid = ({
     if (tableName) {
       if (type === 'referencedBy') {
         const values = [];
-        params.data[`arr_${table.name}_${tableName}`].forEach(data => {
-          let value = data?.[column.name];
-          if (value.toString().length > 20)
-            value = value.toString().substring(0, 20).concat('...');
-          values.push(value);
-        });
+        const paramsData = params.data[`arr_${table.name}_${tableName}`];
+
+        if (paramsData) {
+          paramsData.forEach(data => {
+            let value = data?.[column.name];
+            if (value.toString().length > 20)
+              value = value.toString().substring(0, 20).concat('...');
+            values.push(value);
+          });
+        }
+
         return Array.from(new Set(values)).join('; ').substring(0, 100);
       }
       return params.data[`obj_${table.name}_${tableName}`]?.[column.name];
