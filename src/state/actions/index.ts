@@ -79,6 +79,12 @@ export const actions = {
       payload: { foreignKeyColumns },
     };
   },
+  setReferencedByColumns(referencedByColumns) {
+    return {
+      type: types.SET_REFERENCED_BY_COLUMNS,
+      payload: { referencedByColumns },
+    };
+  },
   setSchema(schema) {
     return {
       type: types.SET_SCHEMA,

@@ -1,17 +1,11 @@
-export type ForeignKeyItemType = {
+export type ForeignKeyOrReferencedByItemType = {
   columnName: string;
   constraintName: string;
   tableName: string;
+  tableLabel?: string;
   relColumnName: string;
   relTableName: string;
-};
-
-export type ReferencedByItemType = {
-  columnName: string;
-  constraintName: string;
-  tableName: string;
-  relColumnName: string;
-  relTableName: string;
+  relTableLabel: string;
 };
 
 export type ColumnItemType = {
@@ -19,8 +13,8 @@ export type ColumnItemType = {
   label: string;
   type: string;
   isPrimaryKey: boolean;
-  foreignKeys: Array<ForeignKeyItemType>;
-  referencedBy: Array<ReferencedByItemType>;
+  foreignKeys: ForeignKeyOrReferencedByItemType[];
+  referencedBy: ForeignKeyOrReferencedByItemType[];
   default: string;
 };
 

@@ -13,6 +13,7 @@ const initialState = {
   isNewTable: false,
   columns: [],
   foreignKeyColumns: [],
+  referencedByColumns: [],
   column: {},
   fields: [],
   rowData: [],

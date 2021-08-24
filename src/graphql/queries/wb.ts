@@ -44,15 +44,19 @@ export const SCHEMA_TABLE_BY_NAME_QUERY = `query ($schemaName: String!, $tableNa
         columnName
         constraintName
         tableName
+        tableLabel
         relColumnName
         relTableName
+        relTableLabel
       }
       referencedBy {
         columnName
         constraintName
         tableName
+        tableLabel
         relColumnName
         relTableName
+        relTableLabel
       }
     }
     settings
@@ -148,16 +152,19 @@ export const COLUMNS_BY_NAME_QUERY = `query ($schemaName: String!, $tableName: S
       columnName
       constraintName
       tableName
+      tableLabel
       relColumnName
       relTableName
+      relTableLabel
     }
     referencedBy {
       columnName
       constraintName
       tableName
+      tableLabel
       relColumnName
       relTableName
+      relTableLabel
     }
   }
-}
-`;
+}`;

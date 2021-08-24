@@ -35,6 +35,7 @@ type GridPropsType = {
   fields: [];
   gridAPI: GridApi;
   foreignKeyColumns: any;
+  referencedByColumns: any;
 };
 
 const Grid = ({
@@ -52,6 +53,7 @@ const Grid = ({
   fields,
   gridAPI,
   foreignKeyColumns,
+  referencedByColumns,
 }: GridPropsType) => {
   const client = useContext(ClientContext);
 
@@ -138,13 +140,34 @@ const Grid = ({
     setTimeout(function setDatasource() {
       const datasource = createServerSideDatasource();
       params.api.setServerSideDatasource(datasource);
-    }, 500);
+    }, 1000);
   };
 
   const onGridSizeChanged = (params: GridSizeChangedEvent) =>
     autoSizeColumns(params.columnApi, params.api);
 
-  const renderColumn = (column: ColumnItemType, tableName = null) => {
+  const valueGetter = (params, tableName, column, type) => {
+    if (tableName) {
+      if (type === 'referencedBy') {
+        const values = [];
+        params.data[`arr_${table.name}_${tableName}`].forEach(data => {
+          let value = data?.[column.name];
+          if (value.toString().length > 20)
+            value = value.toString().substring(0, 20).concat('...');
+          values.push(value);
+        });
+        return Array.from(new Set(values)).join('; ').substring(0, 100);
+      }
+      return params.data[`obj_${table.name}_${tableName}`]?.[column.name];
+    }
+    return params.data[column.name];
+  };
+
+  const renderColumn = (
+    column: ColumnItemType,
+    tableName: string = null,
+    type: 'foreignKey' | 'referencedBy' | null = null,
+  ) => {
     if (column.foreignKeys.length > 0) {
       return (
         <AgGridColumn
@@ -154,11 +177,7 @@ const Grid = ({
           headerTooltip={column.label}
           cellEditor="foreignKeyEditor"
           cellRenderer="foreignKeyRenderer"
-          valueGetter={params =>
-            !tableName
-              ? params.data[column.name]
-              : params.data[`obj_${table.name}_${tableName}`]?.[column.name]
-          }
+          valueGetter={params => valueGetter(params, tableName, column, type)}
           editable={!!tableName}
         />
       );
@@ -171,11 +190,7 @@ const Grid = ({
           headerName={column.label}
           headerTooltip={column.label}
           cellRenderer="primaryKeyRenderer"
-          valueGetter={params =>
-            !tableName
-              ? params.data[column.name]
-              : params.data[`obj_${table.name}_${tableName}`]?.[column.name]
-          }
+          valueGetter={params => valueGetter(params, tableName, column, type)}
           editable={!!tableName}
         />
       );
@@ -186,11 +201,7 @@ const Grid = ({
         key={column.name}
         headerName={column.label}
         headerTooltip={column.label}
-        valueGetter={params =>
-          !tableName
-            ? params.data[column.name]
-            : params.data[`obj_${table.name}_${tableName}`]?.[column.name]
-        }
+        valueGetter={params => valueGetter(params, tableName, column, type)}
         editable={!!tableName}
       />
     );
@@ -247,12 +258,21 @@ const Grid = ({
         popupParent={document.querySelector('body')}
         onGridSizeChanged={onGridSizeChanged}
         onGridReady={onGridReady}>
-        <AgGridColumn headerName={table.name}>
+        <AgGridColumn headerName={table.label}>
           {columns.map(column => renderColumn(column))}
         </AgGridColumn>
         {foreignKeyColumns.map(fkc => (
-          <AgGridColumn headerName={fkc.tableName}>
-            {fkc.cols.map(col => renderColumn(col, fkc.tableName))}
+          <AgGridColumn headerName={fkc.tableLabel}>
+            {fkc.cols.map(col =>
+              renderColumn(col, fkc.tableName, 'foreignKey'),
+            )}
+          </AgGridColumn>
+        ))}
+        {referencedByColumns.map(rbc => (
+          <AgGridColumn headerName={rbc.tableLabel}>
+            {rbc.cols.map(col =>
+              renderColumn(col, rbc.tableName, 'referencedBy'),
+            )}
           </AgGridColumn>
         ))}
       </AgGridReact>
@@ -293,6 +313,7 @@ const mapStateToProps = state => ({
   fields: state.fields,
   gridAPI: state.gridAPI,
   foreignKeyColumns: state.foreignKeyColumns,
+  referencedByColumns: state.referencedByColumns,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -101,6 +101,7 @@ const TableLayout = ({
     const getTableFields = async (columns: ColumnItemType[]) => {
       const tableFields = [];
       const foreignKeyCols = [];
+      const referencedByCols = [];
       for (let i = 0; i < columns.length; i += 1) {
         tableFields.push(columns[i].name);
         // eslint-disable-next-line no-await-in-loop
@@ -116,6 +117,7 @@ const TableLayout = ({
             }).then(r => {
               foreignKeyCols.push({
                 tableName: fkc.relTableName,
+                tableLabel: fkc.relTableLabel,
                 cols: r.data.wbColumns,
               });
               r.data.wbColumns.forEach(col => cols.push(col.name));
@@ -125,8 +127,32 @@ const TableLayout = ({
             });
           }),
         );
+        // eslint-disable-next-line no-await-in-loop
+        await Promise.all(
+          // eslint-disable-next-line array-callback-return
+          columns[i].referencedBy.map(rbc => {
+            const cols = [];
+            fetchColumnsByName({
+              variables: {
+                schemaName: params.databaseName,
+                tableName: rbc.tableName,
+              },
+            }).then(r => {
+              referencedByCols.push({
+                tableName: rbc.tableName,
+                tableLabel: rbc.tableLabel,
+                cols: r.data.wbColumns,
+              });
+              r.data.wbColumns.forEach(col => cols.push(col.name));
+              tableFields.push({
+                [`arr_${params.tableName}_${rbc.tableName}`]: cols,
+              });
+            });
+          }),
+        );
       }
       actions.setForeignKeyColumns(foreignKeyCols);
+      actions.setReferencedByColumns(referencedByCols);
       return tableFields;
     };
 

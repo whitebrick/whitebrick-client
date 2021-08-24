@@ -88,6 +88,11 @@ export default function gridReducer(state: any = {}, action) {
         ...state,
         foreignKeyColumns: payload.foreignKeyColumns,
       };
+    case types.SET_REFERENCED_BY_COLUMNS:
+      return {
+        ...state,
+        referencedByColumns: payload.referencedByColumns,
+      };
     case types.SET_ROW_COUNT:
       return {
         ...state,
