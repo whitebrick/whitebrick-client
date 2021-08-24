@@ -52,9 +52,9 @@ const LinkForeignKey = ({
       return data;
     };
     const c = columns.filter(obj => obj.name === column.colId)[0];
-    fetchSchemaTable(c.foreignKeys[0].relTableName).then(t => {
-      setRelTable(c.foreignKeys[0].relTableName);
-      setTableColumns(t.wbMyTableByName.columns);
+    fetchSchemaTable(c?.foreignKeys[0]?.relTableName).then(t => {
+      setRelTable(c?.foreignKeys[0]?.relTableName);
+      setTableColumns(t?.wbMyTableByName?.columns);
     });
   }, [tables, columns, column, fetchSchemaTableByName, schema.name]);
 

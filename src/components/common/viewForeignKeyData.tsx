@@ -57,9 +57,9 @@ const ViewForeignKeyData = ({
     const fields = [];
     const fetchTableDataWithColumn = async (table, column) => {
       await fetchSchemaTable(table).then(t => {
-        setLabel(t.wbMyTableByName.label);
-        setNewColumns(t.wbMyTableByName.columns);
-        t.wbMyTableByName.columns.map(column => fields.push(column.name));
+        setLabel(t?.wbMyTableByName?.label);
+        setNewColumns(t?.wbMyTableByName?.columns);
+        t?.wbMyTableByName?.columns.map(column => fields.push(column.name));
       });
       const operation = gql.query({
         operation: `${schema.name}_${table}`,
