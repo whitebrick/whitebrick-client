@@ -18,7 +18,7 @@ const defaultProps = {
   onSave: null,
   hasFooter: true,
   width: 560,
-  intent: 'info',
+  intent: 'none',
 };
 
 const Modal = ({
