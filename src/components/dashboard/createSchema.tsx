@@ -5,6 +5,7 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { Button } from 'evergreen-ui';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
+import Delayed from '../common/delayed';
 
 type CreateSchemaType = {
   cloudContext: any;
@@ -26,28 +27,32 @@ const CreateSchema = ({
   return (
     schemas.length < 1 &&
     organizations.length < 1 && (
-      <div className="d-flex align-items-center" style={{ marginTop: '30vh' }}>
+      <Delayed wait={2000}>
         <div
-          className="container text-center rounded p-4"
-          style={{ backgroundColor: '#ececec', width: '60%' }}>
-          <div>
-            <p style={{ fontSize: '20px' }}>{error?.[0]}</p>
-            <p className="text-muted">{error?.[1]}</p>
-            <div
-              className="text-center btn"
-              aria-hidden="true"
-              onClick={() => {
-                actions.setFormData({});
-                actions.setType('createDatabase');
-                actions.setShow(true);
-              }}>
-              <Button appearance="primary" size="large">
-                + Create new database
-              </Button>
+          className="d-flex align-items-center"
+          style={{ marginTop: '30vh' }}>
+          <div
+            className="container text-center rounded p-4"
+            style={{ backgroundColor: '#ececec', width: '60%' }}>
+            <div>
+              <p style={{ fontSize: '20px' }}>{error?.[0]}</p>
+              <p className="text-muted">{error?.[1]}</p>
+              <div
+                className="text-center btn"
+                aria-hidden="true"
+                onClick={() => {
+                  actions.setFormData({});
+                  actions.setType('createDatabase');
+                  actions.setShow(true);
+                }}>
+                <Button appearance="primary" size="large">
+                  + Create new database
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Delayed>
     )
   );
 };
