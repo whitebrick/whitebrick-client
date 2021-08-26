@@ -40,6 +40,7 @@ const Sidebar = ({
   actions,
 }: SidebarPropsType) => {
   const { getAccessTokenSilently, getIdTokenClaims } = useAuth0();
+  const userRole = schema?.role?.name;
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
@@ -132,13 +133,16 @@ const Sidebar = ({
               <div className="list-group-item py-1 d-flex align-items-center">
                 <NewPersonIcon /> <span className="ml-2">Invite others</span>
               </div>
-              <div
-                className="list-group-item py-1 d-flex align-items-center text-danger"
-                aria-hidden="true"
-                onClick={deleteSchema}>
-                <TrashIcon />
-                <div className="ml-2">Delete {schema.label}</div>
-              </div>
+              {(userRole === 'schema_owner' ||
+                userRole === 'schema_administrator') && (
+                <div
+                  className="list-group-item py-1 d-flex align-items-center text-danger"
+                  aria-hidden="true"
+                  onClick={deleteSchema}>
+                  <TrashIcon />
+                  <div className="ml-2">Delete {schema.label}</div>
+                </div>
+              )}
               {showDelete && (
                 <DeleteModal
                   show={showDelete}

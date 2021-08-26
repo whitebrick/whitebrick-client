@@ -17,6 +17,7 @@ type SchemaLayoutType = {
 };
 
 const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
+  const userRole = schema?.role?.name;
   const [users, setUsers] = useState([]);
   const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
     variables: {
@@ -58,16 +59,19 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
         <h3 className="m-0 w-50">
           <span>
             {schema.label}
-            <IconButton
-              appearance="minimal"
-              className="ml-1"
-              onClick={() => {
-                actions.setType('editDatabase');
-                actions.setFormData(schema);
-                actions.setShow(true);
-              }}
-              icon={EditIcon}
-            />
+            {(userRole === 'schema_owner' ||
+              userRole === 'schema_administrator') && (
+              <IconButton
+                appearance="minimal"
+                className="ml-1"
+                onClick={() => {
+                  actions.setType('editDatabase');
+                  actions.setFormData(schema);
+                  actions.setShow(true);
+                }}
+                icon={EditIcon}
+              />
+            )}
           </span>
         </h3>
         <div className="mt-4">
