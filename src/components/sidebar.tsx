@@ -1,22 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import {
-  ApplicationIcon,
-  RefreshIcon,
-  KeyIcon,
-  PlusIcon,
-  CogIcon,
-  TrashIcon,
-  NewPersonIcon,
-} from 'evergreen-ui';
-import { useAuth0 } from '@auth0/auth0-react';
+import React, { useEffect } from 'react';
+import { ApplicationIcon, PlusIcon } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { useManualQuery, useMutation } from 'graphql-hooks';
+import { useManualQuery } from 'graphql-hooks';
 import { actions } from '../state/actions';
-import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../graphql/mutations/wb';
 import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
 import { ORGANIZATIONS_QUERY } from '../graphql/queries/wb';
-import DeleteModal from './common/deleteModal';
+import DebugSettings from './elements/debugSettings';
+import DatabaseSettings from './elements/databaseSettings';
 
 type SidebarPropsType = {
   setFormData: (value: any) => void;
@@ -26,7 +17,6 @@ type SidebarPropsType = {
   table: TableItemType;
   organizations: Array<OrganizationItemType>;
   actions: any;
-  sendAdminSecret: boolean;
 };
 
 const Sidebar = ({
@@ -36,17 +26,9 @@ const Sidebar = ({
   schema,
   table,
   organizations,
-  sendAdminSecret,
   actions,
 }: SidebarPropsType) => {
-  const { getAccessTokenSilently, getIdTokenClaims } = useAuth0();
-  const userRole = schema?.role?.name;
-  const [removeOrDeleteTableMutation] = useMutation(
-    REMOVE_OR_DELETE_TABLE_MUTATION,
-  );
   const [fetchOrganizations] = useManualQuery(ORGANIZATIONS_QUERY);
-
-  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,29 +37,6 @@ const Sidebar = ({
     };
     fetchData();
   }, [actions, fetchOrganizations]);
-
-  const deleteTable = async () => {
-    await removeOrDeleteTableMutation({
-      variables: {
-        schemaName: schema.name,
-        tableName: table.name,
-        del: true,
-      },
-    });
-    actions.setTable('');
-    window.location.replace('/');
-  };
-
-  const deleteSchema = () => {
-    setShowDelete(true);
-  };
-
-  const handleRefreshToken = async () => {
-    await getAccessTokenSilently({ ignoreCache: true });
-    const tokenClaims = await getIdTokenClaims();
-    actions.setAccessToken(tokenClaims.__raw);
-    actions.setTokenClaims(tokenClaims);
-  };
 
   return (
     <div className="row m-0" id="sidebar">
@@ -113,88 +72,14 @@ const Sidebar = ({
         </div>
         <div className="list-group">
           {Object.keys(schema).length > 0 && (
-            <>
-              <div className="sidebar-heading mt-2 list-group-item">
-                Database Settings
-              </div>
-              <div
-                onClick={() => {
-                  setShow(true);
-                  setType('createTable');
-                  setFormData({ schema });
-                }}
-                aria-hidden="true"
-                className="list-group-item py-1 d-flex align-items-center">
-                <PlusIcon /> <span className="ml-2">New table</span>
-              </div>
-              <div className="list-group-item py-1 d-flex align-items-center">
-                <CogIcon /> <span className="ml-2">Settings</span>
-              </div>
-              <div className="list-group-item py-1 d-flex align-items-center">
-                <NewPersonIcon /> <span className="ml-2">Invite others</span>
-              </div>
-              {(userRole === 'schema_owner' ||
-                userRole === 'schema_administrator') && (
-                <div
-                  className="list-group-item py-1 d-flex align-items-center text-danger"
-                  aria-hidden="true"
-                  onClick={deleteSchema}>
-                  <TrashIcon />
-                  <div className="ml-2">Delete {schema.label}</div>
-                </div>
-              )}
-              {showDelete && (
-                <DeleteModal
-                  show={showDelete}
-                  setShow={setShowDelete}
-                  type="database"
-                />
-              )}
-              {table.name && (
-                <div
-                  className="list-group-item py-1 d-flex align-items-center"
-                  aria-hidden="true"
-                  onClick={deleteTable}>
-                  <TrashIcon />{' '}
-                  <div className="ml-2">Delete {table.label.toLowerCase()}</div>
-                </div>
-              )}
-            </>
+            <DatabaseSettings
+              setType={setType}
+              setShow={setShow}
+              setFormData={setFormData}
+            />
           )}
           {process.env.NODE_ENV === 'development' && (
-            <>
-              <div className="sidebar-heading list-group-item mt-2">
-                Debug Settings
-              </div>
-              <div
-                className="list-group-item btn py-1 d-flex align-items-center"
-                aria-hidden="true"
-                onClick={() => {
-                  setShow(true);
-                  setType('token');
-                }}>
-                <KeyIcon />
-                <span className="ml-2">Display Token</span>
-              </div>
-              <div
-                className="list-group-item btn py-1 d-flex align-items-center"
-                aria-hidden="true"
-                onClick={handleRefreshToken}>
-                <RefreshIcon />
-                <span className="ml-2">Refresh Token</span>
-              </div>
-              <div
-                className="list-group-item btn py-1 d-flex align-items-center"
-                aria-hidden="true"
-                onClick={() => actions.setSendAdminSecret(!sendAdminSecret)}>
-                <input
-                  type="checkbox"
-                  checked={sendAdminSecret}
-                  onChange={e => actions.setSendAdminSecret(e.target.checked)}
-                />
-                <span className="ml-2">Send Admin Secret</span>
-              </div>
-            </>
+            <DebugSettings setType={setType} setShow={setShow} />
           )}
         </div>
       </aside>
