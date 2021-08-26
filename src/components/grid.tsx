@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -36,6 +36,7 @@ type GridPropsType = {
   gridAPI: GridApi;
   foreignKeyColumns: any;
   referencedByColumns: any;
+  filters: any;
 };
 
 const Grid = ({
@@ -54,6 +55,7 @@ const Grid = ({
   gridAPI,
   foreignKeyColumns,
   referencedByColumns,
+  filters,
 }: GridPropsType) => {
   const client = useContext(ClientContext);
 
@@ -66,7 +68,39 @@ const Grid = ({
     else gridAPI.sizeColumnsToFit();
   };
 
-  const createServerSideDatasource = () => {
+  const isValidFilter = filter => {
+    return (
+      filter.clause &&
+      filter.condition &&
+      filter.column &&
+      filter.filterText !== ''
+    );
+  };
+
+  const parseFilters = filters => {
+    const f = {};
+    filters.forEach(filter => {
+      if (isValidFilter(filter)) {
+        if (filter.clause === '_where') {
+          f[filter?.column] = {
+            [filter.condition]: parseInt(filter.filterText, 10)
+              ? parseInt(filter.filterText, 10)
+              : filter.filterText,
+          };
+        } else
+          f[filter.clause] = {
+            [filter.column]: {
+              [filter.condition]: parseInt(filter.filterText, 10)
+                ? parseInt(filter.filterText, 10)
+                : filter.filterText,
+            },
+          };
+      }
+    });
+    return f;
+  };
+
+  const createServerSideDatasource = useCallback(() => {
     return {
       async getRows(params: IServerSideGetRowsParams) {
         const subscription = gql.subscription({
@@ -74,6 +108,10 @@ const Grid = ({
           variables: {
             limit: params.request.endRow,
             offset: params.request.startRow,
+            where: {
+              value: parseFilters(filters),
+              type: `${schema.name}_${table.name.concat('_bool_exp')}`,
+            },
             order_by: {
               value: { [orderBy]: `asc` },
               type: `[${schema.name}_${table.name.concat('_order_by!')}]`,
@@ -83,6 +121,12 @@ const Grid = ({
         });
         const operationAgg = gql.query({
           operation: `${schema.name}_${table.name.concat('_aggregate')}`,
+          variables: {
+            where: {
+              value: parseFilters(filters),
+              type: `${schema.name}_${table.name.concat('_bool_exp')}`,
+            },
+          },
           fields: [{ aggregate: ['count'] }],
         });
         const { data: c } = await client.request(operationAgg);
@@ -96,6 +140,12 @@ const Grid = ({
                 data[`${schema.name}_${table.name}`],
                 c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
               );
+              if (
+                c[`${schema.name}_${table.name}_aggregate`].aggregate.count ===
+                0
+              )
+                params.api.showNoRowsOverlay();
+              else params.api.hideOverlay();
               autoSizeColumns(params.columnApi, params.api);
             },
             error(error) {
@@ -116,7 +166,8 @@ const Grid = ({
         }
       },
     };
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const onGridReady = (params: GridReadyEvent) => {
     actions.setGridAPI(params.api);
@@ -137,11 +188,14 @@ const Grid = ({
         applyOrder: true,
       });
     }
+  };
+
+  useEffect(() => {
     setTimeout(function setDatasource() {
       const datasource = createServerSideDatasource();
-      params.api.setServerSideDatasource(datasource);
+      if (gridAPI) gridAPI.setServerSideDatasource(datasource);
     }, 1000);
-  };
+  }, [createServerSideDatasource, gridAPI]);
 
   const onGridSizeChanged = (params: GridSizeChangedEvent) =>
     autoSizeColumns(params.columnApi, params.api);
@@ -173,7 +227,7 @@ const Grid = ({
     tableName: string = null,
     type: 'foreignKey' | 'referencedBy' | null = null,
   ) => {
-    if (column.foreignKeys.length > 0) {
+    if (column.foreignKeys.length > 0 && type === null) {
       return (
         <AgGridColumn
           field={column.name}
@@ -187,7 +241,7 @@ const Grid = ({
         />
       );
     }
-    if (column.isPrimaryKey) {
+    if (column.isPrimaryKey && type === null) {
       return (
         <AgGridColumn
           field={column.name}
@@ -252,7 +306,6 @@ const Grid = ({
           editable: true,
           resizable: true,
           sortable: true,
-          filter: true,
         }}
         sortingOrder={['desc', 'asc', null]}
         onCellValueChanged={onCellValueChanged}
@@ -319,6 +372,7 @@ const mapStateToProps = state => ({
   gridAPI: state.gridAPI,
   foreignKeyColumns: state.foreignKeyColumns,
   referencedByColumns: state.referencedByColumns,
+  filters: state.filters,
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -78,6 +78,16 @@ export default function gridReducer(state: any = {}, action) {
         ...state,
         column: payload.column,
       };
+    case types.SET_FILTERS:
+      return {
+        ...state,
+        filters: payload.filters,
+      };
+    case types.SET_FILTER:
+      return {
+        ...state,
+        filters: [...state.filters, payload.filter],
+      };
     case types.SET_COLUMNS:
       return {
         ...state,

@@ -1,6 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import * as gql from 'gql-query-builder';
-import { ChevronRightIcon, EditIcon, toaster } from 'evergreen-ui';
+import {
+  ChevronRightIcon,
+  EditIcon,
+  IconButton,
+  toaster,
+  FilterListIcon,
+  Button,
+  Popover,
+} from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
@@ -28,6 +36,7 @@ import { updateTableData } from '../../utils/updateTableData';
 import Loading from '../loading';
 import Layout from './layout';
 import NotFound from '../notFound';
+import FilterPane from '../common/filters/filterPane';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -455,24 +464,26 @@ const TableLayout = ({
               + Create a view
             </div>
             <div className="float-right">
-              <button
-                type="submit"
-                onClick={() => saveView(defaultView)}
-                className="btn btn-sm btn-dark mr-2">
+              <Popover
+                bringFocusInside
+                content={<FilterPane />}
+                shouldCloseOnExternalClick={false}>
+                <IconButton icon={FilterListIcon} className="mr-2" />
+              </Popover>
+              <Button onClick={() => saveView(defaultView)} className="mr-2">
                 Save to {defaultView}
-              </button>
-              <button
-                type="submit"
+              </Button>
+              <Button
                 onClick={() => {
                   gridAPI.setSideBarVisible(!gridAPI.isSideBarVisible());
                   gridAPI.openToolPanel('columns');
                 }}
-                className="btn btn-sm btn-primary mr-2">
+                className="mr-2">
                 Select Columns
-              </button>
+              </Button>
             </div>
           </div>
-          <div className="w-100 mt-4">
+          <div className="mt-4">
             <Grid
               onCellValueChanged={onCellValueChanged}
               getContextMenuItems={getContextMenuItems}

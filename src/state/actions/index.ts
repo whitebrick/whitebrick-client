@@ -73,6 +73,18 @@ export const actions = {
       payload: { columns },
     };
   },
+  setFilters(filters) {
+    return {
+      type: types.SET_FILTERS,
+      payload: { filters },
+    };
+  },
+  setFilter(filter) {
+    return {
+      type: types.SET_FILTER,
+      payload: { filter },
+    };
+  },
   setForeignKeyColumns(foreignKeyColumns) {
     return {
       type: types.SET_FOREIGN_KEY_COLUMNS,

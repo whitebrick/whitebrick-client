@@ -15,6 +15,7 @@ const initialState = {
   foreignKeyColumns: [],
   referencedByColumns: [],
   column: {},
+  filters: [],
   fields: [],
   rowData: [],
   rowCount: 0,
