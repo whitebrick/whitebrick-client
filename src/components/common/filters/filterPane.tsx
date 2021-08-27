@@ -26,7 +26,7 @@ const FilterPane = ({ filters, columns, actions }: FilterPanePropsType) => {
       {filters.map((filter, index) => (
         <FilterRow filter={filter} id={index} key={index.toString()} />
       ))}
-      <hr />
+      {filters.length > 0 && <hr />}
       <Button
         marginLeft={10}
         appearance="primary"
