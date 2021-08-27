@@ -466,7 +466,7 @@ const TableLayout = ({
             <div className="float-right">
               <Popover
                 bringFocusInside
-                content={<FilterPane />}
+                content={({ close }) => <FilterPane close={close} />}
                 shouldCloseOnExternalClick={false}>
                 <IconButton icon={FilterListIcon} className="mr-2" />
               </Popover>
