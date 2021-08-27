@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -19,6 +19,7 @@ import ForeignKeyCellRenderer from './cell/foreignKeyCellRenderer';
 import PrimaryKeyCellRenderer from './cell/primaryKeyCellRenderer';
 import ForeignKeyEditor from './cell/foreignKeyEditor';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
+import { getQueryParams } from '../utils/queryParams';
 
 type GridPropsType = {
   onCellValueChanged: (params: any) => void;
@@ -58,6 +59,7 @@ const Grid = ({
   filters,
 }: GridPropsType) => {
   const client = useContext(ClientContext);
+  const [parsedFilters, setParsedFilters] = useState({});
 
   const autoSizeColumns = (columnAPI, gridAPI) => {
     const allColumnIds = [];
@@ -109,7 +111,7 @@ const Grid = ({
             limit: params.request.endRow,
             offset: params.request.startRow,
             where: {
-              value: parseFilters(filters),
+              value: parsedFilters,
               type: `${schema.name}_${table.name.concat('_bool_exp')}`,
             },
             order_by: {
@@ -167,7 +169,7 @@ const Grid = ({
       },
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  }, [parsedFilters, fields]);
 
   const onGridReady = (params: GridReadyEvent) => {
     actions.setGridAPI(params.api);
@@ -196,6 +198,31 @@ const Grid = ({
       if (gridAPI) gridAPI.setServerSideDatasource(datasource);
     }, 1000);
   }, [createServerSideDatasource, gridAPI]);
+
+  useEffect(() => {
+    const params = getQueryParams(window.location.search);
+    const keys = Object.keys(params);
+    if (keys.length > 0) {
+      const queryFilters = [];
+      keys.forEach(param => {
+        queryFilters.push({
+          clause: '_where',
+          column: param,
+          condition: '_eq',
+          filterText: params[param],
+        });
+      });
+      actions.setFilters([...queryFilters]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const pf = parseFilters(filters);
+    if (JSON.stringify(pf) !== JSON.stringify(parsedFilters))
+      setParsedFilters(pf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const onGridSizeChanged = (params: GridSizeChangedEvent) =>
     autoSizeColumns(params.columnApi, params.api);
