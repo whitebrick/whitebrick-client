@@ -59,6 +59,7 @@ const FilterRow = ({
         icon={CrossIcon}
       />
       <Select
+        width={100}
         marginRight={10}
         value={filter.clause}
         onChange={e => handleFilterChange(filter, 'clause', e)}>
@@ -75,6 +76,7 @@ const FilterRow = ({
         ))}
       </Select>
       <Select
+        width={100}
         marginRight={10}
         value={filter.condition}
         onChange={e => handleFilterChange(filter, 'condition', e)}>
@@ -83,7 +85,7 @@ const FilterRow = ({
         ))}
       </Select>
       <TextInput
-        width={120}
+        width={100}
         value={filter.filterText}
         onChange={e => handleFilterChange(filter, 'filterText', e)}
       />
