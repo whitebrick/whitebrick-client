@@ -5,7 +5,7 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
 import { ColumnApi, GridApi } from 'ag-grid-community';
 import * as gql from 'gql-query-builder';
-import { TextInputField, toaster } from 'evergreen-ui';
+import { TextInputField, toaster, Spinner } from 'evergreen-ui';
 import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
 import { SCHEMAS_QUERY } from '../../graphql/queries/wb';
 import {
@@ -560,27 +560,31 @@ const LayoutSidePanel = ({
     if (type === 'newRow' || type === 'editRow')
       return (
         <div className="w-75">
-          {columns.map(c => (
-            <>
-              {c.foreignKeys.length > 0 ? (
-                <TextInputField
-                  label={c.label}
-                  value={formData ? formData[c.name] : ''}
-                  hint={
-                    c.foreignKeys.length > 0
-                      ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
-                      : null
-                  }
-                />
-              ) : (
-                <TextInputField
-                  label={c.label}
-                  value={formData ? formData[c.name] : ''}
-                  hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
-                />
-              )}
-            </>
-          ))}
+          {columns.length > 0 ? (
+            columns.map(c => (
+              <>
+                {c.foreignKeys.length > 0 ? (
+                  <TextInputField
+                    label={c.label}
+                    value={formData ? formData[c.name] : ''}
+                    hint={
+                      c.foreignKeys.length > 0
+                        ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
+                        : null
+                    }
+                  />
+                ) : (
+                  <TextInputField
+                    label={c.label}
+                    value={formData ? formData[c.name] : ''}
+                    hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
+                  />
+                )}
+              </>
+            ))
+          ) : (
+            <Spinner marginX="auto" marginY={120} />
+          )}
         </div>
       );
     if (type === 'view')

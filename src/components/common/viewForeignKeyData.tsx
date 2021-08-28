@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import * as gql from 'gql-query-builder';
-import { TextInputField } from 'evergreen-ui';
+import { TextInputField, Spinner } from 'evergreen-ui';
 import { ClientContext, useManualQuery } from 'graphql-hooks';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { actions } from '../../state/actions';
@@ -117,33 +117,41 @@ const ViewForeignKeyData = ({
       setShow={setShow}
       onSave={onSave}>
       <div className="w-75">
-        {newColumns.map(c => (
-          <>
-            {c.foreignKeys.length > 0 ? (
-              <TextInputField
-                label={c.label}
-                value={changedData[c.name] ? changedData[c.name] : data[c.name]}
-                onChange={e =>
-                  setChangedData({ ...changedData, [c.name]: e.target.value })
-                }
-                hint={
-                  c.foreignKeys.length > 0
-                    ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
-                    : null
-                }
-              />
-            ) : (
-              <TextInputField
-                label={c.label}
-                value={changedData[c.name] ? changedData[c.name] : data[c.name]}
-                onChange={e =>
-                  setChangedData({ ...changedData, [c.name]: e.target.value })
-                }
-                hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
-              />
-            )}
-          </>
-        ))}
+        {newColumns.length > 0 ? (
+          newColumns.map(c => (
+            <>
+              {c.foreignKeys.length > 0 ? (
+                <TextInputField
+                  label={c.label}
+                  value={
+                    changedData[c.name] ? changedData[c.name] : data[c.name]
+                  }
+                  onChange={e =>
+                    setChangedData({ ...changedData, [c.name]: e.target.value })
+                  }
+                  hint={
+                    c.foreignKeys.length > 0
+                      ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
+                      : null
+                  }
+                />
+              ) : (
+                <TextInputField
+                  label={c.label}
+                  value={
+                    changedData[c.name] ? changedData[c.name] : data[c.name]
+                  }
+                  onChange={e =>
+                    setChangedData({ ...changedData, [c.name]: e.target.value })
+                  }
+                  hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
+                />
+              )}
+            </>
+          ))
+        ) : (
+          <Spinner marginX="auto" marginY={120} />
+        )}
       </div>
     </SidePanel>
   );
