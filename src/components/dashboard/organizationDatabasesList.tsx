@@ -84,7 +84,7 @@ const OrganizationDatabasesList = ({
             />
           </div>
         ) : (
-          <NoData type="createDatabase" name="database" />
+          <NoData type="createDatabase" name="database" bg="transparent" />
         )}
       </div>
     </div>

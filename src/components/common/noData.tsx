@@ -10,14 +10,19 @@ type NoDataType = {
   type: string;
   name: string;
   schema: SchemaItemType;
+  bg?: string;
 };
 
-const NoData = ({ actions, type, name, schema }: NoDataType) => {
+const defaultProps = {
+  bg: '#ececec',
+};
+
+const NoData = ({ actions, type, name, schema, bg }: NoDataType) => {
   return (
     <div className="col-md-6 offset-md-4">
       <div
         className="text-center rounded p-3"
-        style={{ backgroundColor: '#ececec', width: '60%' }}>
+        style={{ backgroundColor: bg, width: '60%' }}>
         <p>You do not have any {name} yet.</p>
         <div
           aria-hidden
@@ -34,6 +39,8 @@ const NoData = ({ actions, type, name, schema }: NoDataType) => {
     </div>
   );
 };
+
+NoData.defaultProps = defaultProps;
 
 const mapStateToProps = state => ({
   schema: state.schema,

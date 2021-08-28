@@ -236,7 +236,7 @@ const Grid = ({
         if (paramsData) {
           paramsData.forEach(data => {
             let value = data?.[column.name];
-            if (value.toString().length > 20)
+            if (value && value.toString().length > 20)
               value = value.toString().substring(0, 20).concat('...');
             values.push(value);
           });
@@ -264,7 +264,6 @@ const Grid = ({
           cellEditor="foreignKeyEditor"
           cellRenderer="foreignKeyRenderer"
           valueGetter={params => valueGetter(params, tableName, column, type)}
-          editable={!!tableName}
         />
       );
     }
@@ -277,7 +276,6 @@ const Grid = ({
           headerTooltip={column.label}
           cellRenderer="primaryKeyRenderer"
           valueGetter={params => valueGetter(params, tableName, column, type)}
-          editable={!!tableName}
         />
       );
     }
@@ -288,7 +286,7 @@ const Grid = ({
         headerName={column.label}
         headerTooltip={column.label}
         valueGetter={params => valueGetter(params, tableName, column, type)}
-        editable={!!tableName}
+        editable={!type}
       />
     );
   };
@@ -306,6 +304,8 @@ const Grid = ({
         serverSideStoreType="partial"
         pagination
         paginationPageSize={limit}
+        enterMovesDown
+        enterMovesDownAfterEdit
         sideBar={{
           toolPanels: [
             {

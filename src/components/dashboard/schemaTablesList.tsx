@@ -60,7 +60,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
               </div>
             ))
           ) : (
-            <NoData type="createTable" name="table" />
+            <NoData type="createTable" name="table" bg="transparent" />
           )}
           {tables.length > 0 && <AddData type="createTable" name="table" />}
         </div>
