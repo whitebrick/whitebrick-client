@@ -63,7 +63,7 @@ const Grid = ({
 
   const autoSizeColumns = (columnAPI, gridAPI) => {
     const allColumnIds = [];
-    columnAPI.getAllColumns().forEach(function ids(column) {
+    columnAPI.getAllColumns()?.forEach(function ids(column) {
       allColumnIds.push(column.colId);
     });
     if (allColumnIds.length > 4) columnAPI.autoSizeColumns(allColumnIds, false);
