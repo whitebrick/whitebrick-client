@@ -15,9 +15,9 @@ import {
 import { connect } from 'react-redux';
 import * as gql from 'gql-query-builder';
 import { actions } from '../state/actions';
-import ForeignKeyCellRenderer from './cell/foreignKeyCellRenderer';
-import PrimaryKeyCellRenderer from './cell/primaryKeyCellRenderer';
-import ForeignKeyEditor from './cell/foreignKeyEditor';
+import ForeignKeyCellRenderer from './cell/renderers/foreignKey';
+import PrimaryKeyCellRenderer from './cell/renderers/primaryKey';
+import ForeignKeyEditor from './cell/editors/foreignKey';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
 import { getQueryParams } from '../utils/queryParams';
 
@@ -60,15 +60,6 @@ const Grid = ({
 }: GridPropsType) => {
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
-
-  const autoSizeColumns = (columnAPI, gridAPI) => {
-    const allColumnIds = [];
-    columnAPI.getAllColumns()?.forEach(function ids(column) {
-      allColumnIds.push(column.colId);
-    });
-    if (allColumnIds.length > 4) columnAPI.autoSizeColumns(allColumnIds, false);
-    else gridAPI.sizeColumnsToFit();
-  };
 
   const isValidFilter = filter => {
     return (
@@ -148,7 +139,7 @@ const Grid = ({
               )
                 params.api.showNoRowsOverlay();
               else params.api.hideOverlay();
-              autoSizeColumns(params.columnApi, params.api);
+              params.columnApi.autoSizeAllColumns(false);
             },
             error(error) {
               console.error(error);
@@ -225,7 +216,7 @@ const Grid = ({
   }, [filters]);
 
   const onGridSizeChanged = (params: GridSizeChangedEvent) =>
-    autoSizeColumns(params.columnApi, params.api);
+    params.columnApi.autoSizeAllColumns(false);
 
   const valueGetter = (params, tableName, column, type) => {
     if (tableName) {
@@ -285,6 +276,7 @@ const Grid = ({
         key={column.name}
         headerName={column.label}
         headerTooltip={column.label}
+        cellRenderer={type && 'joinedKeyRenderer'}
         valueGetter={params => valueGetter(params, tableName, column, type)}
         editable={!type}
       />

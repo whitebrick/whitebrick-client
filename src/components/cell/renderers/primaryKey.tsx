@@ -2,7 +2,7 @@ import React from 'react';
 import { Badge } from 'evergreen-ui';
 import { RowNode } from 'ag-grid-community';
 import { useDispatch } from 'react-redux';
-import { actions } from '../../state/actions';
+import { actions } from '../../../state/actions';
 
 type PrimaryKeyCellRendererPropsType = {
   valueFormatted: string;

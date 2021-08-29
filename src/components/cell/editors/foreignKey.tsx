@@ -8,8 +8,8 @@ import React, {
 } from 'react';
 import { ClientContext } from 'graphql-hooks';
 import { IconButton, SmallPlusIcon } from 'evergreen-ui';
-import LinkForeignKey from '../common/linkForeignKey';
-import { updateTableData } from '../../utils/updateTableData';
+import LinkForeignKey from '../../common/linkForeignKey';
+import { updateTableData } from '../../../utils/updateTableData';
 
 const ForeignKeyEditor = forwardRef((props: any, ref) => {
   const client = useContext(ClientContext);

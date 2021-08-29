@@ -2,9 +2,9 @@ import React, { useContext, useState } from 'react';
 import { SmallPlusIcon, Badge } from 'evergreen-ui';
 import { ColDef } from 'ag-grid-community';
 import { ClientContext } from 'graphql-hooks';
-import ViewForeignKeyData from '../common/viewForeignKeyData';
-import LinkForeignKey from '../common/linkForeignKey';
-import { updateTableData } from '../../utils/updateTableData';
+import ViewForeignKeyData from '../../common/viewForeignKeyData';
+import LinkForeignKey from '../../common/linkForeignKey';
+import { updateTableData } from '../../../utils/updateTableData';
 
 type ForeignKeyCellRendererPropsType = {
   valueFormatted: string;
