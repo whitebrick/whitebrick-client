@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import * as gql from 'gql-query-builder';
 import {
   ChevronRightIcon,
   EditIcon,
@@ -15,6 +14,16 @@ import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
 import { Link } from 'gatsby';
 import { GridApi, ColumnApi } from 'ag-grid-community';
 import { actions } from '../../state/actions';
+import {
+  onAddRow,
+  onEditRow,
+  onDeleteRow,
+} from '../../utils/tableElement/rowActions';
+import {
+  AddColumn,
+  EditColumn,
+  onRemove,
+} from '../../utils/tableElement/columnActions';
 
 import Grid from '../grid';
 import {
@@ -316,105 +325,43 @@ const TableLayout = ({
     saveSettingsToDB();
   };
 
-  const onAddRow = () => {
-    actions.setType('newRow');
-    actions.setShow(true);
-  };
-
-  const onEditRow = params => {
-    actions.setType('editRow');
-    actions.setParams(params.node.data);
-    actions.setFormData(params.node.data);
-    actions.setShow(true);
-  };
-
-  const onDeleteRow = params => {
-    const variables = { where: {} };
-    const { data } = params.node;
-    Object.keys(data).forEach(key => {
-      if (data[key]) {
-        variables.where[key] = {
-          _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
-        };
-      }
-    });
-    const operation = gql.mutation({
-      operation: ''.concat('delete_', `${schema.name}_${table.name}`),
-      variables: {
-        where: {
-          value: variables.where,
-          type: `${`${schema.name}_${table.name}`}_bool_exp`,
-          required: true,
-        },
-      },
-      fields: ['affected_rows'],
-    });
-    const fetchData = async () => client.request(operation);
-    fetchData().finally(() => console.log('deleted row'));
-  };
-
-  const onRemove = async colID => {
-    const { loading, error } = await removeOrDeleteColumnMutation({
-      variables: {
-        schemaName: schema.name,
-        tableName: table.name,
-        columnName: colID,
-        del: true,
-      },
-    });
-    if (!loading && !error) {
-      const col = columns.filter(c => c.name === colID)[0];
-      const index = columns.indexOf(col);
-      columns.splice(index, 1);
-      fields.splice(index, 1);
-      actions.setColumns(columns);
-      gridAPI.refreshCells({ force: true });
-    }
-  };
-
   const getContextMenuItems = params => {
     actions.setFormData({});
     return [
       {
         name: 'Add Column',
-        action: () => {
-          actions.setType('addColumn');
-          actions.setShow(true);
-          actions.setColumn(params.column.colId);
-        },
+        action: () => AddColumn(params, actions),
       },
       {
         name: 'Edit Column',
-        action: () => {
-          actions.setType('editColumn');
-          actions.setShow(true);
-          const column: any = columns.filter(
-            column => column.name === params.column.colId,
-          )[0];
-          if (column.default) {
-            column.autoIncrement = true;
-            column.startSequenceNumber = column.default;
-          }
-          actions.setFormData(column);
-          actions.setColumn(params.column.colId);
-        },
+        action: () => EditColumn(params, actions, columns),
       },
       {
         name: 'Remove Column',
-        action: () => onRemove(params.column.colId),
+        action: () =>
+          onRemove(
+            params.column.colId,
+            schema,
+            columns,
+            table,
+            actions,
+            fields,
+            gridAPI,
+            removeOrDeleteColumnMutation,
+          ),
       },
       'separator',
       {
         name: 'Add Row',
-        action: () => onAddRow(),
+        action: () => onAddRow(actions),
       },
       {
         name: 'Edit Row',
-        action: () => onEditRow(params),
+        action: () => onEditRow(params, actions),
       },
       {
         name: 'Delete Row',
-        action: () => onDeleteRow(params),
+        action: () => onDeleteRow(params, schema, table, client),
       },
       'separator',
       'copy',
