@@ -1,10 +1,10 @@
-export const AddColumn = (params, actions) => {
+export const onAddColumn = (params, actions) => {
   actions.setType('addColumn');
   actions.setShow(true);
   actions.setColumn(params.column.colId);
 };
 
-export const EditColumn = (params, actions, columns) => {
+export const onEditColumn = (params, actions, columns) => {
   actions.setType('editColumn');
   actions.setShow(true);
   const column: any = columns.filter(
@@ -18,7 +18,7 @@ export const EditColumn = (params, actions, columns) => {
   actions.setColumn(params.column.colId);
 };
 
-export const onRemove = async (
+export const onDeleteColumn = async (
   colID,
   schema,
   columns,

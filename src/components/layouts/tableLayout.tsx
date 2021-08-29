@@ -18,12 +18,10 @@ import {
   onAddRow,
   onEditRow,
   onDeleteRow,
-} from '../../utils/tableElement/rowActions';
-import {
-  AddColumn,
-  EditColumn,
-  onRemove,
-} from '../../utils/tableElement/columnActions';
+  onAddColumn,
+  onEditColumn,
+  onDeleteColumn,
+} from '../../utils/actions';
 
 import Grid from '../grid';
 import {
@@ -330,16 +328,16 @@ const TableLayout = ({
     return [
       {
         name: 'Add Column',
-        action: () => AddColumn(params, actions),
+        action: () => onAddColumn(params, actions),
       },
       {
         name: 'Edit Column',
-        action: () => EditColumn(params, actions, columns),
+        action: () => onEditColumn(params, actions, columns),
       },
       {
         name: 'Remove Column',
         action: () =>
-          onRemove(
+          onDeleteColumn(
             params.column.colId,
             schema,
             columns,
