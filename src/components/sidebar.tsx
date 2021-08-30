@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { useManualQuery } from 'graphql-hooks';
 import { actions } from '../state/actions';
-import { OrganizationItemType, SchemaItemType, TableItemType } from '../types';
+import { OrganizationItemType, SchemaItemType } from '../types';
 import { ORGANIZATIONS_QUERY } from '../graphql/queries/wb';
 import DebugSettings from './elements/debugSettings';
 import DatabaseSettings from './elements/databaseSettings';
@@ -14,7 +14,6 @@ type SidebarPropsType = {
   setType: (value: string) => void;
   setShow: (value: boolean) => void;
   schema: SchemaItemType;
-  table: TableItemType;
   organizations: Array<OrganizationItemType>;
   actions: any;
 };
@@ -24,7 +23,6 @@ const Sidebar = ({
   setType,
   setShow,
   schema,
-  table,
   organizations,
   actions,
 }: SidebarPropsType) => {
@@ -89,7 +87,6 @@ const Sidebar = ({
 
 const mapStateToProps = state => ({
   schema: state.schema,
-  table: state.table,
   organizations: state.organizations,
   sendAdminSecret: state.sendAdminSecret,
 });
