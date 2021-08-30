@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronRightIcon, EditIcon, IconButton, Select } from 'evergreen-ui';
+import { EditIcon, IconButton } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { useManualQuery } from 'graphql-hooks';
-import { Link, navigate } from 'gatsby';
 import SchemaTablesList from '../dashboard/schemaTablesList';
 import Tabs from '../elements/tabs';
 import { SchemaItemType } from '../../types';
 import { actions } from '../../state/actions';
 import Members from '../common/members';
 import { SCHEMA_USERS_QUERY } from '../../graphql/queries/wb';
+import Breadcrumb from '../common/breadcrumb';
 
 type SchemaLayoutType = {
   schema: SchemaItemType;
-  schemas: SchemaItemType[];
   actions: any;
 };
 
-const SchemaLayout = ({ schema, schemas, actions }: SchemaLayoutType) => {
+const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
   const userRole = schema?.role?.name;
   const [users, setUsers] = useState([]);
   const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
@@ -43,32 +42,10 @@ const SchemaLayout = ({ schema, schemas, actions }: SchemaLayoutType) => {
     },
   ];
 
-  // This function handles the user's trigger to go to another schema when prompted
-  // through the breadcrumb navigation in tableLayout.
-  const changeSchema = e => {
-    const schemaName = e.target.value;
-    navigate(
-      schema.organizationOwnerName
-        ? `/${schema.organizationOwnerName}/${schemaName}/`
-        : `/db/${schemaName}/`,
-    );
-  };
-
   return (
     <div className="mt-3">
       <div style={{ padding: `1rem` }}>
-        <p>
-          <Link to="/">Home</Link> <ChevronRightIcon />{' '}
-          <Select
-            onChange={event => changeSchema(event)}
-            width={150}
-            height={20}
-            value={schema.name}>
-            {schemas.map(schema => (
-              <option value={schema.name}>{schema.label}</option>
-            ))}
-          </Select>
-        </p>
+        <Breadcrumb />
         <h3 className="m-0 w-50">
           <span>
             {schema.label}
@@ -97,7 +74,6 @@ const SchemaLayout = ({ schema, schemas, actions }: SchemaLayoutType) => {
 
 const mapStateToProps = state => ({
   schema: state.schema,
-  schemas: state.schemas,
 });
 
 const mapDispatchToProps = dispatch => ({

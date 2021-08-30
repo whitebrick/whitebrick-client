@@ -1,18 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-  ChevronRightIcon,
   EditIcon,
   IconButton,
   toaster,
   FilterListIcon,
   Button,
   Popover,
-  Select,
 } from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
-import { Link, navigate } from 'gatsby';
 import { GridApi, ColumnApi } from 'ag-grid-community';
 import { actions } from '../../state/actions';
 import {
@@ -46,10 +43,10 @@ import Loading from '../loading';
 import Layout from './layout';
 import NotFound from '../notFound';
 import FilterPane from '../common/filters/filterPane';
+import Breadcrumb from '../common/breadcrumb';
 
 type TableLayoutPropsType = {
   table: TableItemType;
-  tables: TableItemType[];
   columns: ColumnItemType[];
   fields: [];
   rowCount: number;
@@ -58,7 +55,6 @@ type TableLayoutPropsType = {
   offset: number;
   views: any[];
   schema: SchemaItemType;
-  schemas: SchemaItemType[];
   defaultView: string;
   formData: any;
   actions: any;
@@ -70,7 +66,6 @@ type TableLayoutPropsType = {
 
 const TableLayout = ({
   table,
-  tables,
   columns,
   fields,
   rowCount,
@@ -79,7 +74,6 @@ const TableLayout = ({
   offset,
   views,
   schema,
-  schemas,
   defaultView,
   formData,
   actions,
@@ -118,18 +112,6 @@ const TableLayout = ({
           tableName: params.tableName,
         },
       }).then(r => setUsers(r?.data?.wbTableUsers));
-  };
-
-  // This function is used with sort() to alphabetically arrange the elements in an
-  // object.
-  const compare = (a, b) => {
-    if (a.label < b.label) {
-      return -1;
-    }
-    if (a.label > b.label) {
-      return 1;
-    }
-    return 0;
   };
 
   useEffect(() => {
@@ -492,28 +474,6 @@ const TableLayout = ({
       </Layout>
     );
 
-  // This function handles the user's wish to go to another table within the same schema
-  // when prompted through the breadcrumb navigation in tableLayout.
-  const changeTable = e => {
-    const tableName = e.target.value;
-    navigate(
-      schema.organizationOwnerName
-        ? `/${schema.organizationOwnerName}/${schema.name}/${tableName}`
-        : `/db/${schema.name}/table/${tableName}`,
-    );
-  };
-
-  // This function handles the user's trigger to go to another schema when prompted
-  // through the breadcrumb navigation in tableLayout.
-  const changeSchema = e => {
-    const schemaName = e.target.value;
-    navigate(
-      schema.organizationOwnerName
-        ? `/${schema.organizationOwnerName}/${schemaName}/`
-        : `/db/${schemaName}/`,
-    );
-  };
-
   return (
     <>
       <Seo title={`${table.label} | ${schema.label}`} />
@@ -522,28 +482,7 @@ const TableLayout = ({
           <>
             <div className="my-3">
               <div style={{ padding: `1rem` }}>
-                <p>
-                  <Link to="/">Home</Link> <ChevronRightIcon />{' '}
-                  <Select
-                    onChange={event => changeSchema(event)}
-                    width={150}
-                    height={20}
-                    value={schema.name}>
-                    {schemas.map(schema => (
-                      <option value={schema.name}>{schema.label}</option>
-                    ))}
-                  </Select>
-                  <ChevronRightIcon />
-                  <Select
-                    onChange={event => changeTable(event)}
-                    width={150}
-                    height={20}
-                    value={table.name}>
-                    {tables?.sort(compare)?.map(table => (
-                      <option value={table.name}>{table.label}</option>
-                    ))}
-                  </Select>
-                </p>
+                <Breadcrumb tableLayout />
                 <h3 className="m-0 w-25" style={{ cursor: 'pointer' }}>
                   <span>
                     {table.label}
@@ -572,7 +511,6 @@ const TableLayout = ({
 const mapStateToProps = state => ({
   type: state.type,
   table: state.table,
-  tables: state.tables,
   formData: state.formData,
   column: state.column,
   columns: state.columns,
@@ -583,7 +521,6 @@ const mapStateToProps = state => ({
   offset: state.offset,
   views: state.views,
   schema: state.schema,
-  schemas: state.schemas,
   defaultView: state.defaultView,
   columnAPI: state.columnAPI,
   gridAPI: state.gridAPI,
