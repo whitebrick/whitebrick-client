@@ -7,11 +7,12 @@ import {
   FilterListIcon,
   Button,
   Popover,
+  Select,
 } from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
-import { Link } from 'gatsby';
+import { Link, navigate } from 'gatsby';
 import { GridApi, ColumnApi } from 'ag-grid-community';
 import { actions } from '../../state/actions';
 import {
@@ -38,6 +39,8 @@ import {
   SCHEMA_TABLE_BY_NAME_QUERY,
   TABLE_USERS_QUERY,
   COLUMNS_BY_NAME_QUERY,
+  SCHEMA_TABLES_QUERY,
+  SCHEMAS_QUERY,
 } from '../../graphql/queries/wb';
 import { updateTableData } from '../../utils/updateTableData';
 import Loading from '../loading';
@@ -84,11 +87,15 @@ const TableLayout = ({
 }: TableLayoutPropsType) => {
   const client = useContext(ClientContext);
   const [isLoading, setLoading] = useState(true);
+  const [tableList, setTableList] = useState([]);
+  const [schemaList, setSchemaList] = useState([]);
   const [error, setError] = useState(null);
 
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
   const [fetchSchemaByName] = useManualQuery(SCHEMA_BY_NAME_QUERY);
   const [fetchColumnsByName] = useManualQuery(COLUMNS_BY_NAME_QUERY);
+  const [fetchTables] = useManualQuery(SCHEMA_TABLES_QUERY);
+  const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
 
   const [changedValues, setChangedValues] = useState([]);
   const [removeOrDeleteColumnMutation] = useMutation(
@@ -111,6 +118,28 @@ const TableLayout = ({
           tableName: params.tableName,
         },
       }).then(r => setUsers(r?.data?.wbTableUsers));
+  };
+
+  // This function fetches the tables associated with a particular schema (schemaName)
+  const fetchTablesData = async schemaName => {
+    const { data } = await fetchTables({
+      variables: {
+        schemaName: schemaName === null ? schema.name : schemaName,
+      },
+    });
+    return data;
+  };
+
+  // This function is used with sort() to alphabetically arrange the elements in an
+  // object.
+  const compare = (a, b) => {
+    if (a.label < b.label) {
+      return -1;
+    }
+    if (a.label > b.label) {
+      return 1;
+    }
+    return 0;
   };
 
   useEffect(() => {
@@ -233,6 +262,19 @@ const TableLayout = ({
     actions.setOffset(0);
     actions.setCurrent(1);
   }, [table, actions]);
+
+  useEffect(() => {
+    fetchTablesData(null).then(r => setTableList(r?.wbMyTables));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchTables, table]);
+
+  useEffect(() => {
+    const fetchSchemasData = async () => {
+      const { data } = await fetchSchemas();
+      return data;
+    };
+    fetchSchemasData().then(r => setSchemaList(r?.wbMySchemas));
+  }, [fetchSchemas, schema]);
 
   const editValues = val => {
     let values = val;
@@ -458,6 +500,44 @@ const TableLayout = ({
       </Layout>
     );
 
+  // This function handles the user's wish to go to another table within the same schema
+  // when prompted through the breadcrumb navigation in tableLayout.
+  const changeTable = e => {
+    navigate(
+      schema.organizationOwnerName
+        ? `/${schema.organizationOwnerName}/${schema.name}/${e.target.value}`
+        : `/db/${schema.name}/table/${e.target.value}`,
+    );
+  };
+
+  // This function handles the user's trigger to go to another schema when prompted
+  // through the breadcrumb navigation in tableLayout.
+  const changeSchema = e => {
+    const schemaName = e.target.value;
+
+    const changeUrlPath = data => {
+      if (data.wbMyTables.length > 0) {
+        navigate(
+          schema.organizationOwnerName
+            ? `/${schema.organizationOwnerName}/${schemaName}/${
+                data.wbMyTables.sort(compare)[0].name
+              }`
+            : `/db/${schemaName}/table/${
+                data.wbMyTables.sort(compare)[0].name
+              }`,
+        );
+      } else {
+        navigate(
+          schema.organizationOwnerName
+            ? `/${schema.organizationOwnerName}/${schemaName}/`
+            : `/db/${schemaName}/`,
+        );
+      }
+    };
+
+    fetchTablesData(schemaName).then(r => changeUrlPath(r));
+  };
+
   return (
     <>
       <Seo title={`${table.label} | ${schema.label}`} />
@@ -468,23 +548,25 @@ const TableLayout = ({
               <div style={{ padding: `1rem` }}>
                 <p>
                   <Link to="/">Home</Link> <ChevronRightIcon />{' '}
-                  <Link
-                    to={
-                      schema.organizationOwnerName
-                        ? `/${schema.organizationOwnerName}/${schema.name}`
-                        : `/db/${schema.name}`
-                    }>
-                    {schema.label}
-                  </Link>{' '}
+                  <Select
+                    onChange={event => changeSchema(event)}
+                    width={150}
+                    height={20}
+                    value={schema.name}>
+                    {schemaList.map(schema => (
+                      <option value={schema.name}>{schema.label}</option>
+                    ))}
+                  </Select>
                   <ChevronRightIcon />
-                  <Link
-                    to={
-                      schema.organizationOwnerName
-                        ? `/${schema.organizationOwnerName}/${schema.name}/${table.name}`
-                        : `/db/${schema.name}/table/${table.name}`
-                    }>
-                    {table.label}
-                  </Link>
+                  <Select
+                    onChange={event => changeTable(event)}
+                    width={150}
+                    height={20}
+                    value={table.name}>
+                    {tableList.sort(compare)?.map(table => (
+                      <option value={table.name}>{table.label}</option>
+                    ))}
+                  </Select>
                 </p>
                 <h3 className="m-0 w-25" style={{ cursor: 'pointer' }}>
                   <span>
