@@ -40,7 +40,6 @@ import {
   TABLE_USERS_QUERY,
   COLUMNS_BY_NAME_QUERY,
   SCHEMA_TABLES_QUERY,
-  SCHEMAS_QUERY,
 } from '../../graphql/queries/wb';
 import { updateTableData } from '../../utils/updateTableData';
 import Loading from '../loading';
@@ -50,6 +49,7 @@ import FilterPane from '../common/filters/filterPane';
 
 type TableLayoutPropsType = {
   table: TableItemType;
+  tables: TableItemType[];
   columns: ColumnItemType[];
   fields: [];
   rowCount: number;
@@ -58,6 +58,7 @@ type TableLayoutPropsType = {
   offset: number;
   views: any[];
   schema: SchemaItemType;
+  schemas: SchemaItemType[];
   defaultView: string;
   formData: any;
   actions: any;
@@ -69,6 +70,7 @@ type TableLayoutPropsType = {
 
 const TableLayout = ({
   table,
+  tables,
   columns,
   fields,
   rowCount,
@@ -77,6 +79,7 @@ const TableLayout = ({
   offset,
   views,
   schema,
+  schemas,
   defaultView,
   formData,
   actions,
@@ -87,15 +90,12 @@ const TableLayout = ({
 }: TableLayoutPropsType) => {
   const client = useContext(ClientContext);
   const [isLoading, setLoading] = useState(true);
-  const [tableList, setTableList] = useState([]);
-  const [schemaList, setSchemaList] = useState([]);
   const [error, setError] = useState(null);
 
+  const [fetchSchemaTablesByName] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
   const [fetchSchemaByName] = useManualQuery(SCHEMA_BY_NAME_QUERY);
   const [fetchColumnsByName] = useManualQuery(COLUMNS_BY_NAME_QUERY);
-  const [fetchTables] = useManualQuery(SCHEMA_TABLES_QUERY);
-  const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
 
   const [changedValues, setChangedValues] = useState([]);
   const [removeOrDeleteColumnMutation] = useMutation(
@@ -118,16 +118,6 @@ const TableLayout = ({
           tableName: params.tableName,
         },
       }).then(r => setUsers(r?.data?.wbTableUsers));
-  };
-
-  // This function fetches the tables associated with a particular schema (schemaName)
-  const fetchTablesData = async schemaName => {
-    const { data } = await fetchTables({
-      variables: {
-        schemaName: schemaName === null ? schema.name : schemaName,
-      },
-    });
-    return data;
   };
 
   // This function is used with sort() to alphabetically arrange the elements in an
@@ -201,13 +191,27 @@ const TableLayout = ({
       return tableFields;
     };
 
+    const fetchSchemaTables = async (schemaName: string) => {
+      const variables: any = { schemaName };
+      const { loading, data, error } = await fetchSchemaTablesByName({
+        variables,
+      });
+      if (!loading) {
+        if (error) setError(error);
+        else actions.setTables(data.wbMyTables);
+      }
+    };
+
     const fetchSchema = async () => {
       const variables: any = { name: params.databaseName };
       if (params.organization) variables.organizationName = params.organization;
       const { loading, data, error } = await fetchSchemaByName({ variables });
       if (!loading) {
         if (error) setError(error);
-        else actions.setSchema(data.wbMySchemaByName);
+        else {
+          actions.setSchema(data.wbMySchemaByName);
+          await fetchSchemaTables(data.wbMySchemaByName.name);
+        }
       }
     };
 
@@ -253,6 +257,7 @@ const TableLayout = ({
     fetchColumnsByName,
     fetchSchemaByName,
     fetchSchemaTableByName,
+    fetchSchemaTablesByName,
     params,
   ]);
 
@@ -262,19 +267,6 @@ const TableLayout = ({
     actions.setOffset(0);
     actions.setCurrent(1);
   }, [table, actions]);
-
-  useEffect(() => {
-    fetchTablesData(null).then(r => setTableList(r?.wbMyTables));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchTables, table]);
-
-  useEffect(() => {
-    const fetchSchemasData = async () => {
-      const { data } = await fetchSchemas();
-      return data;
-    };
-    fetchSchemasData().then(r => setSchemaList(r?.wbMySchemas));
-  }, [fetchSchemas, schema]);
 
   const editValues = val => {
     let values = val;
@@ -503,10 +495,11 @@ const TableLayout = ({
   // This function handles the user's wish to go to another table within the same schema
   // when prompted through the breadcrumb navigation in tableLayout.
   const changeTable = e => {
+    const tableName = e.target.value;
     navigate(
       schema.organizationOwnerName
-        ? `/${schema.organizationOwnerName}/${schema.name}/${e.target.value}`
-        : `/db/${schema.name}/table/${e.target.value}`,
+        ? `/${schema.organizationOwnerName}/${schema.name}/${tableName}`
+        : `/db/${schema.name}/table/${tableName}`,
     );
   };
 
@@ -514,28 +507,11 @@ const TableLayout = ({
   // through the breadcrumb navigation in tableLayout.
   const changeSchema = e => {
     const schemaName = e.target.value;
-
-    const changeUrlPath = data => {
-      if (data.wbMyTables.length > 0) {
-        navigate(
-          schema.organizationOwnerName
-            ? `/${schema.organizationOwnerName}/${schemaName}/${
-                data.wbMyTables.sort(compare)[0].name
-              }`
-            : `/db/${schemaName}/table/${
-                data.wbMyTables.sort(compare)[0].name
-              }`,
-        );
-      } else {
-        navigate(
-          schema.organizationOwnerName
-            ? `/${schema.organizationOwnerName}/${schemaName}/`
-            : `/db/${schemaName}/`,
-        );
-      }
-    };
-
-    fetchTablesData(schemaName).then(r => changeUrlPath(r));
+    navigate(
+      schema.organizationOwnerName
+        ? `/${schema.organizationOwnerName}/${schemaName}/`
+        : `/db/${schemaName}/`,
+    );
   };
 
   return (
@@ -553,7 +529,7 @@ const TableLayout = ({
                     width={150}
                     height={20}
                     value={schema.name}>
-                    {schemaList.map(schema => (
+                    {schemas.map(schema => (
                       <option value={schema.name}>{schema.label}</option>
                     ))}
                   </Select>
@@ -563,7 +539,7 @@ const TableLayout = ({
                     width={150}
                     height={20}
                     value={table.name}>
-                    {tableList.sort(compare)?.map(table => (
+                    {tables?.sort(compare)?.map(table => (
                       <option value={table.name}>{table.label}</option>
                     ))}
                   </Select>
@@ -596,6 +572,7 @@ const TableLayout = ({
 const mapStateToProps = state => ({
   type: state.type,
   table: state.table,
+  tables: state.tables,
   formData: state.formData,
   column: state.column,
   columns: state.columns,
@@ -606,6 +583,7 @@ const mapStateToProps = state => ({
   offset: state.offset,
   views: state.views,
   schema: state.schema,
+  schemas: state.schemas,
   defaultView: state.defaultView,
   columnAPI: state.columnAPI,
   gridAPI: state.gridAPI,
