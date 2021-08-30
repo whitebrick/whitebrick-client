@@ -70,22 +70,33 @@ const Grid = ({
     );
   };
 
+  const getFilterValue = (condition: string, filterText: any) => {
+    if (condition.includes('like')) {
+      return parseInt(filterText, 10)
+        ? `%${parseInt(filterText, 10)}`
+        : `%${filterText}%`;
+    }
+    return parseInt(filterText, 10) ? parseInt(filterText, 10) : filterText;
+  };
+
   const parseFilters = filters => {
     const f = {};
     filters.forEach(filter => {
       if (isValidFilter(filter)) {
         if (filter.clause === '_where') {
           f[filter?.column] = {
-            [filter.condition]: parseInt(filter.filterText, 10)
-              ? parseInt(filter.filterText, 10)
-              : filter.filterText,
+            [filter.condition]: getFilterValue(
+              filter.condition,
+              filter.filterText,
+            ),
           };
         } else
           f[filter.clause] = {
             [filter.column]: {
-              [filter.condition]: parseInt(filter.filterText, 10)
-                ? parseInt(filter.filterText, 10)
-                : filter.filterText,
+              [filter.condition]: getFilterValue(
+                filter.condition,
+                filter.filterText,
+              ),
             },
           };
       }
