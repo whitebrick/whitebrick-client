@@ -27,10 +27,13 @@ Please use GitHub [Isues](https://github.com/whitebrick/whitebrick-cloud/issues)
 - [x] DDL Table & Column CRUD
 - [x] Live editing with subscription
 - [x] Table-level RBAC
-- [ ] Joins
-- [ ] Column-level RBAC
+- [x] Joins
 - [ ] Documentation
 - [ ] UI styling and themes
+- [ ] Direct pg reader/writer access
+- [ ] Validation
+- [ ] Bucket file download columns
+- [ ] Column-level RBAC
 
 Hosted demo at [whitebrick.com](https://whitebrick.com)
 
