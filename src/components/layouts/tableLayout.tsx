@@ -6,6 +6,7 @@ import {
   FilterListIcon,
   Button,
   Popover,
+  PlusIcon,
 } from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -48,6 +49,7 @@ type TableLayoutPropsType = {
   columnAPI: ColumnApi;
   cloudContext: any;
   params: any;
+  rowData: any;
 };
 
 const TableLayout = ({
@@ -65,6 +67,7 @@ const TableLayout = ({
   columnAPI,
   cloudContext,
   params,
+  rowData,
 }: TableLayoutPropsType) => {
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -316,6 +319,16 @@ const TableLayout = ({
               + Create a view
             </div>
             <div className="float-right">
+              <Button
+                onClick={() => {
+                  rowData.splice(rowCount + 1, 0, {});
+                  // @ts-ignore
+                  gridAPI.refreshServerSideStore();
+                }}
+                className="mr-2"
+                iconBefore={PlusIcon}>
+                Add Row
+              </Button>
               <Popover
                 bringFocusInside
                 content={({ close }) => <FilterPane close={close} />}
@@ -409,6 +422,7 @@ const mapStateToProps = state => ({
   columnAPI: state.columnAPI,
   gridAPI: state.gridAPI,
   cloudContext: state.cloudContext,
+  rowData: state.rowData,
 });
 
 const mapDispatchToProps = dispatch => ({

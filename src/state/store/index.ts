@@ -31,6 +31,7 @@ const initialState = {
   sendAdminSecret: false,
   columnAPI: null,
   gridAPI: null,
+  gridParams: null,
   show: false,
   type: '',
   params: {},

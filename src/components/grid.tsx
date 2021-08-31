@@ -185,6 +185,7 @@ const Grid = ({
   }, [parsedFilters, fields]);
 
   const onGridReady = (params: GridReadyEvent) => {
+    actions.setGridParams(params);
     actions.setGridAPI(params.api);
     actions.setColumnAPI(params.columnApi);
     if (views.length <= 0) {

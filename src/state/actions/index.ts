@@ -205,4 +205,10 @@ export const actions = {
       payload: { fields },
     };
   },
+  setGridParams(gridParams) {
+    return {
+      type: types.SET_GRID_PARAMS,
+      payload: { gridParams },
+    };
+  },
 };
