@@ -3,13 +3,12 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import { bindActionCreators } from 'redux';
-import { ClientContext } from 'graphql-hooks';
+import { ClientContext, useMutation } from 'graphql-hooks';
 
 import {
   IServerSideGetRowsParams,
   GridReadyEvent,
   GridApi,
-  GetContextMenuItems,
   GridSizeChangedEvent,
 } from 'ag-grid-community';
 import { connect } from 'react-redux';
@@ -20,10 +19,18 @@ import PrimaryKeyCellRenderer from './cell/renderers/primaryKey';
 import ForeignKeyEditor from './cell/editors/foreignKey';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
 import { getQueryParams } from '../utils/queryParams';
+import {
+  onAddColumn,
+  onAddRow,
+  onDeleteColumn,
+  onDeleteRow,
+  onEditColumn,
+  onEditRow,
+} from '../utils/actions';
+import { REMOVE_OR_DELETE_COLUMN_MUTATION } from '../graphql/mutations/wb';
+import { updateTableData } from '../utils/updateTableData';
 
 type GridPropsType = {
-  onCellValueChanged: (params: any) => void;
-  getContextMenuItems: GetContextMenuItems;
   table: TableItemType;
   views: any[];
   orderBy: string;
@@ -41,8 +48,6 @@ type GridPropsType = {
 };
 
 const Grid = ({
-  onCellValueChanged,
-  getContextMenuItems,
   table,
   views,
   orderBy,
@@ -60,6 +65,11 @@ const Grid = ({
 }: GridPropsType) => {
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
+  const [changedValues, setChangedValues] = useState([]);
+
+  const [removeOrDeleteColumnMutation] = useMutation(
+    REMOVE_OR_DELETE_COLUMN_MUTATION,
+  );
 
   const isValidFilter = filter => {
     return (
@@ -251,6 +261,127 @@ const Grid = ({
     return params.data[column.name];
   };
 
+  const getContextMenuItems = params => {
+    actions.setFormData({});
+    return [
+      {
+        name: 'Add Column',
+        action: () => onAddColumn(params, actions),
+      },
+      {
+        name: 'Edit Column',
+        action: () => onEditColumn(params, actions, columns),
+      },
+      {
+        name: 'Remove Column',
+        action: () =>
+          onDeleteColumn(
+            params.column.colId,
+            schema,
+            columns,
+            table,
+            actions,
+            fields,
+            gridAPI,
+            removeOrDeleteColumnMutation,
+          ),
+      },
+      'separator',
+      {
+        name: 'Add Row',
+        action: () => onAddRow(actions),
+      },
+      {
+        name: 'Edit Row',
+        action: () => onEditRow(params, actions),
+      },
+      {
+        name: 'Delete Row',
+        action: () => onDeleteRow(params, schema, table, client),
+      },
+      'separator',
+      'copy',
+      'copyWithHeaders',
+      'paste',
+      'export',
+    ];
+  };
+
+  const getMainMenuItems = params => {
+    actions.setFormData({});
+    return [
+      {
+        name: 'Add Column',
+        action: () => onAddColumn(params, actions),
+      },
+      {
+        name: 'Edit Column',
+        action: () => onEditColumn(params, actions, columns),
+      },
+      {
+        name: 'Remove Column',
+        action: () =>
+          onDeleteColumn(
+            params.column.colId,
+            schema,
+            columns,
+            table,
+            actions,
+            fields,
+            gridAPI,
+            removeOrDeleteColumnMutation,
+          ),
+      },
+      'separator',
+      'autoSizeThis',
+      'autoSizeAll',
+      'separator',
+      'resetColumns',
+    ];
+  };
+
+  const editValues = val => {
+    let values = val;
+    values = [...Array.from(new Set(values))];
+    values.forEach((params, index) => {
+      const filteredParams = values.filter(
+        value => params.rowIndex === value.rowIndex,
+      );
+      const { data } = params;
+      data[params.colDef?.field] = params.oldValue;
+      filteredParams.forEach(param => {
+        data[param.colDef?.field] = param.oldValue;
+      });
+      const variables = { where: {}, _set: {} };
+      Object.keys(data).forEach(key => {
+        if (!key.startsWith(`obj_${table.name}`) && data[key]) {
+          variables.where[key] = {
+            _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
+          };
+        }
+      });
+      variables._set[params.colDef.field] = parseInt(params.newValue, 10)
+        ? parseInt(params.newValue, 10)
+        : params.newValue;
+      filteredParams.forEach(param => {
+        variables._set[param.colDef.field] = parseInt(param.newValue, 10)
+          ? parseInt(param.newValue, 10)
+          : param.newValue;
+      });
+      values.splice(index, 1);
+      values = values.filter(el => !filteredParams.includes(el));
+      setChangedValues(values);
+      updateTableData(schema.name, table.name, variables, client, actions);
+    });
+  };
+
+  const onCellValueChanged = params => {
+    const values = changedValues;
+    values.push(params);
+    setChangedValues(values);
+    setTimeout(() => editValues(values), 500);
+  };
+
   const renderColumn = (
     column: ColumnItemType,
     tableName: string = null,
@@ -295,7 +426,7 @@ const Grid = ({
   };
 
   return (
-    <>
+    <div className="mt-4">
       <AgGridReact
         frameworkComponents={{
           foreignKeyEditor: ForeignKeyEditor,
@@ -343,6 +474,7 @@ const Grid = ({
         animateRows
         allowContextMenuWithControlKey
         getContextMenuItems={getContextMenuItems}
+        getMainMenuItems={getMainMenuItems}
         popupParent={document.querySelector('body')}
         onGridSizeChanged={onGridSizeChanged}
         onGridReady={onGridReady}>
@@ -382,7 +514,7 @@ const Grid = ({
           records per page
         </div>
       )}
-    </>
+    </div>
   );
 };
 

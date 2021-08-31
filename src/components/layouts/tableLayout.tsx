@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EditIcon,
   IconButton,
@@ -9,23 +9,12 @@ import {
 } from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import { GridApi, ColumnApi } from 'ag-grid-community';
 import { actions } from '../../state/actions';
-import {
-  onAddRow,
-  onEditRow,
-  onDeleteRow,
-  onAddColumn,
-  onEditColumn,
-  onDeleteColumn,
-} from '../../utils/actions';
 
 import Grid from '../grid';
-import {
-  REMOVE_OR_DELETE_COLUMN_MUTATION,
-  SAVE_TABLE_USER_SETTINGS,
-} from '../../graphql/mutations/wb';
+import { SAVE_TABLE_USER_SETTINGS } from '../../graphql/mutations/wb';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import Seo from '../seo';
 
@@ -38,7 +27,6 @@ import {
   COLUMNS_BY_NAME_QUERY,
   SCHEMA_TABLES_QUERY,
 } from '../../graphql/queries/wb';
-import { updateTableData } from '../../utils/updateTableData';
 import Loading from '../loading';
 import Layout from './layout';
 import NotFound from '../notFound';
@@ -47,8 +35,6 @@ import Breadcrumb from '../common/breadcrumb';
 
 type TableLayoutPropsType = {
   table: TableItemType;
-  columns: ColumnItemType[];
-  fields: [];
   rowCount: number;
   orderBy: string;
   limit: number;
@@ -66,8 +52,6 @@ type TableLayoutPropsType = {
 
 const TableLayout = ({
   table,
-  columns,
-  fields,
   rowCount,
   orderBy,
   limit,
@@ -82,7 +66,6 @@ const TableLayout = ({
   cloudContext,
   params,
 }: TableLayoutPropsType) => {
-  const client = useContext(ClientContext);
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -91,10 +74,6 @@ const TableLayout = ({
   const [fetchSchemaByName] = useManualQuery(SCHEMA_BY_NAME_QUERY);
   const [fetchColumnsByName] = useManualQuery(COLUMNS_BY_NAME_QUERY);
 
-  const [changedValues, setChangedValues] = useState([]);
-  const [removeOrDeleteColumnMutation] = useMutation(
-    REMOVE_OR_DELETE_COLUMN_MUTATION,
-  );
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
 
   const [users, setUsers] = useState([]);
@@ -250,48 +229,6 @@ const TableLayout = ({
     actions.setCurrent(1);
   }, [table, actions]);
 
-  const editValues = val => {
-    let values = val;
-    values = [...Array.from(new Set(values))];
-    values.forEach((params, index) => {
-      const filteredParams = values.filter(
-        value => params.rowIndex === value.rowIndex,
-      );
-      const { data } = params;
-      data[params.colDef?.field] = params.oldValue;
-      filteredParams.forEach(param => {
-        data[param.colDef?.field] = param.oldValue;
-      });
-      const variables = { where: {}, _set: {} };
-      Object.keys(data).forEach(key => {
-        if (!key.startsWith(`obj_${table.name}`) && data[key]) {
-          variables.where[key] = {
-            _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
-          };
-        }
-      });
-      variables._set[params.colDef.field] = parseInt(params.newValue, 10)
-        ? parseInt(params.newValue, 10)
-        : params.newValue;
-      filteredParams.forEach(param => {
-        variables._set[param.colDef.field] = parseInt(param.newValue, 10)
-          ? parseInt(param.newValue, 10)
-          : param.newValue;
-      });
-      values.splice(index, 1);
-      values = values.filter(el => !filteredParams.includes(el));
-      setChangedValues(values);
-      updateTableData(schema.name, table.name, variables, client, actions);
-    });
-  };
-
-  const onCellValueChanged = params => {
-    const values = changedValues;
-    values.push(params);
-    setChangedValues(values);
-    setTimeout(() => editValues(values), 500);
-  };
-
   const saveSettingsToDB = async () => {
     const { loading, error } = await saveUserTableSettings({
       variables: {
@@ -337,52 +274,6 @@ const TableLayout = ({
       actions.setDefaultView(formData.name);
     }
     saveSettingsToDB();
-  };
-
-  const getContextMenuItems = params => {
-    actions.setFormData({});
-    return [
-      {
-        name: 'Add Column',
-        action: () => onAddColumn(params, actions),
-      },
-      {
-        name: 'Edit Column',
-        action: () => onEditColumn(params, actions, columns),
-      },
-      {
-        name: 'Remove Column',
-        action: () =>
-          onDeleteColumn(
-            params.column.colId,
-            schema,
-            columns,
-            table,
-            actions,
-            fields,
-            gridAPI,
-            removeOrDeleteColumnMutation,
-          ),
-      },
-      'separator',
-      {
-        name: 'Add Row',
-        action: () => onAddRow(actions),
-      },
-      {
-        name: 'Edit Row',
-        action: () => onEditRow(params, actions),
-      },
-      {
-        name: 'Delete Row',
-        action: () => onDeleteRow(params, schema, table, client),
-      },
-      'separator',
-      'copy',
-      'copyWithHeaders',
-      'paste',
-      'export',
-    ];
   };
 
   const tabs = [
@@ -444,12 +335,7 @@ const TableLayout = ({
               </Button>
             </div>
           </div>
-          <div className="mt-4">
-            <Grid
-              onCellValueChanged={onCellValueChanged}
-              getContextMenuItems={getContextMenuItems}
-            />
-          </div>
+          <Grid />
         </>
       ),
     },
@@ -513,8 +399,6 @@ const mapStateToProps = state => ({
   table: state.table,
   formData: state.formData,
   column: state.column,
-  columns: state.columns,
-  fields: state.fields,
   rowCount: state.rowCount,
   orderBy: state.orderBy,
   limit: state.limit,
