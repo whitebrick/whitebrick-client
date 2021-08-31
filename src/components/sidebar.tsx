@@ -4,6 +4,7 @@ import {
   IconButton,
   ChevronRightIcon,
   ChevronLeftIcon,
+  Tooltip,
 } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -35,7 +36,7 @@ const Sidebar = ({ expand, setExpand, actions }: SidebarPropsType) => {
     <div
       className="row m-0"
       id="sidebar"
-      style={{ width: expand ? '250px' : '80px' }}>
+      style={{ width: expand ? '250px' : '3.5rem' }}>
       <aside className="p-0">
         <Orgs expand={expand} />
         <div className="list-group mt-4">
@@ -44,21 +45,25 @@ const Sidebar = ({ expand, setExpand, actions }: SidebarPropsType) => {
         </div>
       </aside>
       <div
-        className="list-group-item py-1 d-flex align-items-center"
-        style={{ bottom: '10px' }}>
+        className="list-group-item p-1 d-flex align-items-center"
+        style={{ bottom: '0' }}>
         {expand ? (
           <Button
+            size="large"
             iconBefore={ChevronLeftIcon}
             appearance="minimal"
             onClick={() => setExpand(false)}>
-            hide sidebar
+            collapse
           </Button>
         ) : (
-          <IconButton
-            icon={ChevronRightIcon}
-            appearance="minimal"
-            onClick={() => setExpand(true)}
-          />
+          <Tooltip content="Expand sidebar">
+            <IconButton
+              size="large"
+              icon={ChevronRightIcon}
+              appearance="minimal"
+              onClick={() => setExpand(true)}
+            />
+          </Tooltip>
         )}
       </div>
     </div>

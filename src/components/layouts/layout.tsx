@@ -84,7 +84,7 @@ const Layout = ({
   const getMarginLeft = (hideSidebar: boolean, expand: boolean) => {
     if (!hideSidebar) {
       if (expand) return '250px';
-      return '80px';
+      return '3.5rem';
     }
     return 0;
   };

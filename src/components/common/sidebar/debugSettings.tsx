@@ -1,5 +1,11 @@
 import React from 'react';
-import { CogIcon, IconButton, KeyIcon, RefreshIcon } from 'evergreen-ui';
+import {
+  CogIcon,
+  IconButton,
+  KeyIcon,
+  RefreshIcon,
+  Tooltip,
+} from 'evergreen-ui';
 import { useAuth0 } from '@auth0/auth0-react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -65,12 +71,15 @@ const DebugSettings = ({
             </div>
           </>
         ) : (
-          <div className="list-group-item py-1 d-flex align-items-center">
-            <IconButton
-              icon={CogIcon}
-              appearance="minimal"
-              onClick={() => setExpand(true)}
-            />
+          <div className="list-group-item p-0 d-flex align-items-center">
+            <Tooltip content="All Settings">
+              <IconButton
+                size="large"
+                icon={CogIcon}
+                appearance="minimal"
+                onClick={() => setExpand(true)}
+              />
+            </Tooltip>
           </div>
         )}
       </div>
