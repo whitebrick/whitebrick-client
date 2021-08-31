@@ -12,11 +12,15 @@ export const onEditRow = (params, actions) => {
   actions.setShow(true);
 };
 
-export const onDeleteRow = (params, schema, table, client) => {
+export const onDeleteRow = async (params, schema, table, client) => {
   const variables = { where: {} };
   const { data } = params.node;
   Object.keys(data).forEach(key => {
-    if (data[key]) {
+    if (
+      !key.startsWith(`obj_${table.name}`) &&
+      !key.startsWith(`arr_${table.name}`) &&
+      data[key]
+    ) {
       variables.where[key] = {
         _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
       };
@@ -27,12 +31,13 @@ export const onDeleteRow = (params, schema, table, client) => {
     variables: {
       where: {
         value: variables.where,
-        type: `${`${schema.name}_${table.name}`}_bool_exp`,
+        type: `${schema.name}_${table.name}_bool_exp`,
         required: true,
       },
     },
     fields: ['affected_rows'],
   });
-  const fetchData = async () => client.request(operation);
-  fetchData().finally(() => console.log('deleted row'));
+  await client
+    .request(operation)
+    .finally(() => params.api.refreshServerSideStore(params));
 };

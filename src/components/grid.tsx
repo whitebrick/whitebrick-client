@@ -154,6 +154,7 @@ const Grid = ({
                 data[`${schema.name}_${table.name}`],
                 c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
               );
+              actions.setRows(data[`${schema.name}_${table.name}`]);
               if (
                 c[`${schema.name}_${table.name}_aggregate`].aggregate.count ===
                 0
@@ -354,7 +355,11 @@ const Grid = ({
       });
       const variables = { where: {}, _set: {} };
       Object.keys(data).forEach(key => {
-        if (!key.startsWith(`obj_${table.name}`) && data[key]) {
+        if (
+          !key.startsWith(`obj_${table.name}`) &&
+          !key.startsWith(`arr_${table.name}`) &&
+          data[key]
+        ) {
           variables.where[key] = {
             _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
           };
@@ -418,7 +423,6 @@ const Grid = ({
         key={column.name}
         headerName={column.label}
         headerTooltip={column.label}
-        cellRenderer={type && 'joinedKeyRenderer'}
         valueGetter={params => valueGetter(params, tableName, column, type)}
         editable={!type}
       />
