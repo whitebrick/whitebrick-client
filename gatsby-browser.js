@@ -38,11 +38,11 @@ export const wrapRootElement = ({ element }) => {
             error,
             logout,
           }) => {
-            if (isLoading) return <Loading />;
             if (error) {
               logout({ returnTo: window.location.origin });
               return <NotFound name={error.message} />;
             }
+            if (isLoading) return <Loading />;
             if (!isLoading && isAuthenticated)
               return (
                 <AuthWrapper

@@ -3,6 +3,8 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
+import axios from 'axios';
+import { buildAxiosFetch } from '@lifeomic/axios-fetch';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import Loading from '../loading';
 import { actions } from '../../state/actions';
@@ -32,8 +34,27 @@ const AuthWrapper = ({
 }: AuthWrapper) => {
   const [isLoading, setLoading] = useState(true);
 
+  const gqlAxios = axios.create();
+  gqlAxios.interceptors.response.use(
+    function onFullFilled(response) {
+      return response;
+    },
+    async function onError(error) {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      await axios.post(
+        process.env.GATSBY_WB_ALARM_HOOK_URL,
+        JSON.stringify(error),
+        { headers },
+      );
+      return error;
+    },
+  );
+
   const adminClient = new GraphQLClient({
     url: process.env.GATSBY_HASURA_GRAPHQL_URL,
+    fetch: buildAxiosFetch(gqlAxios),
     subscriptionClient: new SubscriptionClient(
       process.env.GATSBY_HASURA_GRAPHQL_WSS_URL,
       {
@@ -57,6 +78,7 @@ const AuthWrapper = ({
 
   const client = new GraphQLClient({
     url: process.env.GATSBY_HASURA_GRAPHQL_URL,
+    fetch: buildAxiosFetch(gqlAxios),
     subscriptionClient: new SubscriptionClient(
       process.env.GATSBY_HASURA_GRAPHQL_WSS_URL,
       {
