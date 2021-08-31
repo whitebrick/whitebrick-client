@@ -1,7 +1,6 @@
 #sidebar {
     border-right: 1px solid #DFE1EB;
     position: fixed;
-    width: 250px;
     min-height: 90vh;
     height: 100%;
 }
@@ -9,7 +8,6 @@
 #main {
     position: relative;
     width: auto;
-    margin-left: 250px;
     padding: 1rem;
     overflow: auto;
     z-index: 1;
@@ -25,16 +23,6 @@
     cursor: pointer;
     margin: 0 .5rem!important;
     background: none!important;
-}
-
-.list-group-item:hover {
-    background: #f0f0fa !important;
-    color: #1543B7!important;
-}
-
-.list-group-item.active {
-    background: #f0f0fa !important;
-    color: #1543B7!important;
 }
 
 .sidebar-heading {
