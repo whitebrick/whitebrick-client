@@ -1,6 +1,14 @@
 import React from 'react';
 import { Link, navigate } from 'gatsby';
-import { ChevronRightIcon, Select } from 'evergreen-ui';
+import {
+  ChevronRightIcon,
+  SelectMenu,
+  Button,
+  Pane,
+  Text,
+  DatabaseIcon,
+  JoinTableIcon,
+} from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { SchemaItemType, TableItemType } from '../../types';
@@ -39,50 +47,68 @@ const Breadcrumb = ({
 
   // This function handles the user's wish to go to another table within the same schema
   // when prompted through the breadcrumb navigation in tableLayout.
-  const changeTable = e => {
-    const tableName = e.target.value;
+  const changeTable = value => {
     navigate(
       schema.organizationOwnerName
-        ? `/${schema.organizationOwnerName}/${schema.name}/${tableName}`
-        : `/db/${schema.name}/table/${tableName}`,
+        ? `/${schema.organizationOwnerName}/${schema.name}/${value}`
+        : `/db/${schema.name}/table/${value}`,
     );
   };
 
   // This function handles the user's trigger to go to another schema when prompted
   // through the breadcrumb navigation in tableLayout.
-  const changeSchema = e => {
-    const schemaName = e.target.value;
+  const changeSchema = value => {
     navigate(
       schema.organizationOwnerName
-        ? `/${schema.organizationOwnerName}/${schemaName}/`
-        : `/db/${schemaName}/`,
+        ? `/${schema.organizationOwnerName}/${value}/`
+        : `/db/${value}/`,
     );
   };
 
   return (
     <p>
       <Link to="/">Home</Link> <ChevronRightIcon />{' '}
-      <Select
-        onChange={event => changeSchema(event)}
-        width={150}
-        height={20}
-        value={schema.name}>
-        {schemas.map(schema => (
-          <option value={schema.name}>{schema.label}</option>
-        ))}
-      </Select>
+      <SelectMenu
+        title="Databases"
+        onSelect={item => changeSchema(item.value)}
+        options={schemas.map(({ name, label }) => ({ label, value: name }))}
+        selected={schema.name}
+        filterPlaceholder="Choose a database"
+        filterIcon={DatabaseIcon}
+        emptyView={
+          <Pane
+            height="100%"
+            display="flex"
+            alignItems="center"
+            justifyContent="center">
+            <Text size={300}>No options found</Text>
+          </Pane>
+        }>
+        <Button>{schema.name}</Button>
+      </SelectMenu>
       {tableLayout && (
         <>
           <ChevronRightIcon />
-          <Select
-            onChange={event => changeTable(event)}
-            width={150}
-            height={20}
-            value={table.name}>
-            {tables?.sort(compare)?.map(table => (
-              <option value={table.name}>{table.label}</option>
-            ))}
-          </Select>
+          <SelectMenu
+            title="Tables"
+            onSelect={item => changeTable(item.value)}
+            options={tables
+              ?.sort(compare)
+              ?.map(({ name, label }) => ({ label, value: name }))}
+            selected={table.name}
+            filterPlaceholder="Choose a table"
+            filterIcon={JoinTableIcon}
+            emptyView={
+              <Pane
+                height="100%"
+                display="flex"
+                alignItems="center"
+                justifyContent="center">
+                <Text size={300}>No options found</Text>
+              </Pane>
+            }>
+            <Button>{table.name}</Button>
+          </SelectMenu>
         </>
       )}
     </p>
