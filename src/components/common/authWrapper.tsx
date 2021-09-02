@@ -43,9 +43,16 @@ const AuthWrapper = ({
       const headers = {
         'Content-Type': 'application/json',
       };
+      const jsonError = error.toJSON();
+      let message = `**${jsonError.name}**\n\n`;
+      message += `**URL:** ${jsonError.config.url}\n`;
+      message += `**Data:** ${jsonError.config.data}\n`;
+      message += `**Status Code:** ${jsonError.code}\n`;
+      message += `**Message:** ${jsonError.message}\n`;
+      message += `**Stack:** \n ${jsonError.stack}\n`;
       await axios.post(
         process.env.GATSBY_WB_ALARM_HOOK_URL,
-        JSON.stringify(error),
+        { content: message },
         { headers },
       );
       return error;
