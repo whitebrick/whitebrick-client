@@ -35,7 +35,7 @@ type GridPropsType = {
   views: any[];
   orderBy: string;
   limit: number;
-  columns: Array<ColumnItemType>;
+  columns: ColumnItemType[];
   actions: any;
   offset: string;
   defaultView: string;
@@ -117,6 +117,7 @@ const Grid = ({
   const createServerSideDatasource = useCallback(() => {
     return {
       async getRows(params: IServerSideGetRowsParams) {
+        actions.setGridParams(params);
         const subscription = gql.subscription({
           operation: `${schema.name}_${table.name}`,
           variables: {
@@ -185,7 +186,6 @@ const Grid = ({
   }, [parsedFilters, fields]);
 
   const onGridReady = (params: GridReadyEvent) => {
-    actions.setGridParams(params);
     actions.setGridAPI(params.api);
     actions.setColumnAPI(params.columnApi);
     if (views.length <= 0) {

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { SmallPlusIcon, Badge } from 'evergreen-ui';
+import { SmallPlusIcon, Badge, IconButton } from 'evergreen-ui';
 import { ColDef } from 'ag-grid-community';
 import { ClientContext } from 'graphql-hooks';
 import ViewForeignKeyData from '../../common/viewForeignKeyData';
@@ -30,7 +30,11 @@ const ForeignKeyCellRenderer = ({
   const updateValue = async (row, relData, colDef, schemaName, tableName) => {
     const variables = { where: {}, _set: {} };
     Object.keys(row).forEach(key => {
-      if (!key.startsWith(`obj_${tableName}`) && row[key]) {
+      if (
+        !key.startsWith(`obj_${tableName}`) &&
+        !key.startsWith(`arr_${tableName}`) &&
+        row[key]
+      ) {
         variables.where[key] = {
           _eq: parseInt(row[key], 10) ? parseInt(row[key], 10) : row[key],
         };
@@ -55,11 +59,11 @@ const ForeignKeyCellRenderer = ({
             </Badge>
           </div>
         ) : (
-          <div className="float-right d-flex align-items-center">
-            <button type="submit" className="btn" onClick={() => setLink(true)}>
-              <SmallPlusIcon />
-            </button>
-          </div>
+          <IconButton
+            icon={SmallPlusIcon}
+            onClick={() => setLink(true)}
+            appearance="minimal"
+          />
         )}
       </span>
       {show && (

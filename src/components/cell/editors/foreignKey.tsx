@@ -18,10 +18,14 @@ const ForeignKeyEditor = forwardRef((props: any, ref) => {
 
   const refInput = useRef(null);
 
-  const updateValue = async (row, relData, colDef, schemaName, tableName) => {
+  const updateData = async (row, relData, colDef, schemaName, tableName) => {
     const variables = { where: {}, _set: {} };
     Object.keys(row).forEach(key => {
-      if (row[key]) {
+      if (
+        !key.startsWith(`obj_${tableName}`) &&
+        !key.startsWith(`arr_${tableName}`) &&
+        row[key]
+      ) {
         variables.where[key] = {
           _eq: parseInt(row[key], 10) ? parseInt(row[key], 10) : row[key],
         };
@@ -79,7 +83,7 @@ const ForeignKeyEditor = forwardRef((props: any, ref) => {
           show={show}
           setShow={setShow}
           column={props.column}
-          updateData={updateValue}
+          updateData={updateData}
         />
       )}
     </>

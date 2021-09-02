@@ -26,13 +26,17 @@ const PrimaryKeyCellRenderer = ({
   };
 
   return (
-    <Badge
-      aria-hidden
-      color="blue"
-      style={{ cursor: 'pointer' }}
-      onClick={handleClick}>
-      {cellValue}
-    </Badge>
+    <>
+      {cellValue && (
+        <Badge
+          aria-hidden
+          color="blue"
+          style={{ cursor: 'pointer' }}
+          onClick={handleClick}>
+          {cellValue}
+        </Badge>
+      )}
+    </>
   );
 };
 

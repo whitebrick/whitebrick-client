@@ -50,6 +50,7 @@ type TableLayoutPropsType = {
   cloudContext: any;
   params: any;
   rowData: any;
+  gridParams: any;
 };
 
 const TableLayout = ({
@@ -68,6 +69,7 @@ const TableLayout = ({
   cloudContext,
   params,
   rowData,
+  gridParams,
 }: TableLayoutPropsType) => {
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -321,9 +323,10 @@ const TableLayout = ({
             <div className="float-right">
               <Button
                 onClick={() => {
-                  rowData.splice(rowCount + 1, 0, {});
-                  // @ts-ignore
-                  gridAPI.refreshServerSideStore();
+                  rowData.push({});
+                  gridParams.successCallback([...rowData], rowCount + 1);
+                  actions.setRows(rowData);
+                  actions.setRowCount(rowCount + 1);
                 }}
                 className="mr-2"
                 iconBefore={PlusIcon}>
@@ -360,7 +363,7 @@ const TableLayout = ({
   ];
 
   if (isLoading) return <Loading />;
-  if (error)
+  if (error) {
     return (
       <Layout>
         <NotFound
@@ -372,6 +375,7 @@ const TableLayout = ({
         />
       </Layout>
     );
+  }
 
   return (
     <>
@@ -423,6 +427,7 @@ const mapStateToProps = state => ({
   gridAPI: state.gridAPI,
   cloudContext: state.cloudContext,
   rowData: state.rowData,
+  gridParams: state.gridParams,
 });
 
 const mapDispatchToProps = dispatch => ({
