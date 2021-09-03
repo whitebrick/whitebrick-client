@@ -1,6 +1,6 @@
 import * as gql from 'gql-query-builder';
 
-export const updateTableData = (
+export const updateTableData = async (
   schemaName,
   tableName,
   variables,
@@ -37,7 +37,7 @@ export const updateTableData = (
       fields: ['affected_rows'],
     });
   }
-  client.request(operation).finally(() => {
+  await client.request(operation).finally(() => {
     if (actions) actions.setShow(false);
   });
 };

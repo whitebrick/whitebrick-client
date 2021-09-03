@@ -134,52 +134,46 @@ const Grid = ({
           },
           fields,
         });
-        const operationAgg = gql.query({
+        const operationAgg = gql.subscription({
           operation: `${schema.name}_${table.name.concat('_aggregate')}`,
           variables: {
             where: {
-              value: parseFilters(filters),
+              value: parsedFilters,
               type: `${schema.name}_${table.name.concat('_bool_exp')}`,
             },
           },
           fields: [{ aggregate: ['count'] }],
         });
-        const { data: c } = await client.request(operationAgg);
-        if (c && c[`${schema.name}_${table.name}_aggregate`]) {
-          actions.setRowCount(
-            c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-          );
-          client.subscriptionClient.request(subscription).subscribe({
-            next({ data }) {
-              params.successCallback(
-                data[`${schema.name}_${table.name}`],
-                c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-              );
-              actions.setRows(data[`${schema.name}_${table.name}`]);
-              if (
-                c[`${schema.name}_${table.name}_aggregate`].aggregate.count ===
-                0
-              )
-                params.api.showNoRowsOverlay();
-              else params.api.hideOverlay();
-              params.columnApi.autoSizeAllColumns(false);
-            },
-            error(error) {
-              console.error(error);
-              params.failCallback();
-            },
-          });
-        } else {
-          columns.push({
-            default: '',
-            referencedBy: undefined,
-            type: 'string',
-            name: 'welcome',
-            label: 'Welcome',
-            foreignKeys: [],
-            isPrimaryKey: false,
-          });
-        }
+        client.subscriptionClient.request(subscription).subscribe({
+          next({ data }) {
+            client.subscriptionClient.request(operationAgg).subscribe({
+              next({ data: c }) {
+                actions.setRows(data[`${schema.name}_${table.name}`]);
+                actions.setRowCount(
+                  c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
+                );
+                params.successCallback(
+                  data[`${schema.name}_${table.name}`],
+                  c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
+                );
+                if (
+                  c[`${schema.name}_${table.name}_aggregate`].aggregate
+                    .count === 0
+                )
+                  params.api.showNoRowsOverlay();
+                else params.api.hideOverlay();
+                params.columnApi.autoSizeAllColumns(false);
+              },
+              error(error) {
+                console.error(error);
+              },
+            });
+          },
+          error(error) {
+            console.error(error);
+            params.failCallback();
+          },
+        });
       },
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -211,7 +205,13 @@ const Grid = ({
       const datasource = createServerSideDatasource();
       if (gridAPI) gridAPI.setServerSideDatasource(datasource);
     }, 1000);
-  }, [createServerSideDatasource, gridAPI]);
+  }, [
+    createServerSideDatasource,
+    gridAPI,
+    columns,
+    foreignKeyColumns,
+    referencedByColumns,
+  ]);
 
   useEffect(() => {
     const params = getQueryParams(window.location.search);
@@ -530,7 +530,6 @@ const mapStateToProps = state => ({
   orderBy: state.orderBy,
   limit: state.limit,
   views: state.views,
-  rowCount: state.rowCount,
   current: state.current,
   offset: state.offset,
   defaultView: state.defaultView,
