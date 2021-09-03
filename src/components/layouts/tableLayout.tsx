@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+
 import React, { useEffect, useState } from 'react';
 import {
   EditIcon,
@@ -73,6 +75,7 @@ const TableLayout = ({
 }: TableLayoutPropsType) => {
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tableFields, setTableFields] = useState([]);
 
   const [fetchSchemaTablesByName] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
@@ -99,61 +102,67 @@ const TableLayout = ({
   };
 
   useEffect(() => {
-    const getTableFields = async (columns: ColumnItemType[]) => {
-      const tableFields = [];
+    const getForeignKeyColumn = async fkc => {
+      const cols = [];
       const foreignKeyCols = [];
-      const referencedByCols = [];
-      for (let i = 0; i < columns.length; i += 1) {
-        tableFields.push(columns[i].name);
-        // eslint-disable-next-line no-await-in-loop
-        await Promise.all(
-          // eslint-disable-next-line array-callback-return
-          columns[i].foreignKeys.map(fkc => {
-            const cols = [];
-            fetchColumnsByName({
-              variables: {
-                schemaName: params.databaseName,
-                tableName: fkc.relTableName,
-              },
-            }).then(r => {
-              foreignKeyCols.push({
-                tableName: fkc.relTableName,
-                tableLabel: fkc.relTableLabel,
-                cols: r.data.wbColumns,
-              });
-              r.data.wbColumns.forEach(col => cols.push(col.name));
-              tableFields.push({
-                [`obj_${params.tableName}_${fkc.relTableName}`]: cols,
-              });
-            });
-          }),
-        );
-        // eslint-disable-next-line no-await-in-loop
-        await Promise.all(
-          // eslint-disable-next-line array-callback-return
-          columns[i].referencedBy.map(rbc => {
-            const cols = [];
-            fetchColumnsByName({
-              variables: {
-                schemaName: params.databaseName,
-                tableName: rbc.tableName,
-              },
-            }).then(r => {
-              referencedByCols.push({
-                tableName: rbc.tableName,
-                tableLabel: rbc.tableLabel,
-                cols: r.data.wbColumns,
-              });
-              r.data.wbColumns.forEach(col => cols.push(col.name));
-              tableFields.push({
-                [`arr_${params.tableName}_${rbc.tableName}`]: cols,
-              });
-            });
-          }),
-        );
+      const fields = tableFields;
+
+      const { loading, data, error } = await fetchColumnsByName({
+        variables: {
+          schemaName: params.databaseName,
+          tableName: fkc.relTableName,
+        },
+      });
+      if (!loading && !error) {
+        foreignKeyCols.push({
+          tableName: fkc.relTableName,
+          tableLabel: fkc.relTableLabel,
+          cols: data.wbColumns,
+        });
+        data.wbColumns.forEach(col => cols.push(col.name));
+        fields.push({
+          [`obj_${params.tableName}_${fkc.relTableName}`]: cols,
+        });
       }
+      setTableFields(fields);
       actions.setForeignKeyColumns(foreignKeyCols);
+    };
+
+    const getReferencedByColumn = async rbc => {
+      const cols = [];
+      const referencedByCols = [];
+      const fields = tableFields;
+
+      const { loading, data, error } = await fetchColumnsByName({
+        variables: {
+          schemaName: params.databaseName,
+          tableName: rbc.tableName,
+        },
+      });
+      if (!loading && !error) {
+        referencedByCols.push({
+          tableName: rbc.tableName,
+          tableLabel: rbc.tableLabel,
+          cols: data.wbColumns,
+        });
+        data.wbColumns.forEach(col => cols.push(col.name));
+        fields.push({
+          [`arr_${params.tableName}_${rbc.tableName}`]: cols,
+        });
+      }
+      setTableFields(fields);
       actions.setReferencedByColumns(referencedByCols);
+    };
+
+    const getTableFields = async (columns: ColumnItemType[]) => {
+      const fields = tableFields;
+      for (let i = 0; i < columns.length; i += 1) {
+        fields.push(columns[i].name);
+        const fkPromises = columns[i].foreignKeys.map(getForeignKeyColumn);
+        const rbPromises = columns[i].referencedBy.map(getReferencedByColumn);
+        await Promise.all([...fkPromises, ...rbPromises]);
+      }
+      setTableFields(fields);
       return tableFields;
     };
 
@@ -218,6 +227,7 @@ const TableLayout = ({
       });
     else if (params && params.tableName)
       fetchSchemaTable().finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     actions,
     fetchColumnsByName,
