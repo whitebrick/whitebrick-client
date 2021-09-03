@@ -26,18 +26,21 @@ export const onDeleteRow = async (params, schema, table, client) => {
       };
     }
   });
-  const operation = gql.mutation({
-    operation: ''.concat('delete_', `${schema.name}_${table.name}`),
-    variables: {
-      where: {
-        value: variables.where,
-        type: `${schema.name}_${table.name}_bool_exp`,
-        required: true,
+
+  if (Object.keys(variables.where).length > 0) {
+    const operation = gql.mutation({
+      operation: ''.concat('delete_', `${schema.name}_${table.name}`),
+      variables: {
+        where: {
+          value: variables.where,
+          type: `${schema.name}_${table.name}_bool_exp`,
+          required: true,
+        },
       },
-    },
-    fields: ['affected_rows'],
-  });
-  await client
-    .request(operation)
-    .finally(() => params.api.refreshServerSideStore(params));
+      fields: ['affected_rows'],
+    });
+    await client
+      .request(operation)
+      .finally(() => params.api.refreshServerSideStore(params));
+  }
 };
