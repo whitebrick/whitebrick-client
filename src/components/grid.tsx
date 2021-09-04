@@ -201,10 +201,8 @@ const Grid = ({
   };
 
   useEffect(() => {
-    setTimeout(function setDatasource() {
-      const datasource = createServerSideDatasource();
-      if (gridAPI) gridAPI.setServerSideDatasource(datasource);
-    }, 1000);
+    const datasource = createServerSideDatasource();
+    if (gridAPI) gridAPI.setServerSideDatasource(datasource);
   }, [
     createServerSideDatasource,
     gridAPI,
@@ -433,6 +431,7 @@ const Grid = ({
   return (
     <div className="mt-4">
       <AgGridReact
+        reactUi
         frameworkComponents={{
           foreignKeyEditor: ForeignKeyEditor,
           foreignKeyRenderer: ForeignKeyCellRenderer,

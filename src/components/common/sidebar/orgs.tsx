@@ -77,21 +77,21 @@ const Orgs = ({
                 />
               </Button>
             ))}
-            <div className="p-2 d-flex align-items-center">
-              <Tooltip content="Create Organization">
-                <IconButton
-                  size="large"
-                  appearance="minimal"
-                  icon={PlusIcon}
-                  onClick={() => {
-                    actions.setShow(true);
-                    actions.setType('createOrganization');
-                  }}
-                />
-              </Tooltip>
-            </div>
           </div>
         )}
+        <div className="p-2 d-flex align-items-center">
+          <Tooltip content="Create Organization">
+            <IconButton
+              size="large"
+              appearance="minimal"
+              icon={PlusIcon}
+              onClick={() => {
+                actions.setShow(true);
+                actions.setType('createOrganization');
+              }}
+            />
+          </Tooltip>
+        </div>
       </div>
     );
   };
