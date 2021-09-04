@@ -1,7 +1,7 @@
 export const onAddColumn = (params, actions) => {
   actions.setType('addColumn');
   actions.setShow(true);
-  actions.setColumn(params.column.colId);
+  actions.setColumn(params?.column?.colId || '');
 };
 
 export const onEditColumn = (params, actions, columns) => {

@@ -144,36 +144,41 @@ const Grid = ({
           },
           fields: [{ aggregate: ['count'] }],
         });
-        client.subscriptionClient.request(subscription).subscribe({
-          next({ data }) {
-            client.subscriptionClient.request(operationAgg).subscribe({
-              next({ data: c }) {
-                actions.setRows(data[`${schema.name}_${table.name}`]);
-                actions.setRowCount(
-                  c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-                );
-                params.successCallback(
-                  data[`${schema.name}_${table.name}`],
-                  c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-                );
-                if (
-                  c[`${schema.name}_${table.name}_aggregate`].aggregate
-                    .count === 0
-                )
-                  params.api.showNoRowsOverlay();
-                else params.api.hideOverlay();
-                params.columnApi.autoSizeAllColumns(false);
-              },
-              error(error) {
-                console.error(error);
-              },
-            });
-          },
-          error(error) {
-            console.error(error);
-            params.failCallback();
-          },
-        });
+        if (fields.length > 0)
+          client.subscriptionClient.request(subscription).subscribe({
+            next({ data }) {
+              client.subscriptionClient.request(operationAgg).subscribe({
+                next({ data: c }) {
+                  actions.setRows(data[`${schema.name}_${table.name}`]);
+                  actions.setRowCount(
+                    c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
+                  );
+                  params.successCallback(
+                    data[`${schema.name}_${table.name}`],
+                    c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
+                  );
+                  if (
+                    c[`${schema.name}_${table.name}_aggregate`].aggregate
+                      .count === 0
+                  )
+                    params.api.showNoRowsOverlay();
+                  else params.api.hideOverlay();
+                  params.columnApi.autoSizeAllColumns(false);
+                },
+                error(error) {
+                  console.error(error);
+                },
+              });
+            },
+            error(error) {
+              console.error(error);
+              params.failCallback();
+            },
+          });
+        else {
+          params.successCallback([], 0);
+          params.api.showNoRowsOverlay();
+        }
       },
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
