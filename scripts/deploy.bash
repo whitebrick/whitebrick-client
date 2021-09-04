@@ -21,22 +21,24 @@ if [[ "$1" != "dev" && "$1" != "staging" && "$1" != "prod" ]]; then
   exit 1
 fi
 
+env=$1
 s3=""
 cloudfront=""
 redirect=""
 cmd=""
 
-if [[ "$1" == "prod" ]]; then
+if [[ "$env" == "prod" ]]; then
   s3=$S3_PROD
   cloudfront=$CLOUDFRONT_PROD
   redirect=$REDIRECT_PROD
   cmd="npm run build:prod"
-elif [[ "$1" == "staging" ]]; then
+elif [[ "$env" == "staging" ]]; then
   s3=$S3_STAGING
   cloudfront=$CLOUDFRONT_STAGING
   redirect=$REDIRECT_STAGING
   cmd="npm run build:staging"
 else
+  env="dev"
   s3=$S3_DEV
   cloudfront=$CLOUDFRONT_DEV
   redirect=$REDIRECT_DEV
@@ -57,11 +59,20 @@ if [[ "$2" != "skipBuild" ]]; then
     echo -e "\nGatsby build failed.\n"
     exit 1
   fi
+  cmd="touch public/.gatsby-build-$env"
+  echo -e "\n$cmd\n"
+  eval $cmd
 fi
 
 echo -e "\n\n==== Deploying $SITE $1 ($s3) ====\n\n"
 
 cd public
+
+if [ ! -f "./.gatsby-build-$env" ]; then
+    echo -e "Error: public/.gatsby-build-$env could not be found.\n\nAre you sure you are deploying the correct build?\n\n"
+    exit 1
+fi
+
 cmd="aws s3 sync . $s3 --delete --profile wb-client-deploy"
 echo -e "\n$cmd\n"
 eval $cmd
