@@ -7,9 +7,9 @@ import React, {
   useContext,
 } from 'react';
 import { ClientContext } from 'graphql-hooks';
-import { IconButton, SmallPlusIcon } from 'evergreen-ui';
-import LinkForeignKey from '../common/linkForeignKey';
-import { updateTableData } from '../../utils/updateTableData';
+import { IconButton, PlusIcon, SmallPlusIcon } from 'evergreen-ui';
+import LinkForeignKey from '../../common/linkForeignKey';
+import { updateTableData } from '../../../utils/updateTableData';
 
 const ForeignKeyEditor = forwardRef((props: any, ref) => {
   const client = useContext(ClientContext);
@@ -18,10 +18,14 @@ const ForeignKeyEditor = forwardRef((props: any, ref) => {
 
   const refInput = useRef(null);
 
-  const updateValue = async (row, relData, colDef, schemaName, tableName) => {
+  const updateData = async (row, relData, colDef, schemaName, tableName) => {
     const variables = { where: {}, _set: {} };
     Object.keys(row).forEach(key => {
-      if (row[key]) {
+      if (
+        !key.startsWith(`obj_${tableName}`) &&
+        !key.startsWith(`arr_${tableName}`) &&
+        row[key]
+      ) {
         variables.where[key] = {
           _eq: parseInt(row[key], 10) ? parseInt(row[key], 10) : row[key],
         };
@@ -55,7 +59,7 @@ const ForeignKeyEditor = forwardRef((props: any, ref) => {
 
   return (
     <>
-      <div className="input-group">
+      <div className="d-flex align-items-center">
         <input
           type="number"
           ref={refInput}
@@ -63,14 +67,12 @@ const ForeignKeyEditor = forwardRef((props: any, ref) => {
           onChange={event => setValue(parseInt(event.target.value, 10))}
           style={{ width: '90%' }}
         />
-        <span className="input-group-btn">
-          <IconButton
-            onClick={() => setShow(true)}
-            appearance="minimal"
-            icon={SmallPlusIcon}
-            style={{ height: '100%' }}
-          />
-        </span>
+        <IconButton
+          onClick={() => setShow(true)}
+          appearance="minimal"
+          icon={PlusIcon}
+          style={{ height: '100%' }}
+        />
       </div>
       {show && (
         <LinkForeignKey
@@ -79,7 +81,7 @@ const ForeignKeyEditor = forwardRef((props: any, ref) => {
           show={show}
           setShow={setShow}
           column={props.column}
-          updateData={updateValue}
+          updateData={updateData}
         />
       )}
     </>

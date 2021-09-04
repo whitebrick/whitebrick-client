@@ -6,8 +6,11 @@ import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
 import { ColumnApi, GridApi } from 'ag-grid-community';
 import * as gql from 'gql-query-builder';
 import { TextInputField, toaster, Spinner } from 'evergreen-ui';
-import { UPDATE_TABLE_DETAILS_MUTATION } from '../../graphql/mutations/table';
-import { SCHEMAS_QUERY } from '../../graphql/queries/wb';
+import {
+  SCHEMAS_QUERY,
+  SCHEMA_TABLE_BY_NAME_QUERY,
+  SCHEMA_TABLES_QUERY,
+} from '../../graphql/queries/wb';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
   ADD_OR_REMOVE_COLUMN_SEQUENCE,
@@ -21,6 +24,7 @@ import {
   UPDATE_COLUMN_MUTATION,
   UPDATE_ORGANIZATION_MUTATION,
   UPDATE_SCHEMA_MUTATION,
+  UPDATE_TABLE_DETAILS_MUTATION,
 } from '../../graphql/mutations/wb';
 import {
   ColumnItemType,
@@ -108,6 +112,8 @@ const LayoutSidePanel = ({
   );
 
   const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
+  const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
+  const [fetchSchemaTable] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
 
   const deleteForeignKey = async () => {
     const { loading, error } = await removeOrDeleteForeignKey({
@@ -345,7 +351,19 @@ const LayoutSidePanel = ({
           create: true,
         },
       });
-      if (!loading && !error) actions.setShow(false);
+      if (!loading && !error) {
+        const {
+          loading: l,
+          data,
+          error: e,
+        } = await fetchSchemaTables({
+          variables: {
+            schemaName: formData.schema.name,
+          },
+        });
+        if (!l && !e) actions.setTables(data.wbMyTables);
+        actions.setShow(false);
+      }
     } else if (type === 'editDatabase') {
       const variables: any = { name: schema.name };
       if (formData.name !== schema.name)
@@ -395,7 +413,22 @@ const LayoutSidePanel = ({
       const { loading, error } = await updateTableMutation({
         variables,
       });
-      if (!error && !loading) actions.setShow(false);
+      if (!error && !loading) {
+        const {
+          loading: l,
+          data,
+          error: e,
+        } = await fetchSchemaTable({
+          variables: {
+            schemaName: schema.name,
+            tableName: table.name,
+            withColumns: true,
+            withSettings: true,
+          },
+        });
+        if (!l && !e) actions.setTable(data.wbMyTableByName);
+        actions.setShow(false);
+      }
     } else if (type === 'view') {
       saveView();
       actions.setShow(false);

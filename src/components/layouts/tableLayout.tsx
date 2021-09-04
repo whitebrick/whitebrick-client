@@ -1,26 +1,23 @@
-import React, { useContext, useEffect, useState } from 'react';
-import * as gql from 'gql-query-builder';
+/* eslint-disable no-await-in-loop */
+
+import React, { useEffect, useState } from 'react';
 import {
-  ChevronRightIcon,
   EditIcon,
   IconButton,
   toaster,
   FilterListIcon,
   Button,
   Popover,
+  PlusIcon,
 } from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
-import { Link } from 'gatsby';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import { GridApi, ColumnApi } from 'ag-grid-community';
 import { actions } from '../../state/actions';
 
 import Grid from '../grid';
-import {
-  REMOVE_OR_DELETE_COLUMN_MUTATION,
-  SAVE_TABLE_USER_SETTINGS,
-} from '../../graphql/mutations/wb';
+import { SAVE_TABLE_USER_SETTINGS } from '../../graphql/mutations/wb';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import Seo from '../seo';
 
@@ -31,17 +28,16 @@ import {
   SCHEMA_TABLE_BY_NAME_QUERY,
   TABLE_USERS_QUERY,
   COLUMNS_BY_NAME_QUERY,
+  SCHEMA_TABLES_QUERY,
 } from '../../graphql/queries/wb';
-import { updateTableData } from '../../utils/updateTableData';
 import Loading from '../loading';
 import Layout from './layout';
 import NotFound from '../notFound';
 import FilterPane from '../common/filters/filterPane';
+import Breadcrumb from '../common/breadcrumb';
 
 type TableLayoutPropsType = {
   table: TableItemType;
-  columns: ColumnItemType[];
-  fields: [];
   rowCount: number;
   orderBy: string;
   limit: number;
@@ -55,12 +51,12 @@ type TableLayoutPropsType = {
   columnAPI: ColumnApi;
   cloudContext: any;
   params: any;
+  rowData: any;
+  gridParams: any;
 };
 
 const TableLayout = ({
   table,
-  columns,
-  fields,
   rowCount,
   orderBy,
   limit,
@@ -74,19 +70,18 @@ const TableLayout = ({
   columnAPI,
   cloudContext,
   params,
+  rowData,
+  gridParams,
 }: TableLayoutPropsType) => {
-  const client = useContext(ClientContext);
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tableFields, setTableFields] = useState([]);
 
+  const [fetchSchemaTablesByName] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
   const [fetchSchemaByName] = useManualQuery(SCHEMA_BY_NAME_QUERY);
   const [fetchColumnsByName] = useManualQuery(COLUMNS_BY_NAME_QUERY);
 
-  const [changedValues, setChangedValues] = useState([]);
-  const [removeOrDeleteColumnMutation] = useMutation(
-    REMOVE_OR_DELETE_COLUMN_MUTATION,
-  );
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
 
   const [users, setUsers] = useState([]);
@@ -107,62 +102,79 @@ const TableLayout = ({
   };
 
   useEffect(() => {
-    const getTableFields = async (columns: ColumnItemType[]) => {
-      const tableFields = [];
+    const getForeignKeyColumn = async fkc => {
+      const cols = [];
       const foreignKeyCols = [];
-      const referencedByCols = [];
-      for (let i = 0; i < columns.length; i += 1) {
-        tableFields.push(columns[i].name);
-        // eslint-disable-next-line no-await-in-loop
-        await Promise.all(
-          // eslint-disable-next-line array-callback-return
-          columns[i].foreignKeys.map(fkc => {
-            const cols = [];
-            fetchColumnsByName({
-              variables: {
-                schemaName: params.databaseName,
-                tableName: fkc.relTableName,
-              },
-            }).then(r => {
-              foreignKeyCols.push({
-                tableName: fkc.relTableName,
-                tableLabel: fkc.relTableLabel,
-                cols: r.data.wbColumns,
-              });
-              r.data.wbColumns.forEach(col => cols.push(col.name));
-              tableFields.push({
-                [`obj_${params.tableName}_${fkc.relTableName}`]: cols,
-              });
-            });
-          }),
-        );
-        // eslint-disable-next-line no-await-in-loop
-        await Promise.all(
-          // eslint-disable-next-line array-callback-return
-          columns[i].referencedBy.map(rbc => {
-            const cols = [];
-            fetchColumnsByName({
-              variables: {
-                schemaName: params.databaseName,
-                tableName: rbc.tableName,
-              },
-            }).then(r => {
-              referencedByCols.push({
-                tableName: rbc.tableName,
-                tableLabel: rbc.tableLabel,
-                cols: r.data.wbColumns,
-              });
-              r.data.wbColumns.forEach(col => cols.push(col.name));
-              tableFields.push({
-                [`arr_${params.tableName}_${rbc.tableName}`]: cols,
-              });
-            });
-          }),
-        );
+      const fields = tableFields;
+
+      const { loading, data, error } = await fetchColumnsByName({
+        variables: {
+          schemaName: params.databaseName,
+          tableName: fkc.relTableName,
+        },
+      });
+      if (!loading && !error) {
+        foreignKeyCols.push({
+          tableName: fkc.relTableName,
+          tableLabel: fkc.relTableLabel,
+          cols: data.wbColumns,
+        });
+        data.wbColumns.forEach(col => cols.push(col.name));
+        fields.push({
+          [`obj_${params.tableName}_${fkc.relTableName}`]: cols,
+        });
       }
+      setTableFields(fields);
       actions.setForeignKeyColumns(foreignKeyCols);
+    };
+
+    const getReferencedByColumn = async rbc => {
+      const cols = [];
+      const referencedByCols = [];
+      const fields = tableFields;
+
+      const { loading, data, error } = await fetchColumnsByName({
+        variables: {
+          schemaName: params.databaseName,
+          tableName: rbc.tableName,
+        },
+      });
+      if (!loading && !error) {
+        referencedByCols.push({
+          tableName: rbc.tableName,
+          tableLabel: rbc.tableLabel,
+          cols: data.wbColumns,
+        });
+        data.wbColumns.forEach(col => cols.push(col.name));
+        fields.push({
+          [`arr_${params.tableName}_${rbc.tableName}`]: cols,
+        });
+      }
+      setTableFields(fields);
       actions.setReferencedByColumns(referencedByCols);
+    };
+
+    const getTableFields = async (columns: ColumnItemType[]) => {
+      const fields = tableFields;
+      for (let i = 0; i < columns.length; i += 1) {
+        fields.push(columns[i].name);
+        const fkPromises = columns[i].foreignKeys.map(getForeignKeyColumn);
+        const rbPromises = columns[i].referencedBy.map(getReferencedByColumn);
+        await Promise.all([...fkPromises, ...rbPromises]);
+      }
+      setTableFields(fields);
       return tableFields;
+    };
+
+    const fetchSchemaTables = async (schemaName: string) => {
+      const variables: any = { schemaName };
+      const { loading, data, error } = await fetchSchemaTablesByName({
+        variables,
+      });
+      if (!loading) {
+        if (error) setError(error);
+        else actions.setTables(data.wbMyTables);
+      }
     };
 
     const fetchSchema = async () => {
@@ -171,7 +183,10 @@ const TableLayout = ({
       const { loading, data, error } = await fetchSchemaByName({ variables });
       if (!loading) {
         if (error) setError(error);
-        else actions.setSchema(data.wbMySchemaByName);
+        else {
+          actions.setSchema(data.wbMySchemaByName);
+          await fetchSchemaTables(data.wbMySchemaByName.name);
+        }
       }
     };
 
@@ -212,11 +227,13 @@ const TableLayout = ({
       });
     else if (params && params.tableName)
       fetchSchemaTable().finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     actions,
     fetchColumnsByName,
     fetchSchemaByName,
     fetchSchemaTableByName,
+    fetchSchemaTablesByName,
     params,
   ]);
 
@@ -226,48 +243,6 @@ const TableLayout = ({
     actions.setOffset(0);
     actions.setCurrent(1);
   }, [table, actions]);
-
-  const editValues = val => {
-    let values = val;
-    values = [...Array.from(new Set(values))];
-    values.forEach((params, index) => {
-      const filteredParams = values.filter(
-        value => params.rowIndex === value.rowIndex,
-      );
-      const { data } = params;
-      data[params.colDef?.field] = params.oldValue;
-      filteredParams.forEach(param => {
-        data[param.colDef?.field] = param.oldValue;
-      });
-      const variables = { where: {}, _set: {} };
-      Object.keys(data).forEach(key => {
-        if (!key.startsWith(`obj_${table.name}`) && data[key]) {
-          variables.where[key] = {
-            _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
-          };
-        }
-      });
-      variables._set[params.colDef.field] = parseInt(params.newValue, 10)
-        ? parseInt(params.newValue, 10)
-        : params.newValue;
-      filteredParams.forEach(param => {
-        variables._set[param.colDef.field] = parseInt(param.newValue, 10)
-          ? parseInt(param.newValue, 10)
-          : param.newValue;
-      });
-      values.splice(index, 1);
-      values = values.filter(el => !filteredParams.includes(el));
-      setChangedValues(values);
-      updateTableData(schema.name, table.name, variables, client, actions);
-    });
-  };
-
-  const onCellValueChanged = params => {
-    const values = changedValues;
-    values.push(params);
-    setChangedValues(values);
-    setTimeout(() => editValues(values), 500);
-  };
 
   const saveSettingsToDB = async () => {
     const { loading, error } = await saveUserTableSettings({
@@ -316,114 +291,6 @@ const TableLayout = ({
     saveSettingsToDB();
   };
 
-  const onAddRow = () => {
-    actions.setType('newRow');
-    actions.setShow(true);
-  };
-
-  const onEditRow = params => {
-    actions.setType('editRow');
-    actions.setParams(params.node.data);
-    actions.setFormData(params.node.data);
-    actions.setShow(true);
-  };
-
-  const onDeleteRow = params => {
-    const variables = { where: {} };
-    const { data } = params.node;
-    Object.keys(data).forEach(key => {
-      if (data[key]) {
-        variables.where[key] = {
-          _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
-        };
-      }
-    });
-    const operation = gql.mutation({
-      operation: ''.concat('delete_', `${schema.name}_${table.name}`),
-      variables: {
-        where: {
-          value: variables.where,
-          type: `${`${schema.name}_${table.name}`}_bool_exp`,
-          required: true,
-        },
-      },
-      fields: ['affected_rows'],
-    });
-    const fetchData = async () => client.request(operation);
-    fetchData().finally(() => console.log('deleted row'));
-  };
-
-  const onRemove = async colID => {
-    const { loading, error } = await removeOrDeleteColumnMutation({
-      variables: {
-        schemaName: schema.name,
-        tableName: table.name,
-        columnName: colID,
-        del: true,
-      },
-    });
-    if (!loading && !error) {
-      const col = columns.filter(c => c.name === colID)[0];
-      const index = columns.indexOf(col);
-      columns.splice(index, 1);
-      fields.splice(index, 1);
-      actions.setColumns(columns);
-      gridAPI.refreshCells({ force: true });
-    }
-  };
-
-  const getContextMenuItems = params => {
-    actions.setFormData({});
-    return [
-      {
-        name: 'Add Column',
-        action: () => {
-          actions.setType('addColumn');
-          actions.setShow(true);
-          actions.setColumn(params.column.colId);
-        },
-      },
-      {
-        name: 'Edit Column',
-        action: () => {
-          actions.setType('editColumn');
-          actions.setShow(true);
-          const column: any = columns.filter(
-            column => column.name === params.column.colId,
-          )[0];
-          if (column.default) {
-            column.autoIncrement = true;
-            column.startSequenceNumber = column.default;
-          }
-          actions.setFormData(column);
-          actions.setColumn(params.column.colId);
-        },
-      },
-      {
-        name: 'Remove Column',
-        action: () => onRemove(params.column.colId),
-      },
-      'separator',
-      {
-        name: 'Add Row',
-        action: () => onAddRow(),
-      },
-      {
-        name: 'Edit Row',
-        action: () => onEditRow(params),
-      },
-      {
-        name: 'Delete Row',
-        action: () => onDeleteRow(params),
-      },
-      'separator',
-      'copy',
-      'copyWithHeaders',
-      'paste',
-      'export',
-    ];
-  };
-
   const tabs = [
     {
       title: 'Data',
@@ -464,6 +331,17 @@ const TableLayout = ({
               + Create a view
             </div>
             <div className="float-right">
+              <Button
+                onClick={() => {
+                  rowData.push({});
+                  gridParams.successCallback([...rowData], rowCount + 1);
+                  actions.setRows(rowData);
+                  actions.setRowCount(rowCount + 1);
+                }}
+                className="mr-2"
+                iconBefore={PlusIcon}>
+                Add Row
+              </Button>
               <Popover
                 bringFocusInside
                 content={({ close }) => <FilterPane close={close} />}
@@ -483,12 +361,7 @@ const TableLayout = ({
               </Button>
             </div>
           </div>
-          <div className="mt-4">
-            <Grid
-              onCellValueChanged={onCellValueChanged}
-              getContextMenuItems={getContextMenuItems}
-            />
-          </div>
+          <Grid />
         </>
       ),
     },
@@ -500,7 +373,7 @@ const TableLayout = ({
   ];
 
   if (isLoading) return <Loading />;
-  if (error)
+  if (error) {
     return (
       <Layout>
         <NotFound
@@ -512,6 +385,7 @@ const TableLayout = ({
         />
       </Layout>
     );
+  }
 
   return (
     <>
@@ -521,26 +395,7 @@ const TableLayout = ({
           <>
             <div className="my-3">
               <div style={{ padding: `1rem` }}>
-                <p>
-                  <Link to="/">Home</Link> <ChevronRightIcon />{' '}
-                  <Link
-                    to={
-                      schema.organizationOwnerName
-                        ? `/${schema.organizationOwnerName}/${schema.name}`
-                        : `/db/${schema.name}`
-                    }>
-                    {schema.label}
-                  </Link>{' '}
-                  <ChevronRightIcon />
-                  <Link
-                    to={
-                      schema.organizationOwnerName
-                        ? `/${schema.organizationOwnerName}/${schema.name}/${table.name}`
-                        : `/db/${schema.name}/table/${table.name}`
-                    }>
-                    {table.label}
-                  </Link>
-                </p>
+                <Breadcrumb tableLayout />
                 <h3 className="m-0 w-25" style={{ cursor: 'pointer' }}>
                   <span>
                     {table.label}
@@ -571,8 +426,6 @@ const mapStateToProps = state => ({
   table: state.table,
   formData: state.formData,
   column: state.column,
-  columns: state.columns,
-  fields: state.fields,
   rowCount: state.rowCount,
   orderBy: state.orderBy,
   limit: state.limit,
@@ -583,6 +436,8 @@ const mapStateToProps = state => ({
   columnAPI: state.columnAPI,
   gridAPI: state.gridAPI,
   cloudContext: state.cloudContext,
+  rowData: state.rowData,
+  gridParams: state.gridParams,
 });
 
 const mapDispatchToProps = dispatch => ({

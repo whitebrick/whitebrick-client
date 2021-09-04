@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -37,6 +37,7 @@ const Layout = ({
   cloudContext,
   hideSidebar = false,
 }: LayoutPropsType) => {
+  const [expand, setExpand] = useState(false);
   const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
   const [fetchCloudContext] = useManualQuery(`{ wbCloudContext }`);
   const [fetchSchemaTable] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
@@ -80,6 +81,14 @@ const Layout = ({
     }
   };
 
+  const getMarginLeft = (hideSidebar: boolean, expand: boolean) => {
+    if (!hideSidebar) {
+      if (expand) return '250px';
+      return '3.5rem';
+    }
+    return 0;
+  };
+
   return (
     <>
       <Header
@@ -88,14 +97,12 @@ const Layout = ({
         setType={actions.setType}
       />
       <div className="mt-5">
-        {!hideSidebar && (
-          <Sidebar
-            setFormData={actions.setFormData}
-            setShow={actions.setShow}
-            setType={actions.setType}
-          />
-        )}
-        <main id="main" style={{ marginLeft: !hideSidebar ? '250px' : '0' }}>
+        {!hideSidebar && <Sidebar expand={expand} setExpand={setExpand} />}
+        <main
+          id="main"
+          style={{
+            marginLeft: getMarginLeft(hideSidebar, expand),
+          }}>
           {children}
           <LayoutSidePanel fetchTables={fetchTableAndColumns} />
         </main>

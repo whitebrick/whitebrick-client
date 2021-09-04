@@ -3,32 +3,39 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import { bindActionCreators } from 'redux';
-import { ClientContext } from 'graphql-hooks';
+import { ClientContext, useMutation } from 'graphql-hooks';
 
 import {
   IServerSideGetRowsParams,
   GridReadyEvent,
   GridApi,
-  GetContextMenuItems,
   GridSizeChangedEvent,
 } from 'ag-grid-community';
 import { connect } from 'react-redux';
 import * as gql from 'gql-query-builder';
 import { actions } from '../state/actions';
-import ForeignKeyCellRenderer from './cell/foreignKeyCellRenderer';
-import PrimaryKeyCellRenderer from './cell/primaryKeyCellRenderer';
-import ForeignKeyEditor from './cell/foreignKeyEditor';
+import ForeignKeyCellRenderer from './cell/renderers/foreignKey';
+import PrimaryKeyCellRenderer from './cell/renderers/primaryKey';
+import ForeignKeyEditor from './cell/editors/foreignKey';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
 import { getQueryParams } from '../utils/queryParams';
+import {
+  onAddColumn,
+  onAddRow,
+  onDeleteColumn,
+  onDeleteRow,
+  onEditColumn,
+  onEditRow,
+} from '../utils/actions';
+import { REMOVE_OR_DELETE_COLUMN_MUTATION } from '../graphql/mutations/wb';
+import { updateTableData } from '../utils/updateTableData';
 
 type GridPropsType = {
-  onCellValueChanged: (params: any) => void;
-  getContextMenuItems: GetContextMenuItems;
   table: TableItemType;
   views: any[];
   orderBy: string;
   limit: number;
-  columns: Array<ColumnItemType>;
+  columns: ColumnItemType[];
   actions: any;
   offset: string;
   defaultView: string;
@@ -41,8 +48,6 @@ type GridPropsType = {
 };
 
 const Grid = ({
-  onCellValueChanged,
-  getContextMenuItems,
   table,
   views,
   orderBy,
@@ -60,15 +65,11 @@ const Grid = ({
 }: GridPropsType) => {
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
+  const [changedValues, setChangedValues] = useState([]);
 
-  const autoSizeColumns = (columnAPI, gridAPI) => {
-    const allColumnIds = [];
-    columnAPI.getAllColumns().forEach(function ids(column) {
-      allColumnIds.push(column.colId);
-    });
-    if (allColumnIds.length > 4) columnAPI.autoSizeColumns(allColumnIds, false);
-    else gridAPI.sizeColumnsToFit();
-  };
+  const [removeOrDeleteColumnMutation] = useMutation(
+    REMOVE_OR_DELETE_COLUMN_MUTATION,
+  );
 
   const isValidFilter = filter => {
     return (
@@ -79,22 +80,33 @@ const Grid = ({
     );
   };
 
+  const getFilterValue = (condition: string, filterText: any) => {
+    if (condition.includes('like')) {
+      return parseInt(filterText, 10)
+        ? `%${parseInt(filterText, 10)}`
+        : `%${filterText}%`;
+    }
+    return parseInt(filterText, 10) ? parseInt(filterText, 10) : filterText;
+  };
+
   const parseFilters = filters => {
     const f = {};
     filters.forEach(filter => {
       if (isValidFilter(filter)) {
         if (filter.clause === '_where') {
           f[filter?.column] = {
-            [filter.condition]: parseInt(filter.filterText, 10)
-              ? parseInt(filter.filterText, 10)
-              : filter.filterText,
+            [filter.condition]: getFilterValue(
+              filter.condition,
+              filter.filterText,
+            ),
           };
         } else
           f[filter.clause] = {
             [filter.column]: {
-              [filter.condition]: parseInt(filter.filterText, 10)
-                ? parseInt(filter.filterText, 10)
-                : filter.filterText,
+              [filter.condition]: getFilterValue(
+                filter.condition,
+                filter.filterText,
+              ),
             },
           };
       }
@@ -105,6 +117,7 @@ const Grid = ({
   const createServerSideDatasource = useCallback(() => {
     return {
       async getRows(params: IServerSideGetRowsParams) {
+        actions.setGridParams(params);
         const subscription = gql.subscription({
           operation: `${schema.name}_${table.name}`,
           variables: {
@@ -121,50 +134,50 @@ const Grid = ({
           },
           fields,
         });
-        const operationAgg = gql.query({
+        const operationAgg = gql.subscription({
           operation: `${schema.name}_${table.name.concat('_aggregate')}`,
           variables: {
             where: {
-              value: parseFilters(filters),
+              value: parsedFilters,
               type: `${schema.name}_${table.name.concat('_bool_exp')}`,
             },
           },
           fields: [{ aggregate: ['count'] }],
         });
-        const { data: c } = await client.request(operationAgg);
-        if (c && c[`${schema.name}_${table.name}_aggregate`]) {
-          actions.setRowCount(
-            c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-          );
+        if (fields.length > 0)
           client.subscriptionClient.request(subscription).subscribe({
             next({ data }) {
-              params.successCallback(
-                data[`${schema.name}_${table.name}`],
-                c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-              );
-              if (
-                c[`${schema.name}_${table.name}_aggregate`].aggregate.count ===
-                0
-              )
-                params.api.showNoRowsOverlay();
-              else params.api.hideOverlay();
-              autoSizeColumns(params.columnApi, params.api);
+              client.subscriptionClient.request(operationAgg).subscribe({
+                next({ data: c }) {
+                  actions.setRows(data[`${schema.name}_${table.name}`]);
+                  actions.setRowCount(
+                    c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
+                  );
+                  params.successCallback(
+                    data[`${schema.name}_${table.name}`],
+                    c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
+                  );
+                  if (
+                    c[`${schema.name}_${table.name}_aggregate`].aggregate
+                      .count === 0
+                  )
+                    params.api.showNoRowsOverlay();
+                  else params.api.hideOverlay();
+                  params.columnApi.autoSizeAllColumns(false);
+                },
+                error(error) {
+                  console.error(error);
+                },
+              });
             },
             error(error) {
               console.error(error);
               params.failCallback();
             },
           });
-        } else {
-          columns.push({
-            default: '',
-            referencedBy: undefined,
-            type: 'string',
-            name: 'welcome',
-            label: 'Welcome',
-            foreignKeys: [],
-            isPrimaryKey: false,
-          });
+        else {
+          params.successCallback([], 0);
+          params.api.showNoRowsOverlay();
         }
       },
     };
@@ -193,11 +206,15 @@ const Grid = ({
   };
 
   useEffect(() => {
-    setTimeout(function setDatasource() {
-      const datasource = createServerSideDatasource();
-      if (gridAPI) gridAPI.setServerSideDatasource(datasource);
-    }, 1000);
-  }, [createServerSideDatasource, gridAPI]);
+    const datasource = createServerSideDatasource();
+    if (gridAPI) gridAPI.setServerSideDatasource(datasource);
+  }, [
+    createServerSideDatasource,
+    gridAPI,
+    columns,
+    foreignKeyColumns,
+    referencedByColumns,
+  ]);
 
   useEffect(() => {
     const params = getQueryParams(window.location.search);
@@ -225,7 +242,7 @@ const Grid = ({
   }, [filters]);
 
   const onGridSizeChanged = (params: GridSizeChangedEvent) =>
-    autoSizeColumns(params.columnApi, params.api);
+    params.columnApi.autoSizeAllColumns(false);
 
   const valueGetter = (params, tableName, column, type) => {
     if (tableName) {
@@ -247,6 +264,131 @@ const Grid = ({
       return params.data[`obj_${table.name}_${tableName}`]?.[column.name];
     }
     return params.data[column.name];
+  };
+
+  const getContextMenuItems = params => {
+    actions.setFormData({});
+    return [
+      {
+        name: 'Add Column',
+        action: () => onAddColumn(params, actions),
+      },
+      {
+        name: 'Edit Column',
+        action: () => onEditColumn(params, actions, columns),
+      },
+      {
+        name: 'Remove Column',
+        action: () =>
+          onDeleteColumn(
+            params.column.colId,
+            schema,
+            columns,
+            table,
+            actions,
+            fields,
+            gridAPI,
+            removeOrDeleteColumnMutation,
+          ),
+      },
+      'separator',
+      {
+        name: 'Add Row',
+        action: () => onAddRow(actions),
+      },
+      {
+        name: 'Edit Row',
+        action: () => onEditRow(params, actions),
+      },
+      {
+        name: 'Delete Row',
+        action: () => onDeleteRow(params, schema, table, client),
+      },
+      'separator',
+      'copy',
+      'copyWithHeaders',
+      'paste',
+      'export',
+    ];
+  };
+
+  const getMainMenuItems = params => {
+    actions.setFormData({});
+    return [
+      {
+        name: 'Add Column',
+        action: () => onAddColumn(params, actions),
+      },
+      {
+        name: 'Edit Column',
+        action: () => onEditColumn(params, actions, columns),
+      },
+      {
+        name: 'Remove Column',
+        action: () =>
+          onDeleteColumn(
+            params.column.colId,
+            schema,
+            columns,
+            table,
+            actions,
+            fields,
+            gridAPI,
+            removeOrDeleteColumnMutation,
+          ),
+      },
+      'separator',
+      'autoSizeThis',
+      'autoSizeAll',
+      'separator',
+      'resetColumns',
+    ];
+  };
+
+  const editValues = val => {
+    let values = val;
+    values = [...Array.from(new Set(values))];
+    values.forEach((params, index) => {
+      const filteredParams = values.filter(
+        value => params.rowIndex === value.rowIndex,
+      );
+      const { data } = params;
+      data[params.colDef?.field] = params.oldValue;
+      filteredParams.forEach(param => {
+        data[param.colDef?.field] = param.oldValue;
+      });
+      const variables = { where: {}, _set: {} };
+      Object.keys(data).forEach(key => {
+        if (
+          !key.startsWith(`obj_${table.name}`) &&
+          !key.startsWith(`arr_${table.name}`) &&
+          data[key]
+        ) {
+          variables.where[key] = {
+            _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
+          };
+        }
+      });
+      variables._set[params.colDef.field] = parseInt(params.newValue, 10)
+        ? parseInt(params.newValue, 10)
+        : params.newValue;
+      filteredParams.forEach(param => {
+        variables._set[param.colDef.field] = parseInt(param.newValue, 10)
+          ? parseInt(param.newValue, 10)
+          : param.newValue;
+      });
+      values.splice(index, 1);
+      values = values.filter(el => !filteredParams.includes(el));
+      setChangedValues(values);
+      updateTableData(schema.name, table.name, variables, client, actions);
+    });
+  };
+
+  const onCellValueChanged = params => {
+    const values = changedValues;
+    values.push(params);
+    setChangedValues(values);
+    setTimeout(() => editValues(values), 500);
   };
 
   const renderColumn = (
@@ -292,8 +434,9 @@ const Grid = ({
   };
 
   return (
-    <>
+    <div className="mt-4">
       <AgGridReact
+        reactUi
         frameworkComponents={{
           foreignKeyEditor: ForeignKeyEditor,
           foreignKeyRenderer: ForeignKeyCellRenderer,
@@ -340,6 +483,7 @@ const Grid = ({
         animateRows
         allowContextMenuWithControlKey
         getContextMenuItems={getContextMenuItems}
+        getMainMenuItems={getMainMenuItems}
         popupParent={document.querySelector('body')}
         onGridSizeChanged={onGridSizeChanged}
         onGridReady={onGridReady}>
@@ -379,7 +523,7 @@ const Grid = ({
           records per page
         </div>
       )}
-    </>
+    </div>
   );
 };
 
@@ -390,7 +534,6 @@ const mapStateToProps = state => ({
   orderBy: state.orderBy,
   limit: state.limit,
   views: state.views,
-  rowCount: state.rowCount,
   current: state.current,
   offset: state.offset,
   defaultView: state.defaultView,

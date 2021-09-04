@@ -13,7 +13,7 @@ import DeleteModal from '../common/deleteModal';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
-  schemas: Array<SchemaItemType>;
+  schemas: SchemaItemType[];
   renderTitle?: boolean;
 };
 

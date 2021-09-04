@@ -173,6 +173,11 @@ export default function gridReducer(state: any = {}, action) {
         ...state,
         fields: payload.fields,
       };
+    case types.SET_GRID_PARAMS:
+      return {
+        ...state,
+        gridParams: payload.gridParams,
+      };
     default:
       return state;
   }

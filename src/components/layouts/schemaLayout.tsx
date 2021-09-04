@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronRightIcon, EditIcon, IconButton } from 'evergreen-ui';
+import { EditIcon, IconButton } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { useManualQuery } from 'graphql-hooks';
-import { Link } from 'gatsby';
 import SchemaTablesList from '../dashboard/schemaTablesList';
 import Tabs from '../elements/tabs';
 import { SchemaItemType } from '../../types';
 import { actions } from '../../state/actions';
 import Members from '../common/members';
 import { SCHEMA_USERS_QUERY } from '../../graphql/queries/wb';
+import Breadcrumb from '../common/breadcrumb';
 
 type SchemaLayoutType = {
   schema: SchemaItemType;
@@ -45,17 +45,7 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
   return (
     <div className="mt-3">
       <div style={{ padding: `1rem` }}>
-        <p>
-          <Link to="/">Home</Link> <ChevronRightIcon />{' '}
-          <Link
-            to={
-              schema.organizationOwnerName
-                ? `/${schema.organizationOwnerName}/${schema.name}`
-                : `/db/${schema.name}`
-            }>
-            {schema.label}
-          </Link>
-        </p>
+        <Breadcrumb />
         <h3 className="m-0 w-50">
           <span>
             {schema.label}

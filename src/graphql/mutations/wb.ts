@@ -25,6 +25,13 @@ export const CREATE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName
   }
 }`;
 
+export const UPDATE_TABLE_DETAILS_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $newTableName: String, $newTableLabel: String){
+  wbUpdateTable(schemaName: $schemaName, tableName: $tableName, newTableName: $newTableName, newTableLabel: $newTableLabel) {
+    id
+    name
+  }
+}`;
+
 export const REMOVE_OR_DELETE_TABLE_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $del: Boolean) {
   wbRemoveOrDeleteTable(schemaName: $schemaName, tableName: $tableName, del: $del)
 }
