@@ -9,6 +9,7 @@ import { TextInputField, toaster, Spinner } from 'evergreen-ui';
 import {
   SCHEMAS_QUERY,
   SCHEMA_TABLE_BY_NAME_QUERY,
+  SCHEMA_TABLES_QUERY,
 } from '../../graphql/queries/wb';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
@@ -111,6 +112,7 @@ const LayoutSidePanel = ({
   );
 
   const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
+  const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [fetchSchemaTable] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
 
   const deleteForeignKey = async () => {
@@ -349,7 +351,19 @@ const LayoutSidePanel = ({
           create: true,
         },
       });
-      if (!loading && !error) actions.setShow(false);
+      if (!loading && !error) {
+        const {
+          loading: l,
+          data,
+          error: e,
+        } = await fetchSchemaTables({
+          variables: {
+            schemaName: formData.schema.name,
+          },
+        });
+        if (!l && !e) actions.setTables(data.wbMyTables);
+        actions.setShow(false);
+      }
     } else if (type === 'editDatabase') {
       const variables: any = { name: schema.name };
       if (formData.name !== schema.name)
