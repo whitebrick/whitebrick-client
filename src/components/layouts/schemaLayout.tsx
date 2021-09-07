@@ -1,34 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { EditIcon, IconButton } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { useManualQuery } from 'graphql-hooks';
 import SchemaTablesList from '../dashboard/schemaTablesList';
 import Tabs from '../elements/tabs';
 import { SchemaItemType } from '../../types';
 import { actions } from '../../state/actions';
 import Members from '../common/members';
-import { SCHEMA_USERS_QUERY } from '../../graphql/queries/wb';
 import Breadcrumb from '../common/breadcrumb';
 
 type SchemaLayoutType = {
   schema: SchemaItemType;
-  users: any[];
   actions: any;
 };
 
-const SchemaLayout = ({ schema, actions, users }: SchemaLayoutType) => {
+const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
   const userRole = schema?.role?.name;
-  const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
-    variables: {
-      schemaName: schema.name,
-    },
-  });
-
-  const fetchData = () => {
-    fetchSchemaUsers().then(r => actions.setUsers(r?.data?.wbSchemaUsers));
-  };
-  useEffect(fetchData, [fetchSchemaUsers]);
 
   const tabs = [
     {
@@ -37,7 +24,7 @@ const SchemaLayout = ({ schema, actions, users }: SchemaLayoutType) => {
     },
     {
       title: 'Members',
-      element: <Members users={users} refetch={fetchData} name="schema" />,
+      element: <Members name="schema" />,
       noPane: true,
     },
   ];

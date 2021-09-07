@@ -67,13 +67,13 @@ const Organization = ({
   return (
     <Layout>
       {error ? (
-        <Layout>
+        <>
           <NotFound name={getError(error)} />
-        </Layout>
+        </>
       ) : (
         <>
           <Seo title={`${organization.label} | Organization`} />
-          <OrganizationLayout refetch={fetchData} />
+          <OrganizationLayout />
         </>
       )}
     </Layout>

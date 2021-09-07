@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { actions } from '../../../state/actions';
 import { SchemaItemType, TableItemType } from '@/types';
 import DeleteModal from '../deleteModal';
-import InviteUserModal from '../inviteUserModal'
+import InviteUserModal from '../inviteUserModal';
 import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../../../graphql/mutations/wb';
 import { SCHEMA_USERS_QUERY } from '../../../graphql/queries/wb';
 
@@ -14,7 +14,7 @@ type DatabaseProps = {
   expand: boolean;
   schema: SchemaItemType;
   table: TableItemType;
-  actions;
+  actions: any;
 };
 
 const DatabaseSettings = ({
@@ -36,10 +36,6 @@ const DatabaseSettings = ({
     },
   });
 
-  const deleteSchema = () => {
-    setShowDelete(true);
-  };
-
   const deleteTable = async () => {
     await removeOrDeleteTableMutation({
       variables: {
@@ -52,13 +48,8 @@ const DatabaseSettings = ({
     window.location.replace('/');
   };
 
-  const showInviteModal = () => {
-    setShowInvite(true)
-  }
-
   const fetchData = () => {
-    fetchSchemaUsers()
-    .then(r => actions.setUsers(r?.data?.wbSchemaUsers))
+    fetchSchemaUsers().then(r => actions.setUsers(r?.data?.wbSchemaUsers));
   };
 
   return (
@@ -82,7 +73,8 @@ const DatabaseSettings = ({
           <CogIcon /> <span className="ml-2">Settings</span>
         </div>
         <div
-          onClick={showInviteModal}
+          aria-hidden
+          onClick={() => setShowInvite(true)}
           className="list-group-item py-1 d-flex align-items-center">
           <NewPersonIcon /> <span className="ml-2">Invite others</span>
         </div>
@@ -91,7 +83,7 @@ const DatabaseSettings = ({
           <div
             className="list-group-item py-1 d-flex align-items-center text-danger"
             aria-hidden="true"
-            onClick={deleteSchema}>
+            onClick={() => setShowDelete(true)}>
             <TrashIcon />
             <div className="ml-2">Delete {schema.label}</div>
           </div>

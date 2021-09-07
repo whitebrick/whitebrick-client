@@ -96,6 +96,20 @@ export const ORGANIZATION_QUERY = `query ($name: String!) {
 }
 `;
 
+export const ORGANIZATION_USERS_QUERY = `query ($name: String!) {
+  wbOrganizationUsers(organizationName: $name) {
+    userFirstName
+    userLastName
+    userEmail
+    role {
+      name
+      impliedFrom
+      permissions
+    }
+  }
+}
+`;
+
 export const TABLE_USERS_QUERY = `query ($schemaName: String!, $tableName: String!){
   wbTableUsers(schemaName: $schemaName, tableName: $tableName){
     userId

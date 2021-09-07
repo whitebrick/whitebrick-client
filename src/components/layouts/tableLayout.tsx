@@ -26,7 +26,6 @@ import Members from '../common/members';
 import {
   SCHEMA_BY_NAME_QUERY,
   SCHEMA_TABLE_BY_NAME_QUERY,
-  TABLE_USERS_QUERY,
   COLUMNS_BY_NAME_QUERY,
   SCHEMA_TABLES_QUERY,
 } from '../../graphql/queries/wb';
@@ -83,23 +82,6 @@ const TableLayout = ({
   const [fetchColumnsByName] = useManualQuery(COLUMNS_BY_NAME_QUERY);
 
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
-
-  const [users, setUsers] = useState([]);
-  const [fetchSchemaTableUsers] = useManualQuery(TABLE_USERS_QUERY);
-
-  const fetchData = () => {
-    if (
-      params &&
-      params.databaseName !== undefined &&
-      params.tableName !== undefined
-    )
-      fetchSchemaTableUsers({
-        variables: {
-          schemaName: params.databaseName,
-          tableName: params.tableName,
-        },
-      }).then(r => setUsers(r?.data?.wbTableUsers));
-  };
 
   useEffect(() => {
     const getForeignKeyColumn = async fkc => {
@@ -237,8 +219,6 @@ const TableLayout = ({
     params,
   ]);
 
-  useEffect(fetchData, [fetchSchemaTableUsers, params]);
-
   useEffect(() => {
     actions.setOffset(0);
     actions.setCurrent(1);
@@ -367,7 +347,7 @@ const TableLayout = ({
     },
     {
       title: 'Members',
-      element: <Members users={users} refetch={fetchData} name="table" />,
+      element: <Members name="table" />,
       noPane: true,
     },
   ];

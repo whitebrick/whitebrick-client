@@ -17,20 +17,14 @@ import DeleteModal from '../common/deleteModal';
 
 type OrganizationLayoutPropsType = {
   organization: any;
-  refetch: () => void;
   actions: any;
 };
 
 const OrganizationLayout = ({
   organization,
-  refetch,
   actions,
 }: OrganizationLayoutPropsType) => {
   const [showDelete, setShowDelete] = useState(false);
-
-  const deleteOrganization = () => {
-    setShowDelete(true);
-  };
 
   return (
     <div className="ag-theme-alpine">
@@ -59,7 +53,7 @@ const OrganizationLayout = ({
                     <IconButton
                       appearance="minimal"
                       icon={TrashIcon}
-                      onClick={() => deleteOrganization()}
+                      onClick={() => setShowDelete(true)}
                     />
                     {showDelete && (
                       <DeleteModal
@@ -88,13 +82,7 @@ const OrganizationLayout = ({
                 },
                 {
                   title: 'Members',
-                  element: (
-                    <Members
-                      name="organization"
-                      refetch={refetch}
-                      users={organization?.users}
-                    />
-                  ),
+                  element: <Members name="organization" />,
                 },
               ]}
             />

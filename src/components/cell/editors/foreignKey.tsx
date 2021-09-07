@@ -7,7 +7,7 @@ import React, {
   useContext,
 } from 'react';
 import { ClientContext } from 'graphql-hooks';
-import { IconButton, PlusIcon, SmallPlusIcon } from 'evergreen-ui';
+import { IconButton, PlusIcon } from 'evergreen-ui';
 import LinkForeignKey from '../../common/linkForeignKey';
 import { updateTableData } from '../../../utils/updateTableData';
 

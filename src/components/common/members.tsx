@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   Select,
@@ -14,7 +14,7 @@ import {
 } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { useMutation } from 'graphql-hooks';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import gravatar from 'gravatar';
 import { actions } from '../../state/actions';
 import {
@@ -33,16 +33,21 @@ import {
 import { isObjectEmpty } from '../../utils/objectEmpty';
 import InviteUserModal from './inviteUserModal';
 import RolePermissions from './rolePermissions';
+import {
+  ORGANIZATION_USERS_QUERY,
+  SCHEMA_USERS_QUERY,
+  TABLE_USERS_QUERY,
+} from '../../graphql/queries/wb';
 
 type MembersType = {
   user: any;
   users: any[];
   cloudContext: any;
   name: string;
-  refetch: () => void;
   schema: SchemaItemType;
   table: TableItemType;
   organization: OrganizationItemType;
+  actions: any;
 };
 
 const Members = ({
@@ -50,10 +55,10 @@ const Members = ({
   users,
   cloudContext,
   name,
-  refetch,
   schema,
   organization,
   table,
+  actions,
 }: MembersType) => {
   const getRole = role => {
     if (role) return role.split('_').pop();
@@ -64,16 +69,6 @@ const Members = ({
   const [show, setShow] = useState(false);
   const [showRoles, setShowRoles] = useState(false);
 
-  const cloudContextRoles = !isObjectEmpty(cloudContext) && cloudContext?.roles;
-  const roles = !isObjectEmpty(cloudContext) && cloudContext?.roles[name];
-
-  const getUserRole = () => {
-    if (name === 'organization') return getRole(organization?.role?.name);
-    if (name === 'schema') return getRole(schema?.role?.name);
-    return getRole(table?.role?.name);
-  };
-
-  const userRole = getUserRole();
   const [updateSchemaUserRole] = useMutation(SCHEMA_SET_USER_ROLE_MUTATION);
   const [updateTableUserRole] = useMutation(TABLE_SET_USER_ROLE_MUTATION);
   const [updateOrganizationUserRole] = useMutation(SET_USERS_ROLE_MUTATION);
@@ -88,6 +83,55 @@ const Members = ({
     TABLE_REMOVE_USER_ROLE_MUTATION,
   );
 
+  const cloudContextRoles = !isObjectEmpty(cloudContext) && cloudContext?.roles;
+  const roles = !isObjectEmpty(cloudContext) && cloudContext?.roles[name];
+
+  const getUserRole = () => {
+    if (name === 'organization') return getRole(organization?.role?.name);
+    if (name === 'schema') return getRole(schema?.role?.name);
+    return getRole(table?.role?.name);
+  };
+  const userRole = getUserRole();
+
+  const [fetchOrganizationUsers] = useManualQuery(ORGANIZATION_USERS_QUERY, {
+    variables: {
+      name: organization.name,
+    },
+  });
+  const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
+    variables: {
+      schemaName: schema.name,
+    },
+  });
+  const [fetchSchemaTableUsers] = useManualQuery(TABLE_USERS_QUERY, {
+    variables: {
+      schemaName: schema.name,
+      tableName: table.name,
+    },
+  });
+
+  const fetchUsers = () => {
+    if (name === 'organization') {
+      fetchOrganizationUsers().then(r =>
+        actions.setUsers(r?.data?.wbOrganizationUsers),
+      );
+    } else if (name === 'schema') {
+      fetchSchemaUsers().then(r => actions.setUsers(r?.data?.wbSchemaUsers));
+    } else {
+      fetchSchemaTableUsers().then(r =>
+        actions.setUsers(r?.data?.wbTableUsers),
+      );
+    }
+  };
+
+  useEffect(fetchUsers, [
+    actions,
+    fetchOrganizationUsers,
+    fetchSchemaTableUsers,
+    fetchSchemaUsers,
+    name,
+  ]);
+
   const removeUser = async userEmail => {
     if (name === 'organization') {
       const { loading, error } = await removeOrganizationUserMutation({
@@ -96,7 +140,7 @@ const Members = ({
           userEmails: [userEmail],
         },
       });
-      if (!loading && !error) refetch();
+      if (!loading && !error) fetchUsers();
     } else if (name === 'schema') {
       const { loading, error } = await removeSchemaUserMutation({
         variables: {
@@ -104,7 +148,7 @@ const Members = ({
           userEmails: [userEmail],
         },
       });
-      if (!loading && !error) refetch();
+      if (!loading && !error) fetchUsers();
     } else {
       const { loading, error } = await removeTableUserMutation({
         variables: {
@@ -113,7 +157,7 @@ const Members = ({
           userEmails: [userEmail],
         },
       });
-      if (!loading && !error) refetch();
+      if (!loading && !error) fetchUsers();
     }
   };
 
@@ -144,7 +188,7 @@ const Members = ({
         },
       });
     }
-    refetch();
+    fetchUsers();
   };
 
   const renderRoleColumn = user => {
@@ -277,7 +321,7 @@ const Members = ({
         show={show}
         setShow={setShow}
         name={name}
-        refetch={refetch}
+        refetch={fetchUsers}
       />
       <RolePermissions
         show={showRoles}
@@ -295,6 +339,7 @@ const mapStateToProps = state => ({
   schema: state.schema,
   table: state.table,
   user: state.user,
+  users: state.users,
 });
 
 const mapDispatchToProps = dispatch => ({
