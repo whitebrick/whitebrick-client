@@ -13,12 +13,12 @@ import Breadcrumb from '../common/breadcrumb';
 
 type SchemaLayoutType = {
   schema: SchemaItemType;
+  users: any[];
   actions: any;
 };
 
-const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
+const SchemaLayout = ({ schema, actions, users }: SchemaLayoutType) => {
   const userRole = schema?.role?.name;
-  const [users, setUsers] = useState([]);
   const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
     variables: {
       schemaName: schema.name,
@@ -26,7 +26,7 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
   });
 
   const fetchData = () => {
-    fetchSchemaUsers().then(r => setUsers(r?.data?.wbSchemaUsers));
+    fetchSchemaUsers().then(r => actions.setUsers(r?.data?.wbSchemaUsers));
   };
   useEffect(fetchData, [fetchSchemaUsers]);
 
@@ -74,6 +74,7 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
 
 const mapStateToProps = state => ({
   schema: state.schema,
+  users: state.users,
 });
 
 const mapDispatchToProps = dispatch => ({

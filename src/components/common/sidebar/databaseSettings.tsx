@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { PlusIcon, CogIcon, NewPersonIcon, TrashIcon } from 'evergreen-ui';
-import { useMutation } from 'graphql-hooks';
+import { useMutation, useManualQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../../../state/actions';
 import { SchemaItemType, TableItemType } from '@/types';
 import DeleteModal from '../deleteModal';
+import InviteUserModal from '../inviteUserModal'
 import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../../../graphql/mutations/wb';
+import { SCHEMA_USERS_QUERY } from '../../../graphql/queries/wb';
 
 type DatabaseProps = {
   expand: boolean;
@@ -23,9 +25,16 @@ const DatabaseSettings = ({
 }: DatabaseProps) => {
   const userRole = schema?.role?.name;
   const [showDelete, setShowDelete] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
+
   const [removeOrDeleteTableMutation] = useMutation(
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
+  const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
+    variables: {
+      schemaName: schema?.name,
+    },
+  });
 
   const deleteSchema = () => {
     setShowDelete(true);
@@ -41,6 +50,15 @@ const DatabaseSettings = ({
     });
     actions.setTable('');
     window.location.replace('/');
+  };
+
+  const showInviteModal = () => {
+    setShowInvite(true)
+  }
+
+  const fetchData = () => {
+    fetchSchemaUsers()
+    .then(r => actions.setUsers(r?.data?.wbSchemaUsers))
   };
 
   return (
@@ -63,7 +81,9 @@ const DatabaseSettings = ({
         <div className="list-group-item py-1 d-flex align-items-center">
           <CogIcon /> <span className="ml-2">Settings</span>
         </div>
-        <div className="list-group-item py-1 d-flex align-items-center">
+        <div
+          onClick={showInviteModal}
+          className="list-group-item py-1 d-flex align-items-center">
           <NewPersonIcon /> <span className="ml-2">Invite others</span>
         </div>
         {(userRole === 'schema_owner' ||
@@ -92,6 +112,12 @@ const DatabaseSettings = ({
             <div className="ml-2">Delete {table.label.toLowerCase()}</div>
           </div>
         )}
+        <InviteUserModal
+          show={showInvite}
+          setShow={setShowInvite}
+          name="schema"
+          refetch={fetchData}
+        />
       </>
     )
   );

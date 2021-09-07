@@ -63,6 +63,11 @@ export default function gridReducer(state: any = {}, action) {
         ...state,
         schema: payload.schema,
       };
+    case types.SET_USERS:
+        return {
+          ...state,
+          users: payload.users,
+        };
     case types.SET_TABLES:
       return {
         ...state,

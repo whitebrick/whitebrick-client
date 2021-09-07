@@ -109,6 +109,12 @@ export const actions = {
       payload: { schemas },
     };
   },
+  setUsers(users) {
+    return {
+      type: types.SET_USERS,
+      payload: { users },
+    };
+  },
   setTables(tables) {
     return {
       type: types.SET_TABLES,

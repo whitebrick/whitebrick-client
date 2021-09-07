@@ -8,6 +8,7 @@ const initialState = {
   formData: {},
   schema: {},
   schemas: [],
+  users: [],
   tables: [],
   table: '',
   isNewTable: false,
