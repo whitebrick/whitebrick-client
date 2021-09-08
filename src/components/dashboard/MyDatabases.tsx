@@ -47,7 +47,7 @@ const MyDatabases = ({
               </div>
             ))}
             {name === 'My Databases' && (
-              <AddData name="database" type="createDatabase" />
+              <AddData name="database" type="createDatabase" permissionType={undefined}/>
             )}
           </div>
         </div>

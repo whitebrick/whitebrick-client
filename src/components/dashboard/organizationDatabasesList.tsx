@@ -80,6 +80,7 @@ const OrganizationDatabasesList = ({
             <AddData
               name="database"
               type="createDatabase"
+              permissionType="administer_organization"
               extraParams={{ organization }}
             />
           </div>

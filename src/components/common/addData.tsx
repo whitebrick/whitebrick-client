@@ -4,13 +4,16 @@ import { connect } from 'react-redux';
 import Avatar from 'react-avatar';
 import { actions } from '../../state/actions';
 import { SchemaItemType } from '../../types';
+import { CheckPermission } from '../../utils/checkPermission';
 
 type AddDataType = {
   actions: any;
   type: string;
+  permissionType: string;
   name: string;
   schema: SchemaItemType;
   extraParams?: any;
+  cloudContext: any;
 };
 
 const defaultProps = {
@@ -22,10 +25,14 @@ const AddData = ({
   type,
   name,
   schema,
+  cloudContext,
+  permissionType,
   extraParams = null,
 }: AddDataType) => {
   const organization = extraParams?.organization;
   return (
+  <>
+  { CheckPermission ( permissionType, name === "table" ? schema?.role?.name : organization?.role?.name, cloudContext) &&
     <div
       className="col-md-2 col-sm-6 text-center btn"
       aria-hidden="true"
@@ -39,12 +46,15 @@ const AddData = ({
       <Avatar name="+" size="75" round="12px" color="#4B5563" />
       <p className="mt-2">Add {name}</p>
     </div>
+  }
+  </>
   );
 };
 
 AddData.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   schema: state.schema,
+  cloudContext: state.cloudContext,
 });
 
 const mapDispatchToProps = dispatch => ({
