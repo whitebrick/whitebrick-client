@@ -4,12 +4,12 @@ import { connect } from 'react-redux';
 import Avatar from 'react-avatar';
 import { actions } from '../../state/actions';
 import { SchemaItemType } from '../../types';
-import { CheckPermission } from '../../utils/checkPermission';
+import { checkPermission } from '../../utils/checkPermission';
 
 type AddDataType = {
   actions: any;
   type: string;
-  permissionType: string;
+  permissionType?: string | null;
   name: string;
   schema: SchemaItemType;
   extraParams?: any;
@@ -17,6 +17,7 @@ type AddDataType = {
 };
 
 const defaultProps = {
+  permissionType: null,
   extraParams: null,
 };
 
@@ -27,27 +28,31 @@ const AddData = ({
   schema,
   cloudContext,
   permissionType,
-  extraParams = null,
+  extraParams,
 }: AddDataType) => {
   const organization = extraParams?.organization;
   return (
-  <>
-  { CheckPermission ( permissionType, name === "table" ? schema?.role?.name : organization?.role?.name, cloudContext) &&
-    <div
-      className="col-md-2 col-sm-6 text-center btn"
-      aria-hidden="true"
-      onClick={() => {
-        actions.setFormData(
-          type === 'createDatabase' ? { organization } : { schema },
-        );
-        actions.setType(type);
-        actions.setShow(true);
-      }}>
-      <Avatar name="+" size="75" round="12px" color="#4B5563" />
-      <p className="mt-2">Add {name}</p>
-    </div>
-  }
-  </>
+    <>
+      {checkPermission(
+        permissionType,
+        name === 'table' ? schema?.role?.name : organization?.role?.name,
+        cloudContext,
+      ) && (
+        <div
+          className="col-md-2 col-sm-6 text-center btn"
+          aria-hidden="true"
+          onClick={() => {
+            actions.setFormData(
+              type === 'createDatabase' ? { organization } : { schema },
+            );
+            actions.setType(type);
+            actions.setShow(true);
+          }}>
+          <Avatar name="+" size="75" round="12px" color="#4B5563" />
+          <p className="mt-2">Add {name}</p>
+        </div>
+      )}
+    </>
   );
 };
 
