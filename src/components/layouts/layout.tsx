@@ -91,11 +91,7 @@ const Layout = ({
 
   return (
     <>
-      <Header
-        setFormData={actions.setFormData}
-        setShow={actions.setShow}
-        setType={actions.setType}
-      />
+      <Header />
       <div className="mt-5">
         {!hideSidebar && <Sidebar expand={expand} setExpand={setExpand} />}
         <main

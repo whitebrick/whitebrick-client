@@ -26,18 +26,10 @@ import { SchemaItemType } from '../../types';
 type HeaderPropsType = {
   user: any;
   schema: SchemaItemType;
-  setType: (value: string) => void;
-  setShow: (value: boolean) => void;
-  setFormData: (value: any) => void;
+  actions: any;
 };
 
-const Header = ({
-  user,
-  schema,
-  setType,
-  setShow,
-  setFormData,
-}: HeaderPropsType) => {
+const Header = ({ user, schema, actions }: HeaderPropsType) => {
   const { logout } = useAuth0();
 
   return (
@@ -62,27 +54,27 @@ const Header = ({
                   <Menu.Item
                     icon={PanelTableIcon}
                     onClick={() => {
-                      setFormData({ schema });
-                      setType('createTable');
-                      setShow(true);
+                      actions.setFormData({ schema });
+                      actions.setType('createTable');
+                      actions.setShow(true);
                     }}>
                     New Table
                   </Menu.Item>
                   <Menu.Item
                     icon={DatabaseIcon}
                     onClick={() => {
-                      setFormData({});
-                      setType('createDatabase');
-                      setShow(true);
+                      actions.setFormData({});
+                      actions.setType('createDatabase');
+                      actions.setShow(true);
                     }}>
                     New Database
                   </Menu.Item>
                   <Menu.Item
                     icon={ApplicationsIcon}
                     onClick={() => {
-                      setFormData({});
-                      setType('createOrganization');
-                      setShow(true);
+                      actions.setFormData({});
+                      actions.setType('createOrganization');
+                      actions.setShow(true);
                     }}>
                     New Organization
                   </Menu.Item>
