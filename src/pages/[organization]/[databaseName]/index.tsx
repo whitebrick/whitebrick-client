@@ -63,7 +63,12 @@ const OrgSchema = ({
   };
 
   if (isLoading) return <Loading />;
-  if (error) return <NotFound name={getError(error)} />;
+  if (error)
+    return (
+      <Layout>
+        <NotFound name={getError(error)} />
+      </Layout>
+    );
   return (
     <>
       <Seo title={schema.label} />

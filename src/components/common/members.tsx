@@ -228,7 +228,7 @@ const Members = ({
         </>
       );
     }
-    return roles && roles[user.role.name].label;
+    return roles && roles?.[user.role.name]?.label;
   };
 
   const filteredUsers =
