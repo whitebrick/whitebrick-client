@@ -34,6 +34,9 @@ export const SCHEMA_TABLE_BY_NAME_QUERY = `query ($schemaName: String!, $tableNa
   wbMyTableByName(schemaName: $schemaName, tableName: $tableName, withColumns: $withColumns, withSettings: $withSettings) {
     name
     label
+    role {
+      name
+    }
     columns {
       name
       default

@@ -16,7 +16,6 @@ type DatabasesPropsType = {
   organization: OrganizationItemType;
   schemas: SchemaItemType[];
   renderTitle?: boolean;
-  cloudContext: any;
 };
 
 const defaultProps = {
@@ -27,29 +26,25 @@ const OrganizationDatabasesList = ({
   organization,
   schemas,
   renderTitle = true,
-  cloudContext,
 }: DatabasesPropsType) => {
   const [showDelete, setShowDelete] = useState(false);
 
-  const deleteOrganization = () => {
-    setShowDelete(true);
-  };
+  const isOrgAdmin = checkPermission(
+    'administer_organization',
+    organization?.role?.name,
+  );
 
   return (
     <div className="card my-4">
       {renderTitle && (
         <div className="card-header d-flex justify-content-between align-items-center">
           <h6>{organization.label}</h6>
-          {checkPermission(
-            'administer_organization',
-            organization?.role?.name,
-            cloudContext,
-          ) && (
+          {isOrgAdmin && (
             <div>
               <IconButton
                 appearance="minimal"
                 icon={TrashIcon}
-                onClick={deleteOrganization}
+                onClick={() => setShowDelete(true)}
               />
               {showDelete && (
                 <DeleteModal
@@ -102,7 +97,6 @@ const OrganizationDatabasesList = ({
 OrganizationDatabasesList.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   schemas: state.schemas,
-  cloudContext: state.cloudContext,
 });
 
 const mapDispatchToProps = dispatch => ({

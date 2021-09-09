@@ -1,6 +1,9 @@
-export const checkPermission = (type, userRole, cloudContext) => {
+import store from '../state/store';
+
+export const checkPermission = (type, userRole) => {
+  const state = store.getState();
   // Only in the case of "My Databases"
   if (!type) return true;
-  const permittedRoles = cloudContext?.policy?.[type]?.permittedRoles;
+  const permittedRoles = state.cloudContext?.policy?.[type]?.permittedRoles;
   return permittedRoles?.includes(userRole);
 };

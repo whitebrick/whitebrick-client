@@ -8,6 +8,7 @@ import { SchemaItemType } from '../../types';
 import { actions } from '../../state/actions';
 import Members from '../common/members';
 import Breadcrumb from '../common/breadcrumb';
+import { checkPermission } from '../../utils/checkPermission';
 
 type SchemaLayoutType = {
   schema: SchemaItemType;
@@ -16,6 +17,7 @@ type SchemaLayoutType = {
 
 const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
   const userRole = schema?.role?.name;
+  const canEdit = checkPermission('manage_access_to_schema', userRole);
 
   const tabs = [
     {
@@ -36,8 +38,7 @@ const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
         <h3 className="m-0 w-50">
           <span>
             {schema.label}
-            {(userRole === 'schema_owner' ||
-              userRole === 'schema_administrator') && (
+            {canEdit && (
               <IconButton
                 appearance="minimal"
                 className="ml-1"

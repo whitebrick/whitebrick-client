@@ -29,7 +29,7 @@ export type ViewItemType = {
 export type TableItemType = {
   name: string;
   label: string;
-  columns: Array<ColumnItemType>;
+  columns: ColumnItemType[];
   role: {
     name: string;
   };

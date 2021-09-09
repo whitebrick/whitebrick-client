@@ -13,7 +13,6 @@ type AddDataType = {
   name: string;
   schema: SchemaItemType;
   extraParams?: any;
-  cloudContext: any;
 };
 
 const defaultProps = {
@@ -26,18 +25,18 @@ const AddData = ({
   type,
   name,
   schema,
-  cloudContext,
   permissionType,
   extraParams,
 }: AddDataType) => {
   const organization = extraParams?.organization;
+  const hasPermission = checkPermission(
+    permissionType,
+    name === 'table' ? schema?.role?.name : organization?.role?.name,
+  );
+
   return (
     <>
-      {checkPermission(
-        permissionType,
-        name === 'table' ? schema?.role?.name : organization?.role?.name,
-        cloudContext,
-      ) && (
+      {hasPermission && (
         <div
           className="col-md-2 col-sm-6 text-center btn"
           aria-hidden="true"
@@ -59,7 +58,6 @@ const AddData = ({
 AddData.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   schema: state.schema,
-  cloudContext: state.cloudContext,
 });
 
 const mapDispatchToProps = dispatch => ({

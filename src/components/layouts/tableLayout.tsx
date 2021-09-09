@@ -34,6 +34,7 @@ import Layout from './layout';
 import NotFound from '../notFound';
 import FilterPane from '../common/filters/filterPane';
 import Breadcrumb from '../common/breadcrumb';
+import { checkPermission } from '../../utils/checkPermission';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -82,6 +83,8 @@ const TableLayout = ({
   const [fetchColumnsByName] = useManualQuery(COLUMNS_BY_NAME_QUERY);
 
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
+
+  const canEdit = checkPermission('manage_access_to_table', table?.role?.name);
 
   useEffect(() => {
     const getForeignKeyColumn = async fkc => {
@@ -379,15 +382,17 @@ const TableLayout = ({
                 <h3 className="m-0 w-25" style={{ cursor: 'pointer' }}>
                   <span>
                     {table.label}
-                    <EditIcon
-                      className="ml-1"
-                      aria-hidden
-                      onClick={() => {
-                        actions.setType('editTable');
-                        actions.setFormData(table);
-                        actions.setShow(true);
-                      }}
-                    />
+                    {canEdit && (
+                      <EditIcon
+                        className="ml-1"
+                        aria-hidden
+                        onClick={() => {
+                          actions.setType('editTable');
+                          actions.setFormData(table);
+                          actions.setShow(true);
+                        }}
+                      />
+                    )}
                   </span>
                 </h3>
                 <p className="py-1">Total {rowCount} records</p>

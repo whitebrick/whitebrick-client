@@ -206,7 +206,7 @@ const Members = ({
             />
           </>
         );
-      if (user.role.impliedFrom) return roles[user.role.name].label;
+      if (user.role.impliedFrom) return roles?.[user.role.name]?.label;
       return (
         <>
           <Select
@@ -246,37 +246,15 @@ const Members = ({
             user.userEmail.toLowerCase().includes(searchInput.toLowerCase()),
         );
 
-  const getCurrentUserRole = () => {
-    for (let i = 0; i < users.length; i += 1) {
-      if (users[i].userEmail === u.email) {
-        return users[i].role.name;
-      }
-    }
-    return 0;
-  };
-
   const showInviteButton = () => {
-    if (name === 'organization') {
+    if (name === 'organization')
       return checkPermission(
         'manage_access_to_organization',
         organization?.role?.name,
-        cloudContext,
       );
-    }
-
-    if (name === 'schema') {
-      return checkPermission(
-        'manage_access_to_schema',
-        schema?.role?.name,
-        cloudContext,
-      );
-    }
-
-    if (name === 'table') {
-      const userRole = getCurrentUserRole();
-      return checkPermission('manage_access_to_table', userRole, cloudContext);
-    }
-    return 0;
+    if (name === 'schema')
+      return checkPermission('manage_access_to_schema', schema?.role?.name);
+    return checkPermission('manage_access_to_table', table?.role?.name);
   };
 
   return (
@@ -287,16 +265,16 @@ const Members = ({
           onChange={e => setSearchInput(e.target.value)}
           value={searchInput}
         />
-        <div className="float-right">
-          {showInviteButton() && (
+        {showInviteButton() && (
+          <div className="float-right">
             <Button
               appearance="primary"
               iconBefore={PlusIcon}
               onClick={() => setShow(true)}>
               Invite Users
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       <Table>
         <Table.Head>

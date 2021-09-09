@@ -19,15 +19,17 @@ import { checkPermission } from '../../utils/checkPermission';
 type OrganizationLayoutPropsType = {
   organization: any;
   actions: any;
-  cloudContext: any;
 };
 
 const OrganizationLayout = ({
   organization,
   actions,
-  cloudContext,
 }: OrganizationLayoutPropsType) => {
   const [showDelete, setShowDelete] = useState(false);
+  const isOrgAdmin = checkPermission(
+    'administer_organization',
+    organization?.role?.name,
+  );
 
   return (
     <div className="ag-theme-alpine">
@@ -41,11 +43,7 @@ const OrganizationLayout = ({
             <h3 className="w-50" aria-hidden style={{ cursor: 'pointer' }}>
               <span>
                 {organization.label}
-                {checkPermission(
-                  'administer_organization',
-                  organization?.role?.name,
-                  cloudContext,
-                ) && (
+                {isOrgAdmin && (
                   <span>
                     <IconButton
                       className="ml-1"
@@ -102,7 +100,6 @@ const OrganizationLayout = ({
 
 const mapStateToProps = state => ({
   organization: state.organization,
-  cloudContext: state.cloudContext,
 });
 
 const mapDispatchToProps = dispatch => ({
