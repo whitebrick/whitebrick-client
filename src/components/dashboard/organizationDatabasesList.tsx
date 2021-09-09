@@ -10,11 +10,13 @@ import { OrganizationItemType, SchemaItemType } from '../../types';
 import NoData from '../common/noData';
 import AddData from '../common/addData';
 import DeleteModal from '../common/deleteModal';
+import { checkPermission } from '../../utils/checkPermission';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
   schemas: SchemaItemType[];
   renderTitle?: boolean;
+  cloudContext: any;
 };
 
 const defaultProps = {
@@ -25,6 +27,7 @@ const OrganizationDatabasesList = ({
   organization,
   schemas,
   renderTitle = true,
+  cloudContext,
 }: DatabasesPropsType) => {
   const [showDelete, setShowDelete] = useState(false);
 
@@ -37,7 +40,11 @@ const OrganizationDatabasesList = ({
       {renderTitle && (
         <div className="card-header d-flex justify-content-between align-items-center">
           <h6>{organization.label}</h6>
-          {organization?.role?.name === 'organization_administrator' && (
+          {checkPermission(
+            'administer_organization',
+            organization?.role?.name,
+            cloudContext,
+          ) && (
             <div>
               <IconButton
                 appearance="minimal"
@@ -95,6 +102,7 @@ const OrganizationDatabasesList = ({
 OrganizationDatabasesList.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   schemas: state.schemas,
+  cloudContext: state.cloudContext,
 });
 
 const mapDispatchToProps = dispatch => ({

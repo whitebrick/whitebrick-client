@@ -14,15 +14,18 @@ import Tabs from '../elements/tabs';
 import OrganizationDatabasesList from '../dashboard/organizationDatabasesList';
 import Members from '../common/members';
 import DeleteModal from '../common/deleteModal';
+import { checkPermission } from '../../utils/checkPermission';
 
 type OrganizationLayoutPropsType = {
   organization: any;
   actions: any;
+  cloudContext: any;
 };
 
 const OrganizationLayout = ({
   organization,
   actions,
+  cloudContext,
 }: OrganizationLayoutPropsType) => {
   const [showDelete, setShowDelete] = useState(false);
 
@@ -38,7 +41,11 @@ const OrganizationLayout = ({
             <h3 className="w-50" aria-hidden style={{ cursor: 'pointer' }}>
               <span>
                 {organization.label}
-                {organization?.role?.name === 'organization_administrator' && (
+                {checkPermission(
+                  'administer_organization',
+                  organization?.role?.name,
+                  cloudContext,
+                ) && (
                   <span>
                     <IconButton
                       className="ml-1"
@@ -95,6 +102,7 @@ const OrganizationLayout = ({
 
 const mapStateToProps = state => ({
   organization: state.organization,
+  cloudContext: state.cloudContext,
 });
 
 const mapDispatchToProps = dispatch => ({
