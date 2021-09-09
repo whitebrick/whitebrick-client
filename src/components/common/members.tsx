@@ -38,6 +38,7 @@ import {
   SCHEMA_USERS_QUERY,
   TABLE_USERS_QUERY,
 } from '../../graphql/queries/wb';
+import { checkPermission } from '../../utils/checkPermission';
 
 type MembersType = {
   user: any;
@@ -245,6 +246,39 @@ const Members = ({
             user.userEmail.toLowerCase().includes(searchInput.toLowerCase()),
         );
 
+  const getCurrentUserRole = () => {
+    for (let i = 0; i < users.length; i += 1) {
+      if (users[i].userEmail === u.email) {
+        return users[i].role.name;
+      }
+    }
+    return 0;
+  };
+
+  const showInviteButton = () => {
+    if (name === 'organization') {
+      return checkPermission(
+        'manage_access_to_organization',
+        organization?.role?.name,
+        cloudContext,
+      );
+    }
+
+    if (name === 'schema') {
+      return checkPermission(
+        'manage_access_to_schema',
+        schema?.role?.name,
+        cloudContext,
+      );
+    }
+
+    if (name === 'table') {
+      const userRole = getCurrentUserRole();
+      return checkPermission('manage_access_to_table', userRole, cloudContext);
+    }
+    return 0;
+  };
+
   return (
     <div>
       <div className="py-2">
@@ -254,12 +288,14 @@ const Members = ({
           value={searchInput}
         />
         <div className="float-right">
-          <Button
-            appearance="primary"
-            iconBefore={PlusIcon}
-            onClick={() => setShow(true)}>
-            Invite Users
-          </Button>
+          {showInviteButton() && (
+            <Button
+              appearance="primary"
+              iconBefore={PlusIcon}
+              onClick={() => setShow(true)}>
+              Invite Users
+            </Button>
+          )}
         </div>
       </div>
       <Table>
