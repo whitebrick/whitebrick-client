@@ -85,6 +85,7 @@ const TableLayout = ({
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
 
   const canEdit = checkPermission('manage_access_to_table', table?.role?.name);
+  const canAddRow = checkPermission('alter_table', table?.role?.name);
 
   useEffect(() => {
     const getForeignKeyColumn = async fkc => {
@@ -314,17 +315,19 @@ const TableLayout = ({
               + Create a view
             </div>
             <div className="float-right">
-              <Button
-                onClick={() => {
-                  rowData.push({});
-                  gridParams.successCallback([...rowData], rowCount + 1);
-                  actions.setRows(rowData);
-                  actions.setRowCount(rowCount + 1);
-                }}
-                className="mr-2"
-                iconBefore={PlusIcon}>
-                Add Row
-              </Button>
+              {canAddRow && (
+                <Button
+                  onClick={() => {
+                    rowData.push({});
+                    gridParams.successCallback([...rowData], rowCount + 1);
+                    actions.setRows(rowData);
+                    actions.setRowCount(rowCount + 1);
+                  }}
+                  className="mr-2"
+                  iconBefore={PlusIcon}>
+                  Add Row
+                </Button>
+              )}
               <Popover
                 bringFocusInside
                 content={({ close }) => <FilterPane close={close} />}
