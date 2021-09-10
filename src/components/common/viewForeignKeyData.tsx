@@ -131,6 +131,7 @@ const ViewForeignKeyData = ({
                 <TextInputField
                   label={c.label}
                   disabled={!canEdit}
+                  required={!c.isNullable}
                   value={
                     changedData[c.name] ? changedData[c.name] : data[c.name]
                   }
@@ -147,6 +148,7 @@ const ViewForeignKeyData = ({
                 <TextInputField
                   label={c.label}
                   disabled={!canEdit}
+                  required={!c.isNullable}
                   value={
                     changedData[c.name] ? changedData[c.name] : data[c.name]
                   }

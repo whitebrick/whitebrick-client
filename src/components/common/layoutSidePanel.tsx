@@ -599,6 +599,7 @@ const LayoutSidePanel = ({
                 {c.foreignKeys.length > 0 ? (
                   <TextInputField
                     label={c.label}
+                    required={!c.isNullable}
                     value={formData ? formData[c.name] : ''}
                     hint={
                       c.foreignKeys.length > 0
@@ -609,6 +610,7 @@ const LayoutSidePanel = ({
                 ) : (
                   <TextInputField
                     label={c.label}
+                    required={!c.isNullable}
                     value={formData ? formData[c.name] : ''}
                     hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
                   />
