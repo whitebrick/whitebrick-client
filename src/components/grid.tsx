@@ -268,84 +268,79 @@ const Grid = ({
     return params.data[column.name];
   };
 
-  const showSeparator = hasPermission && 'separator';
-
-  const columnActions = params => {
-    const addColumn = {
-      name: 'Add Column',
-      action: () => onAddColumn(params, actions),
-    };
-    const editColumn = {
-      name: 'Edit Column',
-      action: () => onEditColumn(params, actions, columns),
-    };
-    const removeColumn = {
-      name: 'Remove Column',
-      action: () =>
-        onDeleteColumn(
-          params.column.colId,
-          schema,
-          columns,
-          table,
-          actions,
-          fields,
-          gridAPI,
-          removeOrDeleteColumnMutation,
-        ),
-    };
-
-    return { addColumn, editColumn, removeColumn };
-  };
-
   const rowActions = params => {
-    const addRow = { name: 'Add Row', action: () => onAddRow(actions) };
-    const editRow = {
-      name: 'Edit Row',
-      action: () => onEditRow(params, actions),
-    };
-    const deleteRow = {
-      name: 'Delete Row',
-      action: () => onDeleteRow(params, schema, table, client),
-    };
-
-    return { addRow, editRow, deleteRow };
-  };
-
-  const getContextMenuItems = params => {
-    const { addColumn, editColumn, removeColumn } =
-      hasPermission && columnActions(params);
-    const { addRow, editRow, deleteRow } = hasPermission && rowActions(params);
-    actions.setFormData({});
     return [
-      addColumn,
-      editColumn,
-      removeColumn,
-      showSeparator,
-      addRow,
-      editRow,
-      deleteRow,
-      showSeparator,
-      'copy',
-      'copyWithHeaders',
-      'paste',
-      'export',
+      {
+        name: 'Add Row',
+        action: () => onAddRow(actions),
+      },
+      {
+        name: 'Edit Row',
+        action: () => onEditRow(params, actions),
+      },
+      {
+        name: 'Delete Row',
+        action: () => onDeleteRow(params, schema, table, client),
+      },
+      'separator',
     ];
   };
 
-  const getMainMenuItems = params => {
-    const { addColumn, editColumn, removeColumn } =
-      hasPermission && columnActions(params);
-    actions.setFormData({});
+  const columnActions = params => {
     return [
-      addColumn,
-      editColumn,
-      removeColumn,
-      showSeparator,
+      {
+        name: 'Add Column',
+        action: () => onAddColumn(params, actions),
+      },
+      {
+        name: 'Edit Column',
+        action: () => onEditColumn(params, actions, columns),
+      },
+      {
+        name: 'Remove Column',
+        action: () =>
+          onDeleteColumn(
+            params.column.colId,
+            schema,
+            columns,
+            table,
+            actions,
+            fields,
+            gridAPI,
+            removeOrDeleteColumnMutation,
+          ),
+      },
+      'separator',
+    ];
+  };
+
+  const tableActions = (hasPermission, params, onlyCols = false) => {
+    const options = [];
+    if (hasPermission) {
+      if (onlyCols) options.push(...columnActions(params));
+      else options.push(...rowActions(params), ...columnActions(params));
+    }
+    return options;
+  };
+
+  const getContextMenuItems = params => {
+    actions.setFormData({});
+    return tableActions(hasPermission, params).concat([
+      'copy',
+      'copyWithHeaders',
+      hasPermission && 'paste',
+      'export',
+    ]);
+  };
+
+  const getMainMenuItems = params => {
+    actions.setFormData({});
+    return tableActions(hasPermission, params, true).concat([
       'autoSizeThis',
       'autoSizeAll',
       'separator',
       'resetColumns',
-    ];
+    ]);
   };
 
   const editValues = val => {
