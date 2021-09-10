@@ -29,6 +29,7 @@ import {
 } from '../utils/actions';
 import { REMOVE_OR_DELETE_COLUMN_MUTATION } from '../graphql/mutations/wb';
 import { updateTableData } from '../utils/updateTableData';
+import { checkPermission } from '../utils/checkPermission';
 
 type GridPropsType = {
   table: TableItemType;
@@ -391,6 +392,10 @@ const Grid = ({
     setTimeout(() => editValues(values), 500);
   };
 
+  const hasPermission = () => {
+    return checkPermission('alter_table', table?.role?.name);
+  };
+
   const renderColumn = (
     column: ColumnItemType,
     tableName: string = null,
@@ -406,6 +411,7 @@ const Grid = ({
           cellEditor="foreignKeyEditor"
           cellRenderer="foreignKeyRenderer"
           valueGetter={params => valueGetter(params, tableName, column, type)}
+          editable={hasPermission()}
         />
       );
     }
@@ -418,6 +424,7 @@ const Grid = ({
           headerTooltip={column.label}
           cellRenderer="primaryKeyRenderer"
           valueGetter={params => valueGetter(params, tableName, column, type)}
+          editable={hasPermission()}
         />
       );
     }
@@ -428,7 +435,7 @@ const Grid = ({
         headerName={column.label}
         headerTooltip={column.label}
         valueGetter={params => valueGetter(params, tableName, column, type)}
-        editable={!type}
+        editable={hasPermission()}
       />
     );
   };
