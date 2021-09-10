@@ -392,9 +392,7 @@ const Grid = ({
     setTimeout(() => editValues(values), 500);
   };
 
-  const hasPermission = () => {
-    return checkPermission('alter_table', table?.role?.name);
-  };
+  const hasPermission = checkPermission('alter_table', table?.role?.name);
 
   const renderColumn = (
     column: ColumnItemType,
@@ -411,7 +409,6 @@ const Grid = ({
           cellEditor="foreignKeyEditor"
           cellRenderer="foreignKeyRenderer"
           valueGetter={params => valueGetter(params, tableName, column, type)}
-          editable={hasPermission()}
         />
       );
     }
@@ -424,7 +421,6 @@ const Grid = ({
           headerTooltip={column.label}
           cellRenderer="primaryKeyRenderer"
           valueGetter={params => valueGetter(params, tableName, column, type)}
-          editable={hasPermission()}
         />
       );
     }
@@ -435,7 +431,7 @@ const Grid = ({
         headerName={column.label}
         headerTooltip={column.label}
         valueGetter={params => valueGetter(params, tableName, column, type)}
-        editable={hasPermission()}
+        editable={!type && hasPermission}
       />
     );
   };
@@ -480,7 +476,7 @@ const Grid = ({
         defaultColDef={{
           flex: 1,
           minWidth: 100,
-          editable: true,
+          editable: hasPermission,
           resizable: true,
           sortable: true,
         }}

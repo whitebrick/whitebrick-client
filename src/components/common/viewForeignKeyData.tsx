@@ -20,6 +20,11 @@ type ViewForeignKeyDataPropsType = {
   column: any;
   schema: SchemaItemType;
   actions: any;
+  canEdit?: boolean;
+};
+
+const defaultProps = {
+  canEdit: true,
 };
 
 const ViewForeignKeyData = ({
@@ -31,6 +36,7 @@ const ViewForeignKeyData = ({
   column,
   schema,
   actions,
+  canEdit,
 }: ViewForeignKeyDataPropsType) => {
   const client = useContext(ClientContext);
 
@@ -115,6 +121,7 @@ const ViewForeignKeyData = ({
       name={`Viewing data from '${label}' table`}
       show={show}
       setShow={setShow}
+      renderSaveButton={canEdit}
       onSave={onSave}>
       <div className="w-75">
         {newColumns.length > 0 ? (
@@ -123,6 +130,7 @@ const ViewForeignKeyData = ({
               {c.foreignKeys.length > 0 ? (
                 <TextInputField
                   label={c.label}
+                  disabled={!canEdit}
                   value={
                     changedData[c.name] ? changedData[c.name] : data[c.name]
                   }
@@ -138,6 +146,7 @@ const ViewForeignKeyData = ({
               ) : (
                 <TextInputField
                   label={c.label}
+                  disabled={!canEdit}
                   value={
                     changedData[c.name] ? changedData[c.name] : data[c.name]
                   }
@@ -157,6 +166,7 @@ const ViewForeignKeyData = ({
   );
 };
 
+ViewForeignKeyData.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   tables: state.tables,
   columns: state.columns,

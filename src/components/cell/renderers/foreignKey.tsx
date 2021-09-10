@@ -2,11 +2,14 @@ import React, { useContext, useState } from 'react';
 import { SmallPlusIcon, Badge, IconButton } from 'evergreen-ui';
 import { ColDef } from 'ag-grid-community';
 import { ClientContext } from 'graphql-hooks';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import ViewForeignKeyData from '../../common/viewForeignKeyData';
 import LinkForeignKey from '../../common/linkForeignKey';
 import { updateTableData } from '../../../utils/updateTableData';
-import store from '../../../state/store';
 import { checkPermission } from '../../../utils/checkPermission';
+import { actions } from '../../../state/actions';
+import { TableItemType } from '../../../types';
 
 type ForeignKeyCellRendererPropsType = {
   valueFormatted: string;
@@ -14,6 +17,8 @@ type ForeignKeyCellRendererPropsType = {
   column: any;
   data: any;
   colDef: ColDef;
+  table: TableItemType;
+  actions: any;
 };
 
 const ForeignKeyCellRenderer = ({
@@ -22,10 +27,11 @@ const ForeignKeyCellRenderer = ({
   column,
   data,
   colDef,
+  table,
+  actions,
 }: ForeignKeyCellRendererPropsType) => {
   const client = useContext(ClientContext);
   const cellValue = valueFormatted || value;
-  const state = store.getState();
 
   const [show, setShow] = useState(false);
   const [link, setLink] = useState(false);
@@ -45,38 +51,42 @@ const ForeignKeyCellRenderer = ({
     });
     variables._set[colDef.field] =
       relData[colDef.field.split('_').reverse()[0]];
-    updateTableData(schemaName, tableName, variables, client, null);
+    updateTableData(schemaName, tableName, variables, client, actions);
   };
 
-  const handleClick = () => {
-    if (checkPermission('alter_table', state?.table?.role?.name)) {
-      setShow(true);
-    }
-  };
+  const hasPermission = checkPermission('alter_table', table?.role?.name);
 
-  return (
-    <>
-      <span>
-        {cellValue ? (
-          <div>
-            <Badge
-              aria-hidden
-              color="blue"
-              style={{ cursor: 'pointer' }}
-              onClick={handleClick}>
-              {cellValue}
-            </Badge>
-          </div>
-        ) : (
+  const renderCellValue = () => {
+    if (!cellValue) {
+      if (hasPermission)
+        return (
           <IconButton
             icon={SmallPlusIcon}
             onClick={() => setLink(true)}
             appearance="minimal"
           />
-        )}
-      </span>
+        );
+      return <div />;
+    }
+    return (
+      <div>
+        <Badge
+          aria-hidden
+          color="blue"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setShow(true)}>
+          {cellValue}
+        </Badge>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <span>{renderCellValue()}</span>
       {show && (
         <ViewForeignKeyData
+          canEdit={hasPermission}
           show={show}
           setShow={setShow}
           column={column}
@@ -97,4 +107,15 @@ const ForeignKeyCellRenderer = ({
   );
 };
 
-export default ForeignKeyCellRenderer;
+const mapStateToProps = state => ({
+  table: state.table,
+});
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(actions, dispatch),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ForeignKeyCellRenderer);
