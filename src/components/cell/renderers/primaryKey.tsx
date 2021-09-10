@@ -3,6 +3,11 @@ import { Badge } from 'evergreen-ui';
 import { RowNode } from 'ag-grid-community';
 import { useDispatch } from 'react-redux';
 import { actions } from '../../../state/actions';
+import store from '../../../state/store';
+import {
+  checkPermission,
+  checPermission,
+} from '../../../utils/checkPermission';
 
 type PrimaryKeyCellRendererPropsType = {
   valueFormatted: string;
@@ -17,12 +22,15 @@ const PrimaryKeyCellRenderer = ({
 }: PrimaryKeyCellRendererPropsType) => {
   const dispatch = useDispatch();
   const cellValue = valueFormatted || value;
+  const state = store.getState();
 
   const handleClick = () => {
-    dispatch(actions.setType('editRow'));
-    dispatch(actions.setParams(node.data));
-    dispatch(actions.setFormData(node.data));
-    dispatch(actions.setShow(true));
+    if (checkPermission('alter_table', state?.table?.role?.name)) {
+      dispatch(actions.setType('editRow'));
+      dispatch(actions.setParams(node.data));
+      dispatch(actions.setFormData(node.data));
+      dispatch(actions.setShow(true));
+    }
   };
 
   return (

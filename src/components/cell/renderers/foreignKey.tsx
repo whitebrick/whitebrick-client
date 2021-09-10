@@ -5,6 +5,8 @@ import { ClientContext } from 'graphql-hooks';
 import ViewForeignKeyData from '../../common/viewForeignKeyData';
 import LinkForeignKey from '../../common/linkForeignKey';
 import { updateTableData } from '../../../utils/updateTableData';
+import store from '../../../state/store';
+import { checkPermission } from '../../../utils/checkPermission';
 
 type ForeignKeyCellRendererPropsType = {
   valueFormatted: string;
@@ -23,6 +25,7 @@ const ForeignKeyCellRenderer = ({
 }: ForeignKeyCellRendererPropsType) => {
   const client = useContext(ClientContext);
   const cellValue = valueFormatted || value;
+  const state = store.getState();
 
   const [show, setShow] = useState(false);
   const [link, setLink] = useState(false);
@@ -45,6 +48,12 @@ const ForeignKeyCellRenderer = ({
     updateTableData(schemaName, tableName, variables, client, null);
   };
 
+  const handleClick = () => {
+    if (checkPermission('alter_table', state?.table?.role?.name)) {
+      setShow(true);
+    }
+  };
+
   return (
     <>
       <span>
@@ -54,7 +63,7 @@ const ForeignKeyCellRenderer = ({
               aria-hidden
               color="blue"
               style={{ cursor: 'pointer' }}
-              onClick={() => setShow(true)}>
+              onClick={handleClick}>
               {cellValue}
             </Badge>
           </div>
