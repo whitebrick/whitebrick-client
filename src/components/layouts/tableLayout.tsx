@@ -84,8 +84,7 @@ const TableLayout = ({
 
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
 
-  const canEdit = checkPermission('manage_access_to_table', table?.role?.name);
-  const canAddRow = checkPermission('alter_table', table?.role?.name);
+  const canAlter = checkPermission('alter_table', table?.role?.name);
 
   useEffect(() => {
     const getForeignKeyColumn = async fkc => {
@@ -315,7 +314,7 @@ const TableLayout = ({
               + Create a view
             </div>
             <div className="float-right">
-              {canAddRow && (
+              {canAlter && (
                 <Button
                   onClick={() => {
                     rowData.push({});
@@ -385,7 +384,7 @@ const TableLayout = ({
                 <h3 className="m-0 w-25" style={{ cursor: 'pointer' }}>
                   <span>
                     {table.label}
-                    {canEdit && (
+                    {canAlter && (
                       <EditIcon
                         className="ml-1"
                         aria-hidden

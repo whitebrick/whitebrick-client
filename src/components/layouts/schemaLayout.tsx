@@ -17,7 +17,7 @@ type SchemaLayoutType = {
 
 const SchemaLayout = ({ schema, actions }: SchemaLayoutType) => {
   const userRole = schema?.role?.name;
-  const canEdit = checkPermission('manage_access_to_schema', userRole);
+  const canEdit = checkPermission('alter_schema', userRole);
 
   const tabs = [
     {
