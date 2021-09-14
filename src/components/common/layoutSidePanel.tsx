@@ -406,10 +406,11 @@ const LayoutSidePanel = ({
     } else if (type === 'editTable') {
       const variables: any = {
         schemaName: schema.name,
-        tableName: table.name,
+        tableName: table.name === undefined ? formData.name : table.name,
         newTableLabel: formData.label,
       };
-      if (formData.name !== table.name) variables.newTableName = formData.name;
+      if (formData.name !== table.name && table.name !== undefined)
+        variables.newTableName = formData.name;
       const { loading, error } = await updateTableMutation({
         variables,
       });
@@ -421,7 +422,7 @@ const LayoutSidePanel = ({
         } = await fetchSchemaTable({
           variables: {
             schemaName: schema.name,
-            tableName: table.name,
+            tableName: table.name === undefined ? formData.name : table.name,
             withColumns: true,
             withSettings: true,
           },
@@ -559,7 +560,8 @@ const LayoutSidePanel = ({
     if (type === 'createDatabase') return 'Create a new database';
     if (type === 'editDatabase') return `Edit database  ${schema.label}`;
     if (type === 'createTable') return 'Create a new table';
-    if (type === 'editTable') return `Edit table ${table.label}`;
+    if (type === 'editTable')
+      return `Edit table ${table.label === undefined ? '' : table.label}`;
     if (type === 'addColumn') return `Add column to ${table.label}`;
     if (type === 'editColumn') return `Edit column ${column}`;
     if (type === 'newRow') return `Add new row to ${table.label}`;

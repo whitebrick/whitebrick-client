@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import Avatar from 'react-avatar';
-import { navigate } from 'gatsby';
 import Skeleton from 'react-loading-skeleton';
 import { Pane } from 'evergreen-ui';
 import { useManualQuery } from 'graphql-hooks';
@@ -12,6 +10,7 @@ import { actions } from '../../state/actions';
 import { SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
 import NoData from '../common/noData';
 import AddData from '../common/addData';
+import Tables from '../common/tables';
 
 type TablesPropsType = {
   schema: SchemaItemType;
@@ -46,17 +45,8 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
             tables.map(table => (
               <div
                 key={table.name}
-                className="col-md-2 col-sm-6 text-center btn"
-                aria-hidden="true"
-                onClick={() => {
-                  if (schema.organizationOwnerName)
-                    navigate(
-                      `/${schema.organizationOwnerName}/${schema.name}/${table.name}`,
-                    );
-                  else navigate(`/db/${schema.name}/table/${table.name}`);
-                }}>
-                <Avatar name={table.label} size="75" round="12px" />
-                <p className="mt-2">{table.label}</p>
+                className="col-md-2 col-sm-6 text-center btn">
+                <Tables table={table} />
               </div>
             ))
           ) : (

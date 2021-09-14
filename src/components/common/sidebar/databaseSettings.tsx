@@ -1,52 +1,30 @@
 import React, { useState } from 'react';
 import { PlusIcon, CogIcon, NewPersonIcon, TrashIcon } from 'evergreen-ui';
-import { useMutation, useManualQuery } from 'graphql-hooks';
+import { useManualQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../../../state/actions';
-import { SchemaItemType, TableItemType } from '@/types';
+import { SchemaItemType } from '@/types';
 import DeleteModal from '../deleteModal';
 import InviteUserModal from '../inviteUserModal';
-import { REMOVE_OR_DELETE_TABLE_MUTATION } from '../../../graphql/mutations/wb';
 import { SCHEMA_USERS_QUERY } from '../../../graphql/queries/wb';
 
 type DatabaseProps = {
   expand: boolean;
   schema: SchemaItemType;
-  table: TableItemType;
   actions: any;
 };
 
-const DatabaseSettings = ({
-  expand,
-  schema,
-  table,
-  actions,
-}: DatabaseProps) => {
+const DatabaseSettings = ({ expand, schema, actions }: DatabaseProps) => {
   const userRole = schema?.role?.name;
   const [showDelete, setShowDelete] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
 
-  const [removeOrDeleteTableMutation] = useMutation(
-    REMOVE_OR_DELETE_TABLE_MUTATION,
-  );
   const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
     variables: {
       schemaName: schema?.name,
     },
   });
-
-  const deleteTable = async () => {
-    await removeOrDeleteTableMutation({
-      variables: {
-        schemaName: schema.name,
-        tableName: table.name,
-        del: true,
-      },
-    });
-    actions.setTable('');
-    window.location.replace('/');
-  };
 
   const fetchData = () => {
     fetchSchemaUsers().then(r => actions.setUsers(r?.data?.wbSchemaUsers));
@@ -95,15 +73,6 @@ const DatabaseSettings = ({
             type="database"
           />
         )}
-        {table.name && (
-          <div
-            className="list-group-item py-1 d-flex align-items-center"
-            aria-hidden="true"
-            onClick={deleteTable}>
-            <TrashIcon />{' '}
-            <div className="ml-2">Delete {table.label.toLowerCase()}</div>
-          </div>
-        )}
         <InviteUserModal
           show={showInvite}
           setShow={setShowInvite}
@@ -117,7 +86,6 @@ const DatabaseSettings = ({
 
 const mapStateToProps = state => ({
   schema: state.schema,
-  table: state.table,
 });
 
 const mapDispatchToProps = dispatch => ({

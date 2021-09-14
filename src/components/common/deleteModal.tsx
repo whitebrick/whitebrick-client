@@ -8,10 +8,12 @@ import { actions } from '../../state/actions';
 import {
   REMOVE_OR_DELETE_SCHEMA_MUTATION,
   DELETE_ORGANIZATION_MUTATION,
+  REMOVE_OR_DELETE_TABLE_MUTATION,
 } from '../../graphql/mutations/wb';
 
 type DeleteModalType = {
   schema: SchemaItemType;
+  table?: any;
   actions: any;
   show: boolean;
   setShow: any;
@@ -21,6 +23,7 @@ type DeleteModalType = {
 
 const defaultProps = {
   org: null,
+  table: null,
 };
 
 const DeleteModal = ({
@@ -30,6 +33,7 @@ const DeleteModal = ({
   setShow,
   type,
   org = null,
+  table,
 }: DeleteModalType) => {
   const [value, setValue] = useState('');
   const [error, setError] = useState(false);
@@ -40,6 +44,10 @@ const DeleteModal = ({
 
   const [deleteOrganizationMutation] = useMutation(
     DELETE_ORGANIZATION_MUTATION,
+  );
+
+  const [removeOrDeleteTableMutation] = useMutation(
+    REMOVE_OR_DELETE_TABLE_MUTATION,
   );
 
   const onSave = async () => {
@@ -65,8 +73,18 @@ const DeleteModal = ({
       } else {
         setError(true);
       }
+    } else if (value === table.name) {
+      await removeOrDeleteTableMutation({
+        variables: {
+          schemaName: schema.name,
+          tableName: table.name,
+          del: true,
+        },
+      });
+      actions.setTable('');
+      window.location.replace('/');
     } else {
-      // To be implemented (table section)
+      setError(true);
     }
   };
 
@@ -74,22 +92,24 @@ const DeleteModal = ({
     setShow(false);
   };
 
-  const name = type === 'organization' ? org.name : schema.name;
+  const getName = () => {
+    if (type === 'organization') return org.name;
+    if (type === 'database') return schema.name;
+    return table.name;
+  };
 
   return (
     <Dialog
       isShown={show}
-      title={`Delete ${type} ${name}`}
+      title={`Delete ${type} ${getName()}`}
       intent="danger"
       onConfirm={onSave}
       confirmLabel="Delete"
-      isConfirmDisabled={name !== value}
+      isConfirmDisabled={getName() !== value}
       onCancel={onCancel}>
       <TextInputField
         label="Confirm action"
-        description={`Enter '${
-          type === 'organization' ? org.name : schema.name
-        }' to confirm delete`}
+        description={`Enter '${getName()}' to confirm delete`}
         value={value}
         onChange={e => setValue(e.target.value)}
       />
