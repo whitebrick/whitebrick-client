@@ -32,7 +32,7 @@ const DeleteModal = ({
   show,
   setShow,
   type,
-  org = null,
+  org,
   table,
 }: DeleteModalType) => {
   const [value, setValue] = useState('');
@@ -88,28 +88,26 @@ const DeleteModal = ({
     }
   };
 
-  const onCancel = () => {
-    setShow(false);
-  };
-
-  const getName = () => {
-    if (type === 'organization') return org.name;
-    if (type === 'database') return schema.name;
-    return table.name;
-  };
+  const name =
+    // eslint-disable-next-line no-nested-ternary
+    type === 'organization'
+      ? org.name
+      : type === 'database'
+      ? schema.name
+      : table.name;
 
   return (
     <Dialog
       isShown={show}
-      title={`Delete ${type} ${getName()}`}
+      title={`Delete ${type} ${name}`}
       intent="danger"
       onConfirm={onSave}
       confirmLabel="Delete"
-      isConfirmDisabled={getName() !== value}
-      onCancel={onCancel}>
+      isConfirmDisabled={name !== value}
+      onCancel={() => setShow(false)}>
       <TextInputField
         label="Confirm action"
-        description={`Enter '${getName()}' to confirm delete`}
+        description={`Enter '${name}' to confirm delete`}
         value={value}
         onChange={e => setValue(e.target.value)}
       />

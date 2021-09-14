@@ -4,7 +4,7 @@ import { useManualQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../../../state/actions';
-import { SchemaItemType } from '@/types';
+import { SchemaItemType } from '../../../types';
 import DeleteModal from '../deleteModal';
 import InviteUserModal from '../inviteUserModal';
 import { SCHEMA_USERS_QUERY } from '../../../graphql/queries/wb';

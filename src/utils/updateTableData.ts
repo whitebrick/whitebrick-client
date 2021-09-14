@@ -37,7 +37,6 @@ export const updateTableData = async (
       fields: ['affected_rows'],
     });
   }
-  await client.request(operation).finally(() => {
-    if (actions) actions.setShow(false);
-  });
+  const { error } = await client.request(operation);
+  if (!error) if (actions) actions.setShow(false);
 };

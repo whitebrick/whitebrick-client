@@ -434,7 +434,6 @@ const Grid = ({
   return (
     <div className="mt-4">
       <AgGridReact
-        reactUi
         frameworkComponents={{
           foreignKeyEditor: ForeignKeyEditor,
           foreignKeyRenderer: ForeignKeyCellRenderer,
