@@ -11,6 +11,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from './src/components/loading';
+import AuthError from './src/components/common/authError';
 
 const onRedirectCallback = appState => navigate(appState?.returnTo || '/');
 
@@ -34,7 +35,10 @@ export const wrapRootElement = ({ element }) => {
             getAccessTokenSilently,
             getIdTokenClaims,
             user,
+            error,
+            logout,
           }) => {
+            if (error) return <AuthError message={error.message} logout={logout} />;
             if (isLoading) return <Loading />;
             if (!isLoading && isAuthenticated)
               return (
