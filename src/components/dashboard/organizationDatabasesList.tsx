@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import Avatar from 'react-avatar';
-import { navigate } from 'gatsby';
 import { TrashIcon, IconButton } from 'evergreen-ui';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
@@ -11,6 +9,7 @@ import NoData from '../common/noData';
 import AddData from '../common/addData';
 import DeleteModal from '../common/deleteModal';
 import { checkPermission } from '../../utils/checkPermission';
+import ContextItem from '../common/contextItem';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -68,16 +67,11 @@ const OrganizationDatabasesList = ({
                 schema => schema.organizationOwnerName === organization.name,
               )
               .map(schema => (
-                <div
-                  key={schema.name}
-                  className="col-md-2 col-sm-6 text-center btn"
-                  aria-hidden="true"
-                  onClick={() =>
-                    navigate(`/${organization.name}/${schema.name}`)
-                  }>
-                  <Avatar name={schema.label} size="75" round="12px" />
-                  <p className="mt-2">{schema.label}</p>
-                </div>
+                <ContextItem
+                  type="database"
+                  singleSchema={schema}
+                  organization={organization}
+                />
               ))}
             <AddData
               name="database"

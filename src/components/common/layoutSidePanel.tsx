@@ -365,14 +365,20 @@ const LayoutSidePanel = ({
         actions.setShow(false);
       }
     } else if (type === 'editDatabase') {
-      const variables: any = { name: schema.name };
-      if (formData.name !== schema.name)
+      const name = schema.name !== undefined ? schema.name : formData.name;
+      const variables: any = {
+        name,
+        newSchemaLabel: formData.label,
+        newOrganizationOwnerName: formData.organization,
+      };
+      if (formData.name !== schema.name && schema.name !== undefined)
         variables.newSchemaName = formData.name;
-      if (formData.label !== schema.label)
+      if (formData.label !== schema.label && schema.name !== undefined)
         variables.newSchemaLabel = formData.label;
       if (
         typeof formData.organization === 'string' &&
         formData.organization !== schema.organizationOwnerName &&
+        schema.organizationOwnerName !== undefined &&
         formData.organization !== '--'
       )
         variables.newOrganizationOwnerName = formData.organization;
@@ -558,7 +564,8 @@ const LayoutSidePanel = ({
     if (type === 'editOrganization')
       return `Edit organization ${organization.label}`;
     if (type === 'createDatabase') return 'Create a new database';
-    if (type === 'editDatabase') return `Edit database  ${schema.label}`;
+    if (type === 'editDatabase')
+      return `Edit database  ${schema.label === undefined ? '' : schema.label}`;
     if (type === 'createTable') return 'Create a new table';
     if (type === 'editTable')
       return `Edit table ${table.label === undefined ? '' : table.label}`;

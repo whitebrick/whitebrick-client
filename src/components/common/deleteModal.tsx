@@ -12,6 +12,7 @@ import {
 } from '../../graphql/mutations/wb';
 
 type DeleteModalType = {
+  singleSchema?: any;
   schema: SchemaItemType;
   table?: any;
   actions: any;
@@ -24,10 +25,12 @@ type DeleteModalType = {
 const defaultProps = {
   org: null,
   table: null,
+  singleSchema: null,
 };
 
 const DeleteModal = ({
   schema,
+  singleSchema,
   actions,
   show,
   setShow,
@@ -50,21 +53,32 @@ const DeleteModal = ({
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
 
+  const name =
+    // eslint-disable-next-line no-nested-ternary
+    type === 'organization'
+      ? org.name
+      : // eslint-disable-next-line no-nested-ternary
+      type === 'database' && schema.name !== undefined
+      ? schema.name
+      : type === 'database' && schema.name === undefined
+      ? singleSchema.name
+      : table.name;
+
   const onSave = async () => {
     if (type === 'organization') {
-      if (value === org.name) {
+      if (value === name) {
         await deleteOrganizationMutation({
-          variables: { name: org.name },
+          variables: { name },
         });
         window.location.replace('/');
       } else {
         setError(true);
       }
     } else if (type === 'database') {
-      if (value === schema.name) {
+      if (value === name) {
         await removeOrDeleteSchemaMutation({
           variables: {
-            name: schema.name,
+            name,
             del: true,
           },
         });
@@ -73,11 +87,11 @@ const DeleteModal = ({
       } else {
         setError(true);
       }
-    } else if (value === table.name) {
+    } else if (value === name) {
       await removeOrDeleteTableMutation({
         variables: {
           schemaName: schema.name,
-          tableName: table.name,
+          tableName: name,
           del: true,
         },
       });
@@ -87,14 +101,6 @@ const DeleteModal = ({
       setError(true);
     }
   };
-
-  const name =
-    // eslint-disable-next-line no-nested-ternary
-    type === 'organization'
-      ? org.name
-      : type === 'database'
-      ? schema.name
-      : table.name;
 
   return (
     <Dialog
