@@ -84,7 +84,14 @@ const TableLayout = ({
 
   const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
 
+  // permission to alter table
   const canAlter = checkPermission('alter_table', table?.role?.name);
+
+  // permission to read and write records to table
+  const hasRWPermission = checkPermission(
+    'read_and_write_table_records',
+    table?.role?.name,
+  );
 
   useEffect(() => {
     const getForeignKeyColumn = async fkc => {
@@ -314,7 +321,7 @@ const TableLayout = ({
               + Create a view
             </div>
             <div className="float-right">
-              {canAlter && (
+              {hasRWPermission && (
                 <Button
                   onClick={() => {
                     rowData.push({});
