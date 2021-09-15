@@ -70,6 +70,7 @@ Whitebrick comprises a front end [Gatsby](https://www.gatsbyjs.com/) Jamstack cl
 ```
 npm init gatsby
 ```
+
 Further information from Gatsby [here](https://www.gatsbyjs.com/docs/quick-start/)
 
 2. #### Clone this repository
@@ -99,10 +100,5 @@ GATSBY_AUTH0_AUDIENCE=https://production-whitebrick.us.auth0.com/api/v2/
 ```
 npm run develop
 ```
+
 Gatsby will start a hot-reloading development environment accessible by default at http://localhost:8000.
-
-
-
-
-
-

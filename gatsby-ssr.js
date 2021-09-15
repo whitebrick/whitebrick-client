@@ -38,7 +38,8 @@ export const wrapRootElement = ({ element }) => {
             error,
             logout,
           }) => {
-            if (error) return <AuthError message={error.message} logout={logout} />;
+            if (error)
+              return <AuthError message={error.message} logout={logout} />;
             if (isLoading) return <Loading />;
             if (!isLoading && isAuthenticated)
               return (
