@@ -20,7 +20,7 @@ export const wrapRootElement = ({ element }) => {
     <Provider store={store}>
       <Auth0Provider
         domain={process.env.AUTH0_DOMAIN}
-        clientId={process.env.AUTH0_CLIENTID}
+        clientId={process.env.AUTH0_CLIENT_ID}
         audience={process.env.AUTH0_AUDIENCE}
         responseType="token id_token"
         scope="openid profile email offline_access"

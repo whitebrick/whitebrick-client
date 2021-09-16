@@ -88,7 +88,7 @@ vi .env.development
 GATSBY_HASURA_GRAPHQL_URL=https://graph.whitebrick.com/v1/graphql
 GATSBY_HASURA_GRAPHQL_WSS_URL=wss://graph.whitebrick.com/v1/graphql
 GATSBY_AUTH0_DOMAIN=auth.whitebrick.com
-GATSBY_AUTH0_CLIENTID=sc0K4pJGgyNZ5x9L27POwgfXPsCZPtJZ
+GATSBY_AUTH0_CLIENT_ID=sc0K4pJGgyNZ5x9L27POwgfXPsCZPtJZ
 GATSBY_AUTH0_CALLBACK=https://whitebrick.com/home/index.html
 GATSBY_AUTH0_AUDIENCE=https://production-whitebrick.us.auth0.com/api/v2/
 # IF HOSTING YOUR OWN CLOUD BACK END:

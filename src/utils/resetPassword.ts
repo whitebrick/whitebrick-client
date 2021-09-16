@@ -9,7 +9,7 @@ const ResetPassword = () => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      client_id: process.env.GATSBY_AUTH0_CLIENTID,
+      client_id: process.env.GATSBY_AUTH0_CLIENT_ID,
       email,
       connection: 'Username-Password-Authentication',
     }),
