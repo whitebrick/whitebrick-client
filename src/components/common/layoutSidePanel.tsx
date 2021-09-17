@@ -336,26 +336,16 @@ const LayoutSidePanel = ({
         },
       });
       if (!l && !e) actions.setTable(data.wbMyTableByName);
-      actions.setShow(false);
-    }
-  };
-
-  const updateSchemaTables = async variables => {
-    const { loading, error } = await updateTableMutation({
-      variables,
-    });
-    if (!loading && !error) {
       const {
-        loading: l,
-        data,
-        error: e,
+        loading: lo,
+        data: tables,
+        error: er,
       } = await fetchSchemaTables({
         variables: {
           schemaName: schema.name,
         },
       });
-      if (!l && !e) actions.setTables(data.wbMyTables);
-      actions.setShow(false);
+      if (!lo && !er) actions.setTables(tables.wbMyTables);
     }
   };
 
@@ -458,10 +448,7 @@ const LayoutSidePanel = ({
       };
       if (formData.name !== table.name && table.name !== undefined)
         variables.newTableName = formData.name;
-      updateTable(variables);
-
-      // re-render schema's view to see edited table
-      updateSchemaTables(variables);
+      updateTable(variables).finally(() => actions.setShow(false));
     } else if (type === 'view') {
       saveView();
       actions.setShow(false);
