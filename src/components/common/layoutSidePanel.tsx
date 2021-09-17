@@ -318,6 +318,47 @@ const LayoutSidePanel = ({
     saveSettingsToDB();
   };
 
+  const updateTable = async variables => {
+    const { loading, error } = await updateTableMutation({
+      variables,
+    });
+    if (!error && !loading) {
+      const {
+        loading: l,
+        data,
+        error: e,
+      } = await fetchSchemaTable({
+        variables: {
+          schemaName: schema.name,
+          tableName: table.name === undefined ? formData.name : table.name,
+          withColumns: true,
+          withSettings: true,
+        },
+      });
+      if (!l && !e) actions.setTable(data.wbMyTableByName);
+      actions.setShow(false);
+    }
+  };
+
+  const updateSchemaTables = async variables => {
+    const { loading, error } = await updateTableMutation({
+      variables,
+    });
+    if (!loading && !error) {
+      const {
+        loading: l,
+        data,
+        error: e,
+      } = await fetchSchemaTables({
+        variables: {
+          schemaName: schema.name,
+        },
+      });
+      if (!l && !e) actions.setTables(data.wbMyTables);
+      actions.setShow(false);
+    }
+  };
+
   const onSave = async () => {
     if (type === 'createDatabase') {
       const variables: any = {
@@ -417,25 +458,10 @@ const LayoutSidePanel = ({
       };
       if (formData.name !== table.name && table.name !== undefined)
         variables.newTableName = formData.name;
-      const { loading, error } = await updateTableMutation({
-        variables,
-      });
-      if (!error && !loading) {
-        const {
-          loading: l,
-          data,
-          error: e,
-        } = await fetchSchemaTable({
-          variables: {
-            schemaName: schema.name,
-            tableName: table.name === undefined ? formData.name : table.name,
-            withColumns: true,
-            withSettings: true,
-          },
-        });
-        if (!l && !e) actions.setTable(data.wbMyTableByName);
-        actions.setShow(false);
-      }
+      updateTable(variables);
+
+      // re-render schema's view to see edited table
+      updateSchemaTables(variables);
     } else if (type === 'view') {
       saveView();
       actions.setShow(false);
