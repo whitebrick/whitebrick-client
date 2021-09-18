@@ -2,11 +2,11 @@ import React from 'react';
 import Layout from '../../../components/layouts/layout';
 import SchemaLayout from '../../../components/layouts/schemaLayout';
 
-type DatabaseNamePropsType = {
+type OrgSchemaPropsType = {
   params: any;
 };
 
-const DatabaseName = ({ params }: DatabaseNamePropsType) => {
+const OrgSchema = ({ params }: OrgSchemaPropsType) => {
   return (
     <Layout>
       <SchemaLayout params={params} />
@@ -14,4 +14,4 @@ const DatabaseName = ({ params }: DatabaseNamePropsType) => {
   );
 };
 
-export default DatabaseName;
+export default OrgSchema;
