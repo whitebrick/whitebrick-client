@@ -60,7 +60,8 @@ const DeleteModal = ({
       : // eslint-disable-next-line no-nested-ternary
       type === 'database' && schema.name !== undefined
       ? schema.name
-      : type === 'database' && schema.name === undefined
+      : (type === 'database' && schema.name === undefined) ||
+        type === 'myDatabase'
       ? singleSchema.name
       : table.name;
 
@@ -74,7 +75,7 @@ const DeleteModal = ({
       } else {
         setError(true);
       }
-    } else if (type === 'database') {
+    } else if (type === 'database' || type === 'myDatabase') {
       if (value === name) {
         await removeOrDeleteSchemaMutation({
           variables: {
@@ -105,7 +106,7 @@ const DeleteModal = ({
   return (
     <Dialog
       isShown={show}
-      title={`Delete ${type} ${name}`}
+      title={`Delete ${type === 'myDatabase' ? 'database' : type} ${name}`}
       intent="danger"
       onConfirm={onSave}
       confirmLabel="Delete"

@@ -2,10 +2,9 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import Avatar from 'react-avatar';
-import { navigate } from 'gatsby';
 import { actions } from '../../state/actions';
 import AddData from '../common/addData';
+import ContextItem from '../common/contextItem';
 
 type MyDatabasesPropsType = {
   schemas: any[];
@@ -37,14 +36,7 @@ const MyDatabases = ({
         <div className="card-body">
           <div className="row">
             {filteredSchemas.map(schema => (
-              <div
-                key={schema.name}
-                className="col-md-2 text-center btn"
-                aria-hidden="true"
-                onClick={() => navigate(`/db/${schema.name}`)}>
-                <Avatar name={schema.label} size="75" round="12px" />
-                <p className="mt-2">{schema.label}</p>
-              </div>
+              <ContextItem type="myDatabase" singleSchema={schema} />
             ))}
             {name === 'My Databases' && (
               <AddData name="database" type="createDatabase" />

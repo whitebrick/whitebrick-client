@@ -47,7 +47,12 @@ const ContextItem = ({
   const name = type === 'table' ? table.name : singleSchema.name;
   const label = type === 'table' ? table.label : singleSchema.label;
   const hasPermission =
-    type === 'table' ? hasTablePermission : hasSchemaPermission;
+    // eslint-disable-next-line no-nested-ternary
+    type === 'table'
+      ? hasTablePermission
+      : type === 'database'
+      ? hasSchemaPermission
+      : true;
 
   const MENU_ID = name;
   const { show } = useContextMenu({ id: MENU_ID });
@@ -59,7 +64,7 @@ const ContextItem = ({
       actions.setShow(true);
     }
 
-    if (type === 'database') {
+    if (type === 'database' || type === 'myDatabase') {
       actions.setType('editDatabase');
       actions.setFormData(singleSchema);
       actions.setShow(true);
@@ -85,11 +90,13 @@ const ContextItem = ({
       ) : (
         <div
           onContextMenu={e => show(e)}
-          key={singleSchema.name}
+          key={name}
           className="col-md-2 col-sm-6 text-center btn"
           aria-hidden="true"
           onClick={() =>
-            navigate(`/${organization.name}/${singleSchema.name}`)
+            navigate(
+              `/${organization === null ? 'db' : organization.name}/${name}`,
+            )
           }>
           <Avatar name={label} size="75" round="12px" />
           <p className="mt-2">{label}</p>
