@@ -349,6 +349,14 @@ const LayoutSidePanel = ({
     }
   };
 
+  const updateSchemas = async variables => {
+    const { error, loading } = await updateSchema({ variables });
+    if (!loading && !error) {
+      const { data } = await fetchSchemas();
+      actions.setSchemas(data.wbMySchemas);
+    }
+  };
+
   const onSave = async () => {
     if (type === 'createDatabase') {
       const variables: any = {
@@ -413,8 +421,7 @@ const LayoutSidePanel = ({
         formData.organization !== '--'
       )
         variables.newOrganizationOwnerName = formData.organization;
-      const { error, loading } = await updateSchema({ variables });
-      if (!loading && !error) actions.setShow(false);
+      updateSchemas(variables).finally(() => actions.setShow(false));
     } else if (type === 'newRow') {
       const operation = gql.mutation({
         operation: ''.concat('insert_', `${schema.name}_${table.name}`),
