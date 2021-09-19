@@ -62,6 +62,9 @@ if [[ "$2" != "skipBuild" ]]; then
   cmd="touch public/.gatsby-build-$env"
   echo -e "\n$cmd\n"
   eval $cmd
+  cmd="cp deploy/redirect.html public/redirect.html"
+  echo -e "\n$cmd\n"
+  eval $cmd
 fi
 
 echo -e "\n\n==== Deploying $SITE $1 ($s3) ====\n\n"

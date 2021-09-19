@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Whitebrick - Redirecting...</title>
+    <meta charset="utf-8">
+    <script>
+      // eg redirect.html?path=test_donnas-media/test_donnasdvd/actor
+      function getParameterByName(name, url = window.location.href) {
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+          results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+      }
+      var path = getParameterByName("path");
+      if(!path){
+        console.log("Could not find 'path' query parameter - location.href to '/home'");
+        window.location.href="/home";
+      } else {
+        const split = path.split("/");
+        if(split.length==0 || (split.length==1 && split[0].length==0)){
+          console.log(`Could not find vars in path '${path}' - location.href to '/home'`);
+          window.location.href="/home";
+        } else {
+          let redirectQueryParams = [];
+          if(split[0].toLocaleLowerCase()!="db"){
+            redirectQueryParams.push(`organization_name=${split[0]}`);
+          }
+          if (split[1]){
+            redirectQueryParams.push(`schema_name=${split[1]}`);
+          }
+          if (split[2]) {
+            redirectQueryParams.push(`table_name=${split[2]}`);
+          }
+          const redirectQuery = `/redirect/index.html?${redirectQueryParams.join('&')}`;
+          console.log(`location.href path '${path}' to '${redirectQuery}'`);
+          window.location.href = redirectQuery;
+        }
+      }
+    </script>
+  </head>
+  <body style="background-color: #fff; font-family: Helvetica,Arial,sans-serif;">
+    <div style="background-color: #f6f6f6; max-width: 40rem; margin: 2rem auto; Padding: 5px 20px; border-radius: 10px">
+      <p style="font-size: 1.2rem;">Redirecting to Whitebrick - please wait one moment...</p>
+      <p>If the page fails to load please try clicking your browser refresh button and check that Javascript is switched on.</p>
+      <p><a href="/home">Return Home</a></p>
+    </div>
+  </body>
+</html>
