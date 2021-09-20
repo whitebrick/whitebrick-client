@@ -3,13 +3,20 @@ import Avatar from 'react-avatar';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { navigate } from 'gatsby';
-import { TrashIcon, EditIcon } from 'evergreen-ui';
+import { TrashIcon, EditIcon, NewPersonIcon } from 'evergreen-ui';
 import { Menu, Item, useContextMenu } from 'react-contexify';
+import { useManualQuery } from 'graphql-hooks';
 import { SchemaItemType } from '../../types';
 import { actions } from '../../state/actions';
 import 'react-contexify/dist/ReactContexify.css';
 import DeleteModal from './deleteModal';
 import { checkPermission } from '../../utils/checkPermission';
+import InviteUserModal from './inviteUserModal';
+import {
+  SCHEMA_USERS_QUERY,
+  TABLE_USERS_QUERY,
+} from '../../graphql/queries/wb';
+import { isObjectEmpty } from '../../utils/objectEmpty';
 
 type ContextItemProps = {
   table?: any;
@@ -35,6 +42,7 @@ const ContextItem = ({
   type,
 }: ContextItemProps) => {
   const [showDelete, setShowDelete] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
   const hasTablePermission = checkPermission(
     'alter_schema',
     schema?.role?.name,
@@ -44,6 +52,36 @@ const ContextItem = ({
     organization?.role?.name,
   );
 
+  const hasSchemaInvitePermission = checkPermission(
+    'manage_access_to_organization',
+    organization?.role?.name,
+  );
+
+  const hasTableInvitePermission = checkPermission(
+    'manage_access_to_schema',
+    schema?.role?.name,
+  );
+
+  const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
+    variables: {
+      schemaName: isObjectEmpty(schema) ? singleSchema?.name : schema?.name,
+    },
+  });
+
+  const [fetchSchemaTableUsers] = useManualQuery(TABLE_USERS_QUERY, {
+    variables: {
+      schemaName: isObjectEmpty(schema) ? singleSchema?.name : schema?.name,
+      tableName: table?.name,
+    },
+  });
+
+  const inviteName =
+    // eslint-disable-next-line no-nested-ternary
+    type === 'database' || type === 'myDatabase'
+      ? 'schema'
+      : type === 'table'
+      ? 'table'
+      : 'organization';
   const name = type === 'table' ? table.name : singleSchema.name;
   const label = type === 'table' ? table.label : singleSchema.label;
   const hasPermission =
@@ -52,6 +90,13 @@ const ContextItem = ({
       ? hasTablePermission
       : type === 'database'
       ? hasSchemaPermission
+      : true;
+  const hasInvitePermission =
+    // eslint-disable-next-line no-nested-ternary
+    type === 'table'
+      ? hasTableInvitePermission
+      : type === 'database'
+      ? hasSchemaInvitePermission
       : true;
 
   const MENU_ID = name;
@@ -68,6 +113,16 @@ const ContextItem = ({
       actions.setType('editDatabase');
       actions.setFormData(singleSchema);
       actions.setShow(true);
+    }
+  };
+
+  const fetchUsers = () => {
+    if (inviteName === 'schema') {
+      fetchSchemaUsers().then(r => actions.setUsers(r?.data?.wbSchemaUsers));
+    } else {
+      fetchSchemaTableUsers().then(r =>
+        actions.setUsers(r?.data?.wbTableUsers),
+      );
     }
   };
 
@@ -107,8 +162,15 @@ const ContextItem = ({
           <Item onClick={handleEdit} disabled={!hasPermission}>
             <EditIcon marginRight={10} /> Edit {label}
           </Item>
+          <Item
+            onClick={() => {
+              setShowInvite(true);
+            }}
+            disabled={!hasInvitePermission}>
+            <NewPersonIcon marginRight={10} />
+            Invite others
+          </Item>
           <Item onClick={() => setShowDelete(true)} disabled={!hasPermission}>
-            {' '}
             <TrashIcon color="danger" marginRight={10} />
             <span className="text-danger">Delete {label}</span>
           </Item>
@@ -123,6 +185,14 @@ const ContextItem = ({
           singleSchema={singleSchema}
         />
       )}
+      <InviteUserModal
+        show={showInvite}
+        setShow={setShowInvite}
+        name={inviteName}
+        refetch={fetchUsers}
+        singleSchema={singleSchema}
+        singleTable={table}
+      />
     </>
   );
 };

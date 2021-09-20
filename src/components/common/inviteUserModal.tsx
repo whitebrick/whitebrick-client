@@ -27,6 +27,13 @@ type InviteUserModalType = {
   schema: SchemaItemType;
   organization: OrganizationItemType;
   table: TableItemType;
+  singleSchema?: any;
+  singleTable?: any;
+};
+
+const defaultProps = {
+  singleSchema: null,
+  singleTable: null,
 };
 
 const InviteUserModal = ({
@@ -38,6 +45,8 @@ const InviteUserModal = ({
   organization,
   schema,
   table,
+  singleSchema,
+  singleTable,
 }: InviteUserModalType) => {
   const [data, setData] = useState({ user: {}, role: '' });
   const [options, setOptions] = useState([]);
@@ -63,7 +72,7 @@ const InviteUserModal = ({
     if (name === 'schema') {
       await updateSchemaUserRole({
         variables: {
-          schemaName: schema.name,
+          schemaName: isObjectEmpty(schema) ? singleSchema?.name : schema?.name,
           roleName: data.role,
           userEmails: [data.user],
         },
@@ -71,8 +80,8 @@ const InviteUserModal = ({
     } else if (name === 'table') {
       await updateTableUserRole({
         variables: {
-          schemaName: schema.name,
-          tableName: table.name,
+          schemaName: isObjectEmpty(schema) ? singleSchema?.name : schema?.name,
+          tableName: isObjectEmpty(table) ? singleTable?.name : table?.name,
           roleName: data.role,
           userEmails: [data.user],
         },
@@ -113,6 +122,7 @@ const InviteUserModal = ({
   );
 };
 
+InviteUserModal.defaultProps = defaultProps;
 const mapStateToProps = state => ({
   cloudContext: state.cloudContext,
   schema: state.schema,
