@@ -331,12 +331,7 @@ const Members = ({
             ))}
         </Table.Body>
       </Table>
-      <InviteUserModal
-        show={show}
-        setShow={setShow}
-        name={name}
-        refetch={fetchUsers}
-      />
+      <InviteUserModal show={show} setShow={setShow} name={name} />
       <RolePermissions
         show={showRoles}
         setShow={setShowRoles}

@@ -81,14 +81,7 @@ const SchemaLayout = ({
   };
 
   if (isLoading) return <Loading />;
-  if (error) {
-    return (
-      <Layout>
-        <NotFound name={getError(error)} />
-      </Layout>
-    );
-  }
-
+  if (error) return <NotFound name={getError(error)} />;
   return (
     <div className="mt-3">
       <Seo title={schema.label} />

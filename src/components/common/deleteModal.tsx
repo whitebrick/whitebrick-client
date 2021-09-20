@@ -58,10 +58,9 @@ const DeleteModal = ({
     type === 'organization'
       ? org.name
       : // eslint-disable-next-line no-nested-ternary
-      type === 'database' && schema.name !== undefined
+      type === 'schema' && schema.name !== undefined
       ? schema.name
-      : (type === 'database' && schema.name === undefined) ||
-        type === 'myDatabase'
+      : type === 'schema' && schema.name === undefined
       ? singleSchema.name
       : table.name;
 

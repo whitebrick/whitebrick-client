@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { RadioGroup } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { useMutation } from 'graphql-hooks';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import Modal from '../elements/modal';
 import UserSearchInput from '../elements/userInput';
 import { actions } from '../../state/actions';
@@ -17,18 +17,23 @@ import {
   TableItemType,
 } from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
+import {
+  ORGANIZATION_USERS_QUERY,
+  SCHEMA_USERS_QUERY,
+  TABLE_USERS_QUERY,
+} from '../../graphql/queries/wb';
 
 type InviteUserModalType = {
   show: boolean;
   setShow: (value: boolean) => void;
   cloudContext: any;
   name: string;
-  refetch: () => void;
   schema: SchemaItemType;
   organization: OrganizationItemType;
   table: TableItemType;
   singleSchema?: any;
   singleTable?: any;
+  actions: any;
 };
 
 const defaultProps = {
@@ -41,15 +46,20 @@ const InviteUserModal = ({
   setShow,
   cloudContext,
   name,
-  refetch,
   organization,
   schema,
   table,
   singleSchema,
   singleTable,
+  actions,
 }: InviteUserModalType) => {
   const [data, setData] = useState({ user: {}, role: '' });
   const [options, setOptions] = useState([]);
+
+  const [fetchTableUsers] = useManualQuery(TABLE_USERS_QUERY);
+  const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY);
+  const [fetchOrganizationUsers] = useManualQuery(ORGANIZATION_USERS_QUERY);
+
   const [updateSchemaUserRole] = useMutation(SCHEMA_SET_USER_ROLE_MUTATION);
   const [updateTableUserRole] = useMutation(TABLE_SET_USER_ROLE_MUTATION);
   const [updateOrganizationUserRole] = useMutation(SET_USERS_ROLE_MUTATION);
@@ -67,6 +77,29 @@ const InviteUserModal = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, roles]);
+
+  const fetchUsers = () => {
+    if (name === 'table') {
+      fetchTableUsers({
+        variables: {
+          schemaName: schema.name,
+          tableName: isObjectEmpty(table) ? singleTable.name : table.name,
+        },
+      }).then(r => actions.setUsers(r?.data?.wbTableUsers));
+    } else if (name === 'schema') {
+      fetchSchemaUsers({
+        variables: {
+          schemaName: isObjectEmpty(schema) ? singleSchema.name : schema.name,
+        },
+      }).then(r => actions.setUsers(r?.data?.wbSchemaUsers));
+    } else {
+      fetchOrganizationUsers({
+        variables: {
+          organizationName: organization.name,
+        },
+      }).then(r => actions.setUsers(r?.data?.wbOrganizationUsers));
+    }
+  };
 
   const onSave = async () => {
     if (name === 'schema') {
@@ -95,7 +128,7 @@ const InviteUserModal = ({
         },
       });
     }
-    refetch();
+    fetchUsers();
     setShow(false);
   };
 

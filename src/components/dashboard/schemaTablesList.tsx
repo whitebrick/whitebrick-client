@@ -10,7 +10,7 @@ import { actions } from '../../state/actions';
 import { SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
 import NoData from '../common/noData';
 import AddData from '../common/addData';
-import ContextItem from '../common/contextItem';
+import ContextMenu from '../common/contextMenu';
 
 type TablesPropsType = {
   schema: SchemaItemType;
@@ -46,7 +46,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
               <div
                 key={table.name}
                 className="col-md-2 col-sm-6 text-center btn">
-                <ContextItem type="table" table={table} />
+                <ContextMenu type="table" item={table} />
               </div>
             ))
           ) : (

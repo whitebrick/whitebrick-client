@@ -9,7 +9,7 @@ import NoData from '../common/noData';
 import AddData from '../common/addData';
 import DeleteModal from '../common/deleteModal';
 import { checkPermission } from '../../utils/checkPermission';
-import ContextItem from '../common/contextItem';
+import ContextMenu from '../common/contextMenu';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -67,11 +67,7 @@ const OrganizationDatabasesList = ({
                 schema => schema.organizationOwnerName === organization.name,
               )
               .map(schema => (
-                <ContextItem
-                  type="database"
-                  singleSchema={schema}
-                  organization={organization}
-                />
+                <ContextMenu type="schema" item={schema} />
               ))}
             <AddData
               name="database"

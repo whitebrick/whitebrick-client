@@ -77,7 +77,6 @@ const DatabaseSettings = ({ expand, schema, actions }: DatabaseProps) => {
           show={showInvite}
           setShow={setShowInvite}
           name="schema"
-          refetch={fetchData}
         />
       </>
     )

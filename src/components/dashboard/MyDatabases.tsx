@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { actions } from '../../state/actions';
 import AddData from '../common/addData';
-import ContextItem from '../common/contextItem';
+import ContextMenu from '../common/contextMenu';
 
 type MyDatabasesPropsType = {
   schemas: any[];
@@ -36,7 +36,7 @@ const MyDatabases = ({
         <div className="card-body">
           <div className="row">
             {filteredSchemas.map(schema => (
-              <ContextItem type="myDatabase" singleSchema={schema} />
+              <ContextMenu type="schema" item={schema} />
             ))}
             {name === 'My Databases' && (
               <AddData name="database" type="createDatabase" />

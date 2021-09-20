@@ -27,6 +27,9 @@ export const SCHEMA_TABLES_QUERY = `query ($schemaName: String!){
   wbMyTables(schemaName: $schemaName) {
     name
     label
+    role {
+      name
+    }
   }
 }`;
 
