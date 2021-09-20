@@ -31,12 +31,16 @@ const SchemaMenuItem = ({ schemaItem, actions }: TableMenuItemProps) => {
 
   const handleEdit = () => {
     actions.setType('editDatabase');
-    actions.setFormData({
-      ...schemaItem,
-      organization: {
-        name: schemaItem.organizationOwnerName,
-      },
-    });
+    actions.setFormData(
+      schemaItem.organizationOwnerName
+        ? {
+            ...schemaItem,
+            organization: {
+              name: schemaItem.organizationOwnerName,
+            },
+          }
+        : schemaItem,
+    );
     actions.setShow(true);
   };
 
