@@ -8,9 +8,9 @@ import { useManualQuery } from 'graphql-hooks';
 import { SchemaItemType, TableItemType } from '../../types';
 import { actions } from '../../state/actions';
 import { SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
-import NoData from '../common/noData';
 import AddData from '../common/addData';
 import ContextMenu from '../common/contextMenu';
+import EmptyModal from '../common/emptyModal';
 
 type TablesPropsType = {
   schema: SchemaItemType;
@@ -50,7 +50,7 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
               </div>
             ))
           ) : (
-            <NoData type="createTable" name="table" bg="transparent" />
+            <EmptyModal type="table" item={schema} />
           )}
           {tables.length > 0 && (
             <AddData

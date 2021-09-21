@@ -5,11 +5,11 @@ import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { TrashIcon, IconButton } from 'evergreen-ui';
 import { actions } from '../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../types';
-import NoData from '../common/noData';
 import AddData from '../common/addData';
 import DeleteModal from '../common/deleteModal';
 import { checkPermission } from '../../utils/checkPermission';
 import ContextMenu from '../common/contextMenu';
+import EmptyModal from '../common/emptyModal';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -77,7 +77,7 @@ const OrganizationDatabasesList = ({
             />
           </div>
         ) : (
-          <NoData type="createDatabase" name="database" bg="transparent" />
+          <EmptyModal type="schema" item={organization} />
         )}
       </div>
     </div>
