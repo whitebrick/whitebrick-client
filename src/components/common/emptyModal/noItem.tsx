@@ -28,20 +28,21 @@ const NoItem = ({ data, actions, type }: NoItemProps) => {
 
   return (
     <>
-      <p>No {type} created yet</p>
-      <div aria-hidden>
+      <p>
+        You don&apos;t have any {type === 'schema' ? 'databases' : 'tables'} in
+        here!
+      </p>
+      {hasPermission && (
         <Button
           appearance="primary"
-          size="large"
-          disabled={!hasPermission}
           onClick={() => {
             actions.setFormData(formData);
             actions.setType(actionType);
             actions.setShow(true);
           }}>
-          + Add {type}
+          + Create {type === 'schema' ? 'database' : type}
         </Button>
-      </div>
+      )}
     </>
   );
 };
