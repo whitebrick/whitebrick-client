@@ -343,6 +343,11 @@ const Grid = ({
     ]);
   };
 
+  const getColumnType = (name: string) => {
+    const col = columns.filter(col => col.name === name)[0];
+    return col.type;
+  };
+
   const editValues = val => {
     let values = val;
     values = [...Array.from(new Set(values))];
@@ -363,7 +368,10 @@ const Grid = ({
           data[key]
         ) {
           variables.where[key] = {
-            _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
+            _eq:
+              getColumnType(key) === 'integer'
+                ? parseInt(data[key], 10)
+                : data[key],
           };
         }
       });
