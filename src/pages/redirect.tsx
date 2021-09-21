@@ -1,4 +1,5 @@
 import React from 'react';
+import { navigate } from 'gatsby';
 import Loading from '../components/loading';
 import { getQueryParams } from '../utils/queryParams';
 import TableLayout from '../components/layouts/tableLayout';
@@ -69,6 +70,7 @@ const Redirect = () => {
         </Layout>
       );
     }
+    navigate('/');
     return <Loading />;
   };
 
