@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import {
-  ChevronRightIcon,
-  EditIcon,
-  IconButton,
-  TrashIcon,
-} from 'evergreen-ui';
+import { EditIcon, IconButton, TrashIcon } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
-import { Link } from 'gatsby';
 import { useManualQuery } from 'graphql-hooks';
 import { actions } from '../../state/actions';
 import Tabs from '../elements/tabs';
@@ -19,6 +13,7 @@ import { checkPermission } from '../../utils/checkPermission';
 import Loading from '../loading';
 import { ORGANIZATION_QUERY } from '../../graphql/queries/wb';
 import NotFound from '../notFound';
+import Breadcrumb from '../common/breadcrumb';
 import Seo from '../seo';
 
 type OrganizationLayoutPropsType = {
@@ -85,10 +80,7 @@ const OrganizationLayout = ({
     <div className="my-3">
       <Seo title={`${organization.label} | Organization`} />
       <div style={{ padding: `1rem` }}>
-        <p>
-          <Link to="/">Home</Link> <ChevronRightIcon />{' '}
-          <Link to={`/${organization.name}`}>{organization.label}</Link>
-        </p>
+        <Breadcrumb organizationLayout />
         <div className="d-flex mt-4 ml-1">
           <h3 className="w-50" aria-hidden style={{ cursor: 'pointer' }}>
             <span>
