@@ -41,7 +41,7 @@ const Header = ({ user, schema, actions }: HeaderPropsType) => {
             aria-hidden="true"
             onClick={() => navigate('/')}>
             <span className="logo">
-              <img src={WhitebrickLogo} alt="Logo" height="15vh" /> whitebrick
+              <img src={WhitebrickLogo} alt="Logo" height="30vh" /> whitebrick
             </span>
           </div>
         </span>
