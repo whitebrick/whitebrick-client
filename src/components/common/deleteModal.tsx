@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { TextInputField, Dialog } from 'evergreen-ui';
-import { useMutation } from 'graphql-hooks';
+import { useMutation, useManualQuery } from 'graphql-hooks';
 import { SchemaItemType } from '../../types';
 import { actions } from '../../state/actions';
 import {
@@ -10,6 +10,7 @@ import {
   DELETE_ORGANIZATION_MUTATION,
   REMOVE_OR_DELETE_TABLE_MUTATION,
 } from '../../graphql/mutations/wb';
+import { SCHEMAS_QUERY, SCHEMA_TABLES_QUERY } from '../../graphql/queries/wb';
 
 type DeleteModalType = {
   singleSchema?: any;
@@ -53,6 +54,23 @@ const DeleteModal = ({
     REMOVE_OR_DELETE_TABLE_MUTATION,
   );
 
+  const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
+  const [fetchSchemaTables] = useManualQuery(SCHEMA_TABLES_QUERY);
+
+  const refetchSchemas = async () => {
+    const { loading, data, error } = await fetchSchemas();
+    if (!error && !loading) actions.setSchemas(data.wbMySchemas);
+  };
+
+  const refetchTables = async () => {
+    const { loading, data, error } = await fetchSchemaTables({
+      variables: {
+        schemaName: schema.name,
+      },
+    });
+    if (!error && !loading) actions.setTables(data.wbMyTables);
+  };
+
   const name =
     // eslint-disable-next-line no-nested-ternary
     type === 'organization'
@@ -83,7 +101,7 @@ const DeleteModal = ({
           },
         });
         actions.setSchema({});
-        window.location.replace('/');
+        refetchSchemas().finally(() => setShow(false));
       } else {
         setError(true);
       }
@@ -96,7 +114,7 @@ const DeleteModal = ({
         },
       });
       actions.setTable('');
-      window.location.replace('/');
+      refetchTables().finally(() => setShow(false));
     } else {
       setError(true);
     }
