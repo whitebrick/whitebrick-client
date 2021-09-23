@@ -74,7 +74,7 @@ const DeleteModal = ({
       } else {
         setError(true);
       }
-    } else if (type === 'database' || type === 'myDatabase') {
+    } else if (type === 'schema') {
       if (value === name) {
         await removeOrDeleteSchemaMutation({
           variables: {
@@ -105,7 +105,7 @@ const DeleteModal = ({
   return (
     <Dialog
       isShown={show}
-      title={`Delete ${type === 'myDatabase' ? 'database' : type} ${name}`}
+      title={`Delete ${type === 'schema' ? 'database' : type} ${name}`}
       intent="danger"
       onConfirm={onSave}
       confirmLabel="Delete"

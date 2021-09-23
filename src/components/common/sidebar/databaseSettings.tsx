@@ -70,7 +70,7 @@ const DatabaseSettings = ({ expand, schema, actions }: DatabaseProps) => {
           <DeleteModal
             show={showDelete}
             setShow={setShowDelete}
-            type="database"
+            type="schema"
           />
         )}
         <InviteUserModal
