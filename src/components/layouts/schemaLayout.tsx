@@ -12,7 +12,6 @@ import Breadcrumb from '../common/breadcrumb';
 import { checkPermission } from '../../utils/checkPermission';
 import { SCHEMA_BY_NAME_QUERY } from '../../graphql/queries/wb';
 import Loading from '../loading';
-import Layout from './layout';
 import NotFound from '../notFound';
 import Seo from '../seo';
 

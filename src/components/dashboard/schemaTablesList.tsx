@@ -62,8 +62,9 @@ const SchemaTablesList = ({ schema, tables, actions }: TablesPropsType) => {
         </div>
       ) : (
         <div className="row">
-          {[...Array(12)].map(e => (
-            <div className="col-md-2 text-center btn" key={e}>
+          {[...Array(12)].map((e, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <div className="col-md-2 text-center btn" key={index}>
               <Skeleton height="100px" />
             </div>
           ))}

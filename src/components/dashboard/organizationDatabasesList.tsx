@@ -67,7 +67,7 @@ const OrganizationDatabasesList = ({
                 schema => schema.organizationOwnerName === organization.name,
               )
               .map(schema => (
-                <ContextMenu type="schema" item={schema} />
+                <ContextMenu type="schema" item={schema} key={schema.name} />
               ))}
             <AddData
               name="database"

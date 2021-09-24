@@ -496,14 +496,14 @@ const Grid = ({
           {columns.map(column => renderColumn(column))}
         </AgGridColumn>
         {foreignKeyColumns.map(fkc => (
-          <AgGridColumn headerName={fkc.tableLabel}>
+          <AgGridColumn headerName={fkc.tableLabel} key={fkc.tableName}>
             {fkc.cols.map(col =>
               renderColumn(col, fkc.tableName, 'foreignKey'),
             )}
           </AgGridColumn>
         ))}
         {referencedByColumns.map(rbc => (
-          <AgGridColumn headerName={rbc.tableLabel}>
+          <AgGridColumn headerName={rbc.tableLabel} key={rbc.tableName}>
             {rbc.cols.map(col =>
               renderColumn(col, rbc.tableName, 'referencedBy'),
             )}

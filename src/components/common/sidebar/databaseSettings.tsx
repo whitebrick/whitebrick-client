@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { PlusIcon, CogIcon, NewPersonIcon, TrashIcon } from 'evergreen-ui';
-import { useManualQuery } from 'graphql-hooks';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from '../../../state/actions';
 import { SchemaItemType } from '../../../types';
 import DeleteModal from '../deleteModal';
 import InviteUserModal from '../inviteUserModal';
-import { SCHEMA_USERS_QUERY } from '../../../graphql/queries/wb';
 
 type DatabaseProps = {
   expand: boolean;
@@ -19,16 +17,6 @@ const DatabaseSettings = ({ expand, schema, actions }: DatabaseProps) => {
   const userRole = schema?.role?.name;
   const [showDelete, setShowDelete] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
-
-  const [fetchSchemaUsers] = useManualQuery(SCHEMA_USERS_QUERY, {
-    variables: {
-      schemaName: schema?.name,
-    },
-  });
-
-  const fetchData = () => {
-    fetchSchemaUsers().then(r => actions.setUsers(r?.data?.wbSchemaUsers));
-  };
 
   return (
     Object.keys(schema).length > 0 &&

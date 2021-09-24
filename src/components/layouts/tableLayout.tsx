@@ -290,6 +290,7 @@ const TableLayout = ({
             {views.length > 0 &&
               views.map(view => (
                 <div
+                  key={view.name}
                   onClick={() => {
                     columnAPI.applyColumnState({
                       state: view.state,

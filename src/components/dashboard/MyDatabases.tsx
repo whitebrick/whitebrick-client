@@ -36,7 +36,7 @@ const MyDatabases = ({
         <div className="card-body">
           <div className="row">
             {filteredSchemas.map(schema => (
-              <ContextMenu type="schema" item={schema} />
+              <ContextMenu type="schema" item={schema} key={schema.name} />
             ))}
             {name === 'My Databases' && (
               <AddData name="database" type="createDatabase" />
