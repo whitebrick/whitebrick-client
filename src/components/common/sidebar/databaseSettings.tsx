@@ -6,6 +6,7 @@ import { actions } from '../../../state/actions';
 import { SchemaItemType } from '../../../types';
 import DeleteModal from '../deleteModal';
 import InviteUserModal from '../inviteUserModal';
+import { checkPermission } from '../../../utils/checkPermission';
 
 type DatabaseProps = {
   expand: boolean;
@@ -14,9 +15,13 @@ type DatabaseProps = {
 };
 
 const DatabaseSettings = ({ expand, schema, actions }: DatabaseProps) => {
-  const userRole = schema?.role?.name;
   const [showDelete, setShowDelete] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+
+  const hasPermission = checkPermission(
+    'manage_access_to_schema',
+    schema?.role?.name,
+  );
 
   return (
     Object.keys(schema).length > 0 &&
@@ -38,21 +43,22 @@ const DatabaseSettings = ({ expand, schema, actions }: DatabaseProps) => {
         <div className="list-group-item py-1 d-flex align-items-center">
           <CogIcon /> <span className="ml-2">Settings</span>
         </div>
-        <div
-          aria-hidden
-          onClick={() => setShowInvite(true)}
-          className="list-group-item py-1 d-flex align-items-center">
-          <NewPersonIcon /> <span className="ml-2">Invite others</span>
-        </div>
-        {(userRole === 'schema_owner' ||
-          userRole === 'schema_administrator') && (
-          <div
-            className="list-group-item py-1 d-flex align-items-center text-danger"
-            aria-hidden="true"
-            onClick={() => setShowDelete(true)}>
-            <TrashIcon />
-            <div className="ml-2">Delete {schema.label}</div>
-          </div>
+        {hasPermission && (
+          <>
+            <div
+              aria-hidden
+              onClick={() => setShowInvite(true)}
+              className="list-group-item py-1 d-flex align-items-center">
+              <NewPersonIcon /> <span className="ml-2">Invite others</span>
+            </div>
+            <div
+              className="list-group-item py-1 d-flex align-items-center text-danger"
+              aria-hidden="true"
+              onClick={() => setShowDelete(true)}>
+              <TrashIcon />
+              <div className="ml-2">Delete {schema.label}</div>
+            </div>
+          </>
         )}
         {showDelete && (
           <DeleteModal
