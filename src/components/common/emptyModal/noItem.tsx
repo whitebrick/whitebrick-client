@@ -28,7 +28,9 @@ const NoItem = ({ data, actions, type }: NoItemProps) => {
     type === 'schema' ? hasSchemaPermission : hasTablePermission;
   const actionType = type === 'schema' ? 'createDatabase' : 'createTable';
   const formData =
-    type === 'schema' ? { organization: { name: data?.name } } : { data };
+    type === 'schema'
+      ? { organization: { name: data?.name } }
+      : { schema: { name: data?.name } };
 
   return (
     <>
