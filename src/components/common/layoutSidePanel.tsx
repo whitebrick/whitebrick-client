@@ -203,18 +203,18 @@ const LayoutSidePanel = ({
     },
     {
       name: 'isPrimaryKey',
-      label: 'make it primary key?',
+      label: 'Primary key?',
       type: 'checkbox',
     },
     {
       name: 'autoIncrement',
-      label: 'Auto Increase value?',
+      label: 'Auto Increment?',
       type: 'checkbox',
       render: col?.type === 'integer',
     },
     {
       name: 'startSequenceNumber',
-      label: 'Start at (optional)',
+      label: 'Start sequence at (optional)',
       type: 'text',
       render: !!formData.autoIncrement,
     },
