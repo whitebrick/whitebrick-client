@@ -4,6 +4,11 @@ SITE="whitebrick"
 S3_DEV="s3://dev.whitebrick.com"
 S3_STAGING="s3://staging.whitebrick.com"
 S3_PROD="s3://whitebrick.com"
+BUILD_CMD_DEV="npm run build:development"
+BUILD_CMD_STAGING="npm run build:staging"
+BUILD_CMD_PROD="npm run build:prod"
+BUILD_EXE="gatsby"
+OUT_DIR="public"
 CLOUDFRONT_DEV="E2SMZQYG45APHN"
 CLOUDFRONT_STAGING="E3TH44CM96PJ5D"
 CLOUDFRONT_PROD="ETADCV7026FAI"
@@ -31,48 +36,48 @@ if [[ "$env" == "prod" ]]; then
   s3=$S3_PROD
   cloudfront=$CLOUDFRONT_PROD
   redirect=$REDIRECT_PROD
-  cmd="npm run build:prod"
+  cmd=$BUILD_CMD_PROD
 elif [[ "$env" == "staging" ]]; then
   s3=$S3_STAGING
   cloudfront=$CLOUDFRONT_STAGING
   redirect=$REDIRECT_STAGING
-  cmd="npm run build:staging"
+  cmd=$BUILD_CMD_STAGING
 else
   env="dev"
   s3=$S3_DEV
   cloudfront=$CLOUDFRONT_DEV
   redirect=$REDIRECT_DEV
-  cmd="npm run build:development"
+  cmd=$BUILD_CMD_DEV
 fi
 
 if [[ "$2" != "skipBuild" ]]; then
-  echo -e "\nChecking for gatsby..."
-  which gatsby
+  echo -e "\nChecking for exe..."
+  which $BUILD_EXE
   if [ $? -ne 0 ]; then
-    echo -e "\nError: The command 'gatsby' could not be found.\n"
+    echo -e "\nError: The command '$BUILD_EXE' could not be found.\n"
     exit 1
   fi
   echo -e "\n\n==== Building $SITE $1 ====\n\n"
   echo -e "\n$cmd\n"
   eval $cmd
   if [ $? -ne 0 ]; then
-    echo -e "\nGatsby build failed.\n"
+    echo -e "\n$BUILD_EXE build failed.\n"
     exit 1
   fi
-  cmd="touch public/.gatsby-build-$env"
+  cmd="touch public/.$BUILD_EXE-build-$env"
   echo -e "\n$cmd\n"
   eval $cmd
-  cmd="cp deploy/redirect.html public/redirect.html"
+  cmd="cp deploy/*.html public/"
   echo -e "\n$cmd\n"
   eval $cmd
 fi
 
 echo -e "\n\n==== Deploying $SITE $1 ($s3) ====\n\n"
 
-cd public
+cd $OUT_DIR
 
-if [ ! -f "./.gatsby-build-$env" ]; then
-    echo -e "Error: public/.gatsby-build-$env could not be found.\n\nAre you sure you are deploying the correct build?\n\n"
+if [ ! -f "./.$BUILD_EXE-build-$env" ]; then
+    echo -e "Error: public/.$BUILD_EXE-build-$env could not be found.\n\nAre you sure you are deploying the correct build?\n\n"
     exit 1
 fi
 
@@ -80,7 +85,7 @@ cmd="aws s3 sync . $s3 --delete --profile wb-client-deploy"
 echo -e "\n$cmd\n"
 eval $cmd
 if [ ! -z "$redirect" ]; then
-  cmd="aws s3 cp index.html $s3 --website-redirect '$redirect' --profile wb-client-deploy"
+  cmd="aws s3 cp ../deploy/meta-redirect-${env}.html $s3/index.html --website-redirect '$redirect' --profile wb-client-deploy"
   echo -e "\n$cmd\n"
   eval $cmd
 fi
