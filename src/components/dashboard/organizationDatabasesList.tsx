@@ -10,6 +10,7 @@ import DeleteModal from '../common/deleteModal';
 import { checkPermission } from '../../utils/checkPermission';
 import ContextMenu from '../common/contextMenu';
 import EmptyModal from '../common/emptyModal';
+import { isObjectEmpty } from '../../utils/objectEmpty';
 
 type DatabasesPropsType = {
   organization: OrganizationItemType;
@@ -30,7 +31,7 @@ const OrganizationDatabasesList = ({
 
   const isOrgAdmin = checkPermission(
     'administer_organization',
-    organization?.role?.name,
+    !isObjectEmpty(organization) && organization.role.name,
   );
 
   return (

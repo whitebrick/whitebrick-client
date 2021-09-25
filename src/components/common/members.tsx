@@ -250,11 +250,17 @@ const Members = ({
     if (name === 'organization')
       return checkPermission(
         'manage_access_to_organization',
-        organization?.role?.name,
+        !isObjectEmpty(organization) && organization?.role?.name,
       );
     if (name === 'schema')
-      return checkPermission('manage_access_to_schema', schema?.role?.name);
-    return checkPermission('manage_access_to_table', table?.role?.name);
+      return checkPermission(
+        'manage_access_to_schema',
+        !isObjectEmpty(schema) && schema?.role?.name,
+      );
+    return checkPermission(
+      'manage_access_to_table',
+      !isObjectEmpty(table) && table?.role?.name,
+    );
   };
 
   return (

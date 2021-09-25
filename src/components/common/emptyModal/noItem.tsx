@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { actions } from '../../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../../types';
 import { checkPermission } from '../../../utils/checkPermission';
+import { isObjectEmpty } from '../../../utils/objectEmpty';
 
 type NoItemProps = {
   data: OrganizationItemType | SchemaItemType;
@@ -15,10 +16,13 @@ type NoItemProps = {
 const NoItem = ({ data, actions, type }: NoItemProps) => {
   const hasSchemaPermission = checkPermission(
     'administer_organization',
-    data?.role?.name,
+    !isObjectEmpty(data) && data?.role?.name,
   );
 
-  const hasTablePermission = checkPermission('alter_schema', data?.role?.name);
+  const hasTablePermission = checkPermission(
+    'alter_schema',
+    !isObjectEmpty(data) && data?.role?.name,
+  );
 
   const hasPermission =
     type === 'schema' ? hasSchemaPermission : hasTablePermission;

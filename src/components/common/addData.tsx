@@ -5,6 +5,7 @@ import Avatar from 'react-avatar';
 import { actions } from '../../state/actions';
 import { SchemaItemType } from '../../types';
 import { checkPermission } from '../../utils/checkPermission';
+import { isObjectEmpty } from '../../utils/objectEmpty';
 
 type AddDataType = {
   actions: any;
@@ -31,7 +32,9 @@ const AddData = ({
   const organization = extraParams?.organization;
   const hasPermission = checkPermission(
     permissionType,
-    name === 'table' ? schema?.role?.name : organization?.role?.name,
+    name === 'table'
+      ? !isObjectEmpty(schema) && schema.role.name
+      : typeof organization !== 'undefined' && organization.role.name,
   );
 
   return (

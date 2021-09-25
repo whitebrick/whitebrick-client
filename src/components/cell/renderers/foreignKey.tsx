@@ -10,6 +10,7 @@ import { updateTableData } from '../../../utils/updateTableData';
 import { checkPermission } from '../../../utils/checkPermission';
 import { actions } from '../../../state/actions';
 import { TableItemType } from '../../../types';
+import { isObjectEmpty } from '../../../utils/objectEmpty';
 
 type ForeignKeyCellRendererPropsType = {
   valueFormatted: string;
@@ -54,7 +55,10 @@ const ForeignKeyCellRenderer = ({
     updateTableData(schemaName, tableName, variables, client, actions);
   };
 
-  const hasPermission = checkPermission('alter_table', table?.role?.name);
+  const hasPermission = checkPermission(
+    'alter_table',
+    !isObjectEmpty(table) && table?.role?.name,
+  );
 
   const renderCellValue = () => {
     if (!cellValue) {

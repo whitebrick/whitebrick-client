@@ -5,5 +5,7 @@ export const checkPermission = (type, userRole) => {
   // Only in the case of "My Databases"
   if (!type) return true;
   const permittedRoles = state.cloudContext?.policy?.[type]?.permittedRoles;
-  return permittedRoles?.includes(userRole);
+  return (
+    typeof permittedRoles !== 'undefined' && permittedRoles.includes(userRole)
+  );
 };
