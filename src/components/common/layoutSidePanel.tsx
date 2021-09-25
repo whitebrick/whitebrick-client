@@ -365,7 +365,7 @@ const LayoutSidePanel = ({
         create: true,
       };
       if (formData.organization && formData.organization !== '--')
-        variables.organizationOwnerName = formData.organization;
+        variables.organizationOwnerName = formData.organization.name;
       const { error, loading } = await createSchema({ variables });
       if (!loading && !error) {
         fetchSchemasData();

@@ -95,7 +95,16 @@ const SchemaLayout = ({
                 className="ml-1"
                 onClick={() => {
                   actions.setType('editDatabase');
-                  actions.setFormData(schema);
+                  actions.setFormData(
+                    schema.organizationOwnerName
+                      ? {
+                          ...schema,
+                          organization: {
+                            name: schema.organizationOwnerName,
+                          },
+                        }
+                      : schema,
+                  );
                   actions.setShow(true);
                 }}
                 icon={EditIcon}
