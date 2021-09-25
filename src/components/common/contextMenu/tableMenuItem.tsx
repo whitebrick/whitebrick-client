@@ -47,7 +47,7 @@ const TableMenuItem = ({ tableItem, schema, actions }: TableMenuItemProps) => {
             navigate(
               `/${schema.organizationOwnerName}/${schema.name}/${tableItem.name}`,
             );
-          else navigate(`/db/${schema.name}/table/${tableItem.name}`);
+          else navigate(`/db/${schema.name}/${tableItem.name}`);
         }}>
         <Avatar name={tableItem.label} size="75" round="12px" />
         <p className="mt-2">{tableItem.label}</p>

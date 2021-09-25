@@ -1,6 +1,6 @@
 import React from 'react';
-import Layout from '../../../../components/layouts/layout';
-import TableLayout from '../../../../components/layouts/tableLayout';
+import Layout from '../../../components/layouts/layout';
+import TableLayout from '../../../components/layouts/tableLayout';
 
 type TablePropsType = {
   params: any;

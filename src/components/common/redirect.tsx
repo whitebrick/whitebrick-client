@@ -21,7 +21,7 @@ const Redirect = () => {
     } else {
       // eslint-disable-next-line
       if (params.schema_name && params.table_name)
-        path = `db/${params.schema_name}/table/${params.table_name}`;
+        path = `db/${params.schema_name}/${params.table_name}`;
       else path = `db/${params.schema_name}`;
     }
     window.history.replaceState(

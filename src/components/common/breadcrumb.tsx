@@ -63,7 +63,7 @@ const Breadcrumb = ({
     navigate(
       schema.organizationOwnerName
         ? `/${schema.organizationOwnerName}/${schema.name}/${value}`
-        : `/db/${schema.name}/table/${value}`,
+        : `/db/${schema.name}/${value}`,
     );
   };
 
