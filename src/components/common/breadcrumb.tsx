@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, navigate } from 'gatsby';
 import {
   ChevronRightIcon,
+  ChevronDownIcon,
   SelectMenu,
   Button,
   Pane,
@@ -9,6 +10,7 @@ import {
   DatabaseIcon,
   JoinTableIcon,
   ApplicationsIcon,
+  IconButton,
 } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -45,6 +47,19 @@ const Breadcrumb = ({
   tableLayout,
   organizationLayout,
 }: BreadcrumbPropsType) => {
+  const breadcrumbLabel = {
+    borderTopRightRadius: '0px',
+    borderBottomRightRadius: '0px',
+  };
+
+  const breadcrumbArrow = {
+    borderTopLeftRadius: '0px',
+    borderBottomLeftRadius: '0px',
+    padding: '0px',
+    width: '25px',
+    minWidth: '25px',
+  };
+
   // This function is used with sort() to alphabetically arrange the elements in an
   // object.
   const compare = (a, b) => {
@@ -88,12 +103,18 @@ const Breadcrumb = ({
       <Link to="/">Home</Link> <ChevronRightIcon />{' '}
       {organizationLayout && (
         <>
+          <Button
+            style={breadcrumbLabel}
+            onClick={() => changeOrg(organization.name)}>
+            {organization.label}
+          </Button>
           <SelectMenu
             title="Organizations"
             onSelect={item => changeOrg(item.value)}
             options={organizations
               ?.sort(compare)
               ?.map(({ name, label }) => ({ label, value: name }))}
+            closeOnSelect
             selected={organization.name}
             filterPlaceholder="Choose an organization"
             filterIcon={ApplicationsIcon}
@@ -106,39 +127,53 @@ const Breadcrumb = ({
                 <Text size={300}>No options found</Text>
               </Pane>
             }>
-            <Button>{organization.name}</Button>
+            <IconButton icon={ChevronDownIcon} style={breadcrumbArrow} />
           </SelectMenu>
         </>
       )}
       {!organizationLayout && (
-        <SelectMenu
-          title="Databases"
-          onSelect={item => changeSchema(item.value)}
-          options={schemas.map(({ name, label }) => ({ label, value: name }))}
-          selected={schema.name}
-          filterPlaceholder="Choose a database"
-          filterIcon={DatabaseIcon}
-          emptyView={
-            <Pane
-              height="100%"
-              display="flex"
-              alignItems="center"
-              justifyContent="center">
-              <Text size={300}>No options found</Text>
-            </Pane>
-          }>
-          <Button>{schema.name}</Button>
-        </SelectMenu>
+        <>
+          <Button
+            style={breadcrumbLabel}
+            onClick={() => changeSchema(schema.name)}>
+            {schema.label}
+          </Button>
+          <SelectMenu
+            title="Databases"
+            onSelect={item => changeSchema(item.value)}
+            options={schemas.map(({ name, label }) => ({ label, value: name }))}
+            closeOnSelect
+            selected={schema.name}
+            filterPlaceholder="Choose a database"
+            filterIcon={DatabaseIcon}
+            emptyView={
+              <Pane
+                height="100%"
+                display="flex"
+                alignItems="center"
+                justifyContent="center">
+                <Text size={300}>No options found</Text>
+              </Pane>
+            }>
+            <IconButton icon={ChevronDownIcon} style={breadcrumbArrow} />
+          </SelectMenu>
+        </>
       )}
       {tableLayout && (
         <>
           <ChevronRightIcon />
+          <Button
+            style={breadcrumbLabel}
+            onClick={() => changeTable(table.name)}>
+            {table.label}
+          </Button>
           <SelectMenu
             title="Tables"
             onSelect={item => changeTable(item.value)}
             options={tables
               ?.sort(compare)
               ?.map(({ name, label }) => ({ label, value: name }))}
+            closeOnSelect
             selected={table.name}
             filterPlaceholder="Choose a table"
             filterIcon={JoinTableIcon}
@@ -151,7 +186,7 @@ const Breadcrumb = ({
                 <Text size={300}>No options found</Text>
               </Pane>
             }>
-            <Button>{table.name}</Button>
+            <IconButton icon={ChevronDownIcon} style={breadcrumbArrow} />
           </SelectMenu>
         </>
       )}
