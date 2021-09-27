@@ -5,19 +5,14 @@ import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import { actions } from '../../state/actions';
 import Sidebar from '../sidebar';
-import {
-  SCHEMAS_QUERY,
-  SCHEMA_TABLE_BY_NAME_QUERY,
-} from '../../graphql/queries/wb';
+import { SCHEMAS_QUERY } from '../../graphql/queries/wb';
 import Header from '../elements/header';
-import { SchemaItemType, TableItemType } from '../../types';
+import { SchemaItemType } from '../../types';
 import { isObjectEmpty } from '../../utils/objectEmpty';
-import LayoutSidePanel from '../common/layoutSidePanel';
+import SidePanelForm from '../common/sidePanelForm';
 
 type LayoutPropsType = {
   schemas: SchemaItemType[];
-  table: TableItemType;
-  schema: SchemaItemType;
   children: React.ReactNode;
   actions: any;
   cloudContext: any;
@@ -30,8 +25,6 @@ const defaultProps = {
 
 const Layout = ({
   schemas,
-  table,
-  schema,
   children,
   actions,
   cloudContext,
@@ -40,7 +33,6 @@ const Layout = ({
   const [expand, setExpand] = useState(false);
   const [fetchSchemas] = useManualQuery(SCHEMAS_QUERY);
   const [fetchCloudContext] = useManualQuery(`{ wbCloudContext }`);
-  const [fetchSchemaTable] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
 
   useEffect(() => {
     const fetchSchemasData = async () => {
@@ -58,28 +50,6 @@ const Layout = ({
     if (isObjectEmpty(cloudContext))
       fetchCloud().then(data => actions.setCloudContext(data.wbCloudContext));
   }, [actions, cloudContext, fetchCloudContext]);
-
-  const fetchTableAndColumns = async () => {
-    const { data } = await fetchSchemaTable({
-      variables: {
-        schemaName: schema.name,
-        tableName: table.name,
-        withColumns: true,
-        withSettings: true,
-      },
-    });
-    actions.setTable(data.wbMyTableByName);
-    if (data.wbMyTableByName.columns.length > 0) {
-      actions.setColumns(data.wbMyTableByName.columns);
-      actions.setOrderBy(data.wbMyTableByName.columns[0].name);
-      if (data.wbMyTableByName.settings) {
-        actions.setViews(data.wbMyTableByName.settings.views);
-        actions.setDefaultView(data.wbMyTableByName.settings.defaultView);
-      }
-    } else {
-      actions.setColumns([]);
-    }
-  };
 
   const getMarginLeft = (hideSidebar: boolean, expand: boolean) => {
     if (!hideSidebar) {
@@ -100,7 +70,7 @@ const Layout = ({
             marginLeft: getMarginLeft(hideSidebar, expand),
           }}>
           {children}
-          <LayoutSidePanel fetchTables={fetchTableAndColumns} />
+          <SidePanelForm />
         </main>
       </div>
     </>
@@ -111,8 +81,6 @@ Layout.defaultProps = defaultProps;
 
 const mapStateToProps = state => ({
   schemas: state.schemas,
-  schema: state.schema,
-  table: state.table,
   cloudContext: state.cloudContext,
 });
 

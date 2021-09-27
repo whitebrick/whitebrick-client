@@ -14,6 +14,7 @@ import { SCHEMA_BY_NAME_QUERY } from '../../graphql/queries/wb';
 import Loading from '../loading';
 import NotFound from '../notFound';
 import Seo from '../seo';
+import { getOrganizationValue } from '../../utils/select';
 
 type SchemaLayoutType = {
   schema: SchemaItemType;
@@ -99,9 +100,9 @@ const SchemaLayout = ({
                     schema.organizationOwnerName
                       ? {
                           ...schema,
-                          organization: {
-                            name: schema.organizationOwnerName,
-                          },
+                          organization: getOrganizationValue(
+                            schema.organizationOwnerName,
+                          ),
                         }
                       : schema,
                   );

@@ -6,6 +6,7 @@ import { actions } from '../../state/actions';
 import { SchemaItemType } from '../../types';
 import { checkPermission } from '../../utils/checkPermission';
 import { isObjectEmpty } from '../../utils/objectEmpty';
+import { getOrganizationValue } from '../../utils/select';
 
 type AddDataType = {
   actions: any;
@@ -45,7 +46,11 @@ const AddData = ({
           aria-hidden="true"
           onClick={() => {
             actions.setFormData(
-              type === 'createDatabase' ? { organization } : { schema },
+              type === 'createDatabase'
+                ? {
+                    organization: getOrganizationValue(organization.name),
+                  }
+                : { schema },
             );
             actions.setType(type);
             actions.setShow(true);

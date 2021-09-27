@@ -10,6 +10,7 @@ import { actions } from '../../../state/actions';
 import { checkPermission } from '../../../utils/checkPermission';
 import InviteUserModal from '../inviteUserModal';
 import DeleteModal from '../deleteModal';
+import { getOrganizationValue } from '../../../utils/select';
 
 type TableMenuItemProps = {
   schemaItem: SchemaItemType;
@@ -35,9 +36,9 @@ const SchemaMenuItem = ({ schemaItem, actions }: TableMenuItemProps) => {
       schemaItem.organizationOwnerName
         ? {
             ...schemaItem,
-            organization: {
-              name: schemaItem.organizationOwnerName,
-            },
+            organization: getOrganizationValue(
+              schemaItem.organizationOwnerName,
+            ),
           }
         : schemaItem,
     );
@@ -98,7 +99,7 @@ const SchemaMenuItem = ({ schemaItem, actions }: TableMenuItemProps) => {
 };
 
 const mapStateToProps = state => ({
-  organization: state.organization,
+  organizations: state.organizations,
 });
 
 const mapDispatchToProps = dispatch => ({
