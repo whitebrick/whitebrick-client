@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FormEvent } from 'react';
 import {
   SideSheet,
   Heading,
@@ -13,15 +13,21 @@ type SidePanelPropsType = {
   description?: string;
   show: boolean;
   setShow: (value: boolean) => void;
+  values?: any;
   onSave?: () => void;
   children: React.ReactNode;
+  isLoading?: boolean;
+  validateForm?: (values: any) => void;
   renderSaveButton?: boolean;
 };
 
 const defaultProps = {
   description: null,
   onSave: null,
+  isLoading: false,
   renderSaveButton: true,
+  validateForm: null,
+  values: {},
 };
 
 const SidePanel = ({
@@ -30,7 +36,10 @@ const SidePanel = ({
   show,
   setShow,
   onSave,
+  values,
   children,
+  isLoading,
+  validateForm,
   renderSaveButton = true,
 }: SidePanelPropsType) => {
   return (
@@ -44,48 +53,58 @@ const SidePanel = ({
           flex: '1',
           flexDirection: 'column',
         }}>
-        <Pane
-          display="flex"
-          zIndex={1}
-          flexShrink={0}
-          elevation={0}
-          backgroundColor="white">
+        <form
+          onSubmit={(e: FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            validateForm(values);
+            onSave();
+          }}>
           <Pane
-            padding={16}
-            flex={1}
-            alignItems="center"
             display="flex"
-            borderBottom="muted">
-            <Heading size={600}>{name}</Heading>
-            {description && (
-              <Paragraph size={400} color="muted">
-                {description}
-              </Paragraph>
-            )}
-          </Pane>
-          {renderSaveButton && (
+            zIndex={1}
+            flexShrink={0}
+            elevation={0}
+            backgroundColor="white">
             <Pane
               padding={16}
+              flex={1}
               alignItems="center"
               display="flex"
               borderBottom="muted">
-              <Button appearance="primary" onClick={onSave}>
-                Save
-              </Button>
+              <Heading size={600}>{name}</Heading>
+              {description && (
+                <Paragraph size={400} color="muted">
+                  {description}
+                </Paragraph>
+              )}
             </Pane>
-          )}
-        </Pane>
-        <Pane flex="1" overflowY="scroll" background="tint1" padding={16}>
-          <Card
-            backgroundColor="white"
-            elevation={0}
-            display="flex"
-            alignItems="center"
-            paddingY={50}
-            justifyContent="center">
-            {children}
-          </Card>
-        </Pane>
+            {renderSaveButton && (
+              <Pane
+                padding={16}
+                alignItems="center"
+                display="flex"
+                borderBottom="muted">
+                <Button
+                  type="submit"
+                  appearance="primary"
+                  isLoading={isLoading}>
+                  Save
+                </Button>
+              </Pane>
+            )}
+          </Pane>
+          <Pane flex="1" overflowY="scroll" background="tint1" padding={16}>
+            <Card
+              backgroundColor="white"
+              elevation={0}
+              display="flex"
+              alignItems="center"
+              paddingY={50}
+              justifyContent="center">
+              {children}
+            </Card>
+          </Pane>
+        </form>
       </SideSheet>
     </div>
   );

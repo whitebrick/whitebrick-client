@@ -42,7 +42,6 @@ const OrganizationDatabasesList = ({
           {isOrgAdmin && (
             <div>
               <IconButton
-                appearance="default"
                 icon={TrashIcon}
                 intent="danger"
                 onClick={() => setShowDelete(true)}

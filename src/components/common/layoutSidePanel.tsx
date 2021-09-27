@@ -90,13 +90,11 @@ const LayoutSidePanel = ({
   actions,
 }: LayoutSidePanelPropsType) => {
   const client = useContext(ClientContext);
-  const [createSchema] = useMutation(CREATE_SCHEMA_MUTATION);
   const [updateSchema] = useMutation(UPDATE_SCHEMA_MUTATION);
   const [createTable] = useMutation(CREATE_TABLE_MUTATION);
-  const [createOrganization] = useMutation(CREATE_ORGANIZATION_MUTATION);
+
   const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
   const [updateTableMutation] = useMutation(UPDATE_TABLE_DETAILS_MUTATION);
-  const [saveUserTableSettings] = useMutation(SAVE_TABLE_USER_SETTINGS);
   const [updateColumnMutation] = useMutation(UPDATE_COLUMN_MUTATION);
   const [addOrCreateColumnMutation] = useMutation(
     ADD_OR_CREATE_COLUMN_MUTATION,
@@ -105,9 +103,7 @@ const LayoutSidePanel = ({
   const [createOrDeletePrimaryKeys] = useMutation(
     CREATE_OR_DELETE_PRIMARY_KEYS,
   );
-  const [updateOrganizationMutation] = useMutation(
-    UPDATE_ORGANIZATION_MUTATION,
-  );
+
   const [addOrRemoveColumnSequenceMutation] = useMutation(
     ADD_OR_REMOVE_COLUMN_SEQUENCE,
   );
@@ -173,16 +169,6 @@ const LayoutSidePanel = ({
       addNewOptionsValue: ['--'],
       defaultValue: '--',
     },
-    { name: 'name', label: 'Name', type: 'text', required: true },
-    {
-      name: 'label',
-      label: 'Label',
-      type: 'text',
-      required: true,
-    },
-  ];
-
-  const newOrganizationFormFields: any[] = [
     { name: 'name', label: 'Name', type: 'text', required: true },
     {
       name: 'label',
@@ -270,53 +256,6 @@ const LayoutSidePanel = ({
   const fetchSchemasData = async () => {
     const { data } = await fetchSchemas();
     actions.setSchemas(data.wbMySchemas);
-  };
-
-  const saveSettingsToDB = async () => {
-    const { loading, error } = await saveUserTableSettings({
-      variables: {
-        schemaName: schema.name,
-        tableName: table.name,
-        settings: {
-          views,
-          defaultView,
-        },
-      },
-    });
-    if (!loading && !error)
-      toaster.success('Saved!', {
-        duration: 10,
-      });
-  };
-
-  const saveView = (toView = null) => {
-    if (toView) {
-      let viewObj = views.filter(view => view.name === toView)[0];
-      const index = views.indexOf(viewObj);
-      if (index !== -1) {
-        viewObj = {
-          name: toView,
-          state: columnAPI.getColumnState(),
-          orderBy,
-          limit,
-          offset,
-        };
-        const v = views;
-        v[index] = viewObj;
-        actions.setViews(v);
-      }
-    } else {
-      const viewObj = {
-        name: formData.name,
-        state: columnAPI.getColumnState(),
-        orderBy,
-        limit,
-        offset,
-      };
-      actions.setView(viewObj);
-      actions.setDefaultView(formData.name);
-    }
-    saveSettingsToDB();
   };
 
   const updateTable = async variables => {
@@ -640,86 +579,88 @@ const LayoutSidePanel = ({
     return null;
   };
 
-  const getChildren = (type: string) => {
-    if (type === 'token')
-      return (
-        <code
-          className="w-100 p-4"
-          aria-hidden="true"
-          style={{ cursor: 'pointer' }}
-          onClick={() =>
-            navigator.clipboard.writeText(`Bearer ${accessToken}`)
-          }>
-          Bearer {accessToken}
-        </code>
-      );
-    if (type === 'createOrganization' || type === 'editOrganization')
-      return <FormMaker fields={newOrganizationFormFields} />;
-    if (type === 'createDatabase' || type === 'editDatabase')
-      return <FormMaker fields={dataBaseFormFields} />;
-    if (type === 'createTable')
-      return <FormMaker fields={newTableFormFields} />;
-    if (type === 'editTable') return <FormMaker fields={updateTableFields} />;
-    if (type === 'addColumn' || type === 'editColumn')
-      return <FormMaker fields={newTableColumnFields} />;
-    if (type === 'newRow' || type === 'editRow')
-      return (
-        <div className="w-75">
-          {columns.length > 0 ? (
-            columns.map(c => (
-              <>
-                {c.foreignKeys.length > 0 ? (
-                  <TextInputField
-                    label={c.label}
-                    required={!c.isNullable}
-                    value={formData ? formData[c.name] : ''}
-                    hint={
-                      c.foreignKeys.length > 0
-                        ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
-                        : null
-                    }
-                  />
-                ) : (
-                  <TextInputField
-                    label={c.label}
-                    required={!c.isNullable}
-                    value={formData ? formData[c.name] : ''}
-                    hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
-                  />
-                )}
-              </>
-            ))
-          ) : (
-            <Spinner marginX="auto" marginY={120} />
-          )}
-        </div>
-      );
-    if (type === 'view')
-      return (
-        <FormMaker
-          fields={[
-            {
-              name: 'name',
-              label: 'Name of the view',
-              type: 'text',
-              required: true,
-            },
-          ]}
-        />
-      );
-    return null;
-  };
+  // const getChildren = (type: string) => {
+  //   if (type === 'token')
+  //     return (
+  //       <code
+  //         className="w-100 p-4"
+  //         aria-hidden="true"
+  //         style={{ cursor: 'pointer' }}
+  //         onClick={() =>
+  //           navigator.clipboard.writeText(`Bearer ${accessToken}`)
+  //         }>
+  //         Bearer {accessToken}
+  //       </code>
+  //     );
+  //   if (type === 'createOrganization' || type === 'editOrganization')
+  //     return <FormMaker fields={newOrganizationFormFields} />;
+  //   if (type === 'createDatabase' || type === 'editDatabase')
+  //     return <FormMaker fields={dataBaseFormFields} />;
+  //   if (type === 'createTable')
+  //     return <FormMaker fields={newTableFormFields} />;
+  //   if (type === 'editTable') return <FormMaker fields={updateTableFields} />;
+  //   if (type === 'addColumn' || type === 'editColumn')
+  //     return <FormMaker fields={newTableColumnFields} />;
+  //   if (type === 'newRow' || type === 'editRow')
+  //     return (
+  //       <div className="w-75">
+  //         {columns.length > 0 ? (
+  //           columns.map(c => (
+  //             <>
+  //               {c.foreignKeys.length > 0 ? (
+  //                 <TextInputField
+  //                   label={c.label}
+  //                   required={!c.isNullable}
+  //                   value={formData ? formData[c.name] : ''}
+  //                   hint={
+  //                     c.foreignKeys.length > 0
+  //                       ? `Note: This is a Foreign Key to ${c.foreignKeys[0].relTableName}`
+  //                       : null
+  //                   }
+  //                 />
+  //               ) : (
+  //                 <TextInputField
+  //                   label={c.label}
+  //                   required={!c.isNullable}
+  //                   value={formData ? formData[c.name] : ''}
+  //                   hint={c.isPrimaryKey ? 'Note: This is a Primary Key' : null}
+  //                 />
+  //               )}
+  //             </>
+  //           ))
+  //         ) : (
+  //           <Spinner marginX="auto" marginY={120} />
+  //         )}
+  //       </div>
+  //     );
+  //   if (type === 'view')
+  //     return (
+  //
+  //     );
+  //   return null;
+  // };
 
-  return (
-    <SidePanel
-      show={show}
-      renderSaveButton={type !== 'token'}
-      setShow={actions.setShow}
-      onSave={onSave}
-      name={getName(type)}>
-      {getChildren(type)}
-    </SidePanel>
-  );
+  // const save = values => {
+  //   console.log(values);
+  // };
+  //
+  // return (
+  //   <FormMaker
+  //     name={getName(type)}
+  //     fields={[
+  //       {
+  //         name: 'name',
+  //         label: 'Name of the view',
+  //         type: 'text',
+  //         required: true,
+  //       },
+  //     ]}
+  //     initialValues={{
+  //       name: '',
+  //     }}
+  //     onSubmit={save}
+  //   />
+  // );
 };
 
 const mapStateToProps = state => ({
