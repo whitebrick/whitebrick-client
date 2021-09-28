@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux';
 import { TextInputField, SelectField } from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { actions } from '../../state/actions';
+import { setOrder } from '../../utils/setOrder';
 
 type FormMakerPropsType = {
   fields: any[];
@@ -90,7 +91,7 @@ const FormMaker = ({ fields, formData, actions }: FormMakerPropsType) => {
               required={required}
               onChange={e => handleSelectChange(multiple, name, e)}>
               {!multiple && <option disabled>Select {label}</option>}
-              {options.map(option => (
+              {options?.sort(setOrder)?.map(option => (
                 <option
                   key={option[nestedValue]}
                   value={option[nestedValue]}

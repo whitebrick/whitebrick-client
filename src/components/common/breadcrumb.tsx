@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, navigate } from 'gatsby';
+import { navigate } from 'gatsby';
 import {
   ChevronRightIcon,
   ChevronDownIcon,
@@ -21,6 +21,7 @@ import {
   TableItemType,
 } from '../../types';
 import { actions } from '../../state/actions';
+import { setOrder } from '../../utils/setOrder';
 
 type BreadcrumbPropsType = {
   schema: SchemaItemType;
@@ -59,18 +60,6 @@ const Breadcrumb = ({
     padding: '0px',
     width: '25px',
     minWidth: '25px',
-  };
-
-  // This function is used with sort() to alphabetically arrange the elements in an
-  // object.
-  const compare = (a, b) => {
-    if (a.label < b.label) {
-      return -1;
-    }
-    if (a.label > b.label) {
-      return 1;
-    }
-    return 0;
   };
 
   // This function handles the user's wish to go to another table within the same schema
@@ -114,7 +103,7 @@ const Breadcrumb = ({
             title="Organizations"
             onSelect={item => changeOrg(item.value)}
             options={organizations
-              ?.sort(compare)
+              ?.sort(setOrder)
               ?.map(({ name, label }) => ({ label, value: name }))}
             closeOnSelect
             selected={organization.name}
@@ -143,7 +132,9 @@ const Breadcrumb = ({
           <SelectMenu
             title="Databases"
             onSelect={item => changeSchema(item.value)}
-            options={schemas.map(({ name, label }) => ({ label, value: name }))}
+            options={schemas
+              ?.sort(setOrder)
+              ?.map(({ name, label }) => ({ label, value: name }))}
             closeOnSelect
             selected={schema.name}
             filterPlaceholder="Choose a database"
@@ -173,7 +164,7 @@ const Breadcrumb = ({
             title="Tables"
             onSelect={item => changeTable(item.value)}
             options={tables
-              ?.sort(compare)
+              ?.sort(setOrder)
               ?.map(({ name, label }) => ({ label, value: name }))}
             closeOnSelect
             selected={table.name}
