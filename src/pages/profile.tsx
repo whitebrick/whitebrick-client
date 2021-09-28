@@ -20,7 +20,7 @@ const Profile = ({ user }: ProfileType) => {
       email: user.email,
     },
   });
-  const [data, setData] = useState(null);
+  const [data, setData] = useState({ email: '', firstName: '', lastName: '' });
   const [updateBasicDetails] = useMutation(UPDATE_USER_DETAILS_MUTATION);
 
   useEffect(() => {
@@ -73,8 +73,9 @@ const Profile = ({ user }: ProfileType) => {
                 <h5>Email</h5>
                 <div className="mt-3">
                   <TextInputField
+                    label=""
                     hint="Note: Your email can't be editing/changed."
-                    value={data?.email}
+                    value={data.email}
                     disabled
                   />
                 </div>
@@ -89,7 +90,7 @@ const Profile = ({ user }: ProfileType) => {
                   <div className="col-md-6 col-sm-12">
                     <TextInputField
                       label="First Name"
-                      value={data?.firstName}
+                      value={data.firstName}
                       onChange={e =>
                         setData({ ...data, firstName: e.target.value })
                       }
@@ -98,7 +99,7 @@ const Profile = ({ user }: ProfileType) => {
                   <div className="col-md-6 col-sm-12">
                     <TextInputField
                       label="Last Name"
-                      value={data?.lastName}
+                      value={data.lastName}
                       onChange={e =>
                         setData({ ...data, lastName: e.target.value })
                       }
