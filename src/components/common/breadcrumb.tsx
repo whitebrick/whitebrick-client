@@ -11,6 +11,7 @@ import {
   JoinTableIcon,
   ApplicationsIcon,
   IconButton,
+  HomeIcon,
 } from 'evergreen-ui';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -100,7 +101,8 @@ const Breadcrumb = ({
 
   return (
     <p>
-      <Link to="/">Home</Link> <ChevronRightIcon />{' '}
+      <IconButton icon={HomeIcon} onClick={() => navigate('/')} />
+      <ChevronRightIcon />{' '}
       {organizationLayout && (
         <>
           <Button
