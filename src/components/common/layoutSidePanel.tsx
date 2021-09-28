@@ -561,21 +561,10 @@ const LayoutSidePanel = ({
   };
 
   const getName = (type: string) => {
-    if (type === 'token') return 'Access Token';
-    if (type === 'createOrganization') return 'Create a new organization';
-    if (type === 'editOrganization')
-      return `Edit organization ${organization.label}`;
-    if (type === 'createDatabase') return 'Create a new database';
-    if (type === 'editDatabase')
-      return `Edit database  ${schema.label === undefined ? '' : schema.label}`;
-    if (type === 'createTable') return 'Create a new table';
-    if (type === 'editTable')
-      return `Edit table ${table.label === undefined ? '' : table.label}`;
     if (type === 'addColumn') return `Add column to ${table.label}`;
     if (type === 'editColumn') return `Edit column ${column}`;
     if (type === 'newRow') return `Add new row to ${table.label}`;
     if (type === 'editRow') return `Edit row in ${table.label}`;
-    if (type === 'view') return `Create a new view in ${table.label}`;
     return null;
   };
 

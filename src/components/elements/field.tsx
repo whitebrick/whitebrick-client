@@ -66,6 +66,7 @@ const Field = ({
       <SelectField
         name={name}
         label={label}
+        disabled={readOnly}
         value={values[name]}
         required={required}
         onChange={handleChange}>

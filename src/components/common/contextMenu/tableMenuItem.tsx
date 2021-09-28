@@ -10,6 +10,7 @@ import { actions } from '../../../state/actions';
 import { checkPermission } from '../../../utils/checkPermission';
 import InviteUserModal from '../inviteUserModal';
 import DeleteModal from '../deleteModal';
+import { getSchemaValue } from '../../../utils/select';
 
 type TableMenuItemProps = {
   tableItem: TableItemType;
@@ -32,7 +33,7 @@ const TableMenuItem = ({ tableItem, schema, actions }: TableMenuItemProps) => {
 
   const handleEdit = () => {
     actions.setType('editTable');
-    actions.setFormData(tableItem);
+    actions.setFormData({ ...tableItem, schema: getSchemaValue(schema.name) });
     actions.setShow(true);
   };
 

@@ -35,6 +35,7 @@ import NotFound from '../notFound';
 import FilterPane from '../common/filters/filterPane';
 import Breadcrumb from '../common/breadcrumb';
 import { checkPermission } from '../../utils/checkPermission';
+import { getSchemaValue } from '../../utils/select';
 
 type TableLayoutPropsType = {
   table: TableItemType;
@@ -394,12 +395,15 @@ const TableLayout = ({
                   <span>
                     {table.label}
                     {canAlter && (
-                      <EditIcon
-                        className="ml-1"
-                        aria-hidden
+                      <IconButton
+                        icon={EditIcon}
+                        appearance="minimal"
                         onClick={() => {
                           actions.setType('editTable');
-                          actions.setFormData(table);
+                          actions.setFormData({
+                            ...table,
+                            schema: getSchemaValue(schema.name),
+                          });
                           actions.setShow(true);
                         }}
                       />

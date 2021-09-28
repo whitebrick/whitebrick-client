@@ -7,6 +7,7 @@ import ViewForm from './view';
 import Token from './token';
 import OrganizationForm from './organization';
 import DatabaseForm from './database';
+import TableForm from './table';
 
 type SidePanelFormPropsType = {
   type: string;
@@ -20,6 +21,7 @@ const SidePanelForm = ({ type }: SidePanelFormPropsType) => {
       return <OrganizationForm />;
     if (type === 'createDatabase' || type === 'editDatabase')
       return <DatabaseForm />;
+    if (type === 'createTable' || type === 'editTable') return <TableForm />;
     return null;
   };
   return renderPanel();
