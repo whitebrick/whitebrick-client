@@ -12,21 +12,13 @@ import {
   UPDATE_SCHEMA_MUTATION,
 } from '../../../graphql/mutations/wb';
 import { SCHEMAS_QUERY } from '../../../graphql/queries/wb';
+import { parseOptions } from '../../../utils/select';
 
 type DatabaseFormPropsType = {
   organizations: OrganizationItemType[];
   type: 'createDatabase' | 'editDatabase';
   formData: any;
   actions: any;
-};
-
-const parseOptions = options => {
-  const opts = [];
-  opts.push({ key: '--', value: '--' });
-  options.map(option =>
-    opts.push({ key: option.label, value: option.name, ...option }),
-  );
-  return opts;
 };
 
 const databaseForm = (

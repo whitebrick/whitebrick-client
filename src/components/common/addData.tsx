@@ -6,7 +6,7 @@ import { actions } from '../../state/actions';
 import { SchemaItemType } from '../../types';
 import { checkPermission } from '../../utils/checkPermission';
 import { isObjectEmpty } from '../../utils/objectEmpty';
-import { getOrganizationValue } from '../../utils/select';
+import { getOrganizationValue, getSchemaValue } from '../../utils/select';
 
 type AddDataType = {
   actions: any;
@@ -50,7 +50,7 @@ const AddData = ({
                 ? {
                     organization: getOrganizationValue(organization.name),
                   }
-                : { schema },
+                : { schema: getSchemaValue(schema.name) },
             );
             actions.setType(type);
             actions.setShow(true);
