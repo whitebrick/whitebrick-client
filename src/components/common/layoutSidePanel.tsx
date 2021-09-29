@@ -36,6 +36,7 @@ import { actions } from '../../state/actions';
 import SidePanel from '../elements/sidePanel';
 import FormMaker from '../elements/formMaker';
 import { updateTableData } from '../../utils/updateTableData';
+import { checkPermission } from '../../utils/checkPermission';
 
 type LayoutSidePanelPropsType = {
   show: boolean;
@@ -359,17 +360,45 @@ const LayoutSidePanel = ({
 
   const onSave = async () => {
     if (type === 'createDatabase') {
+      let hasPermission;
       const variables: any = {
         name: formData.name,
         label: formData.label,
         create: true,
       };
-      if (formData.organization && formData.organization !== '--')
+      if (
+        formData.organization &&
+        formData.organization !== '--' &&
+        typeof formData.organization === 'object'
+      )
         variables.organizationOwnerName = formData.organization.name;
-      const { error, loading } = await createSchema({ variables });
-      if (!loading && !error) {
-        fetchSchemasData();
-        actions.setShow(false);
+      else variables.organizationOwnerName = formData.organization;
+
+      // Find the organization selected in select field to check for permission
+      // We're not using state organization value as it is unavailable from header.
+      const org = organizations.filter(
+        organization => organization.name === variables.organizationOwnerName,
+      );
+
+      // only in the case of My Databases
+      if (variables.organizationOwnerName === undefined) {
+        hasPermission = true;
+      } else {
+        hasPermission = checkPermission(
+          'administer_organization',
+          org[0]?.role?.name,
+        );
+      }
+      if (hasPermission) {
+        const { error, loading } = await createSchema({ variables });
+        if (!loading && !error) {
+          fetchSchemasData();
+          actions.setShow(false);
+        }
+      } else {
+        toaster.warning(`Insufficient permission for ${org[0].label}`, {
+          duration: 10,
+        });
       }
     } else if (type === 'createOrganization') {
       const { error, loading } = await createOrganization({
@@ -382,26 +411,40 @@ const LayoutSidePanel = ({
 
       if (!loading && !error) actions.setShow(false);
     } else if (type === 'createTable') {
-      const { error, loading } = await createTable({
-        variables: {
-          schemaName: formData.schema.name,
-          tableName: formData.name,
-          tableLabel: formData.label,
-          create: true,
-        },
-      });
-      if (!loading && !error) {
-        const {
-          loading: l,
-          data,
-          error: e,
-        } = await fetchSchemaTables({
-          variables: {
-            schemaName: formData.schema.name,
-          },
+      const variables: any = {
+        schemaName: formData.schema.name,
+        tableName: formData.name,
+        tableLabel: formData.label,
+        create: true,
+      };
+
+      if (typeof formData.schema === 'string')
+        variables.schemaName = formData.schema;
+
+      // Find the schema selected in the selectfield to check for permission.
+      // We're not using state schema value as it is unavailable from header.
+      const db = schemas.filter(schema => schema.name === variables.schemaName);
+      const hasPermission = checkPermission('alter_schema', db[0]?.role.name);
+
+      if (hasPermission) {
+        const { error, loading } = await createTable({ variables });
+        if (!loading && !error) {
+          const {
+            loading: l,
+            data,
+            error: e,
+          } = await fetchSchemaTables({
+            variables: {
+              schemaName: formData.schema.name,
+            },
+          });
+          if (!l && !e) actions.setTables(data.wbMyTables);
+          actions.setShow(false);
+        }
+      } else {
+        toaster.warning(`Insufficient permission for ${db[0].label}`, {
+          duration: 10,
         });
-        if (!l && !e) actions.setTables(data.wbMyTables);
-        actions.setShow(false);
       }
     } else if (type === 'editDatabase') {
       const name = schema.name !== undefined ? schema.name : formData.name;
