@@ -405,6 +405,7 @@ const Grid = ({
     if (column.foreignKeys.length > 0 && type === null) {
       return (
         <AgGridColumn
+          hide={false}
           field={column.name}
           key={column.name}
           headerName={column.label}
@@ -418,6 +419,7 @@ const Grid = ({
     if (column.isPrimaryKey && type === null) {
       return (
         <AgGridColumn
+          hide={false}
           field={column.name}
           key={column.name}
           headerName={column.label}
@@ -429,6 +431,7 @@ const Grid = ({
     }
     return (
       <AgGridColumn
+        hide={!!type}
         field={column.name}
         key={column.name}
         headerName={column.label}
@@ -481,6 +484,7 @@ const Grid = ({
           editable: hasPermission,
           resizable: true,
           sortable: true,
+          hide: true,
         }}
         sortingOrder={['desc', 'asc', null]}
         onCellValueChanged={onCellValueChanged}
