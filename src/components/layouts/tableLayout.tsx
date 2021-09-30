@@ -329,6 +329,7 @@ const TableLayout = ({
                     gridParams.successCallback([...rowData], rowCount + 1);
                     actions.setRows(rowData);
                     actions.setRowCount(rowCount + 1);
+                    gridAPI.paginationGoToLastPage();
                   }}
                   className="mr-2"
                   iconBefore={PlusIcon}>

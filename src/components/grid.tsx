@@ -431,7 +431,7 @@ const Grid = ({
     }
     return (
       <AgGridColumn
-        hide={!!type}
+        initialHide={!!type}
         field={column.name}
         key={column.name}
         headerName={column.label}
@@ -484,7 +484,6 @@ const Grid = ({
           editable: hasPermission,
           resizable: true,
           sortable: true,
-          hide: true,
         }}
         sortingOrder={['desc', 'asc', null]}
         onCellValueChanged={onCellValueChanged}
