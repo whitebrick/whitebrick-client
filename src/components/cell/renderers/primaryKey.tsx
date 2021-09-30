@@ -8,6 +8,7 @@ import { checkPermission } from '../../../utils/checkPermission';
 import { TableItemType } from '../../../types';
 
 type PrimaryKeyCellRendererPropsType = {
+  columnDefault: any;
   valueFormatted: string;
   value: string;
   node: RowNode;
@@ -16,6 +17,7 @@ type PrimaryKeyCellRendererPropsType = {
 };
 
 const PrimaryKeyCellRenderer = ({
+  columnDefault,
   valueFormatted,
   value,
   node,
@@ -32,10 +34,10 @@ const PrimaryKeyCellRenderer = ({
     actions.setShow(true);
   };
 
-  return (
-    <>
-      {hasPermission ? (
-        cellValue && (
+  const renderCell = () => {
+    if (hasPermission) {
+      if (cellValue)
+        return (
           <Badge
             aria-hidden
             color="blue"
@@ -43,12 +45,14 @@ const PrimaryKeyCellRenderer = ({
             onClick={handleClick}>
             {cellValue}
           </Badge>
-        )
-      ) : (
-        <div>{cellValue}</div>
-      )}
-    </>
-  );
+        );
+      if (columnDefault?.startsWith('nextval'))
+        return <Badge color="neutral">AUTO</Badge>;
+    }
+    return <div>{cellValue}</div>;
+  };
+
+  return renderCell();
 };
 
 const mapStateToProps = state => ({

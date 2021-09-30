@@ -424,7 +424,13 @@ const Grid = ({
           key={column.name}
           headerName={column.label}
           headerTooltip={column.label}
+          editable={params => {
+            if (column?.default?.startsWith('nextval'))
+              return !!valueGetter(params, tableName, column, type);
+            return true;
+          }}
           cellRenderer="primaryKeyRenderer"
+          cellRendererParams={{ columnDefault: column.default }}
           valueGetter={params => valueGetter(params, tableName, column, type)}
         />
       );
@@ -453,6 +459,7 @@ const Grid = ({
         rowModelType="serverSide"
         // @ts-ignore
         serverSideStoreType="partial"
+        singleClickEdit
         pagination
         paginationPageSize={limit}
         enterMovesDown
