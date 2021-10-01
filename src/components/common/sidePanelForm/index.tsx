@@ -9,6 +9,7 @@ import OrganizationForm from './organization';
 import DatabaseForm from './database';
 import TableForm from './table';
 import RowForm from './row';
+import ColumnForm from './column';
 
 type SidePanelFormPropsType = {
   type: string;
@@ -24,6 +25,7 @@ const SidePanelForm = ({ type }: SidePanelFormPropsType) => {
       return <DatabaseForm />;
     if (type === 'createTable' || type === 'editTable') return <TableForm />;
     if (type === 'newRow' || type === 'editRow') return <RowForm />;
+    if (type === 'createColumn' || type === 'editColumn') return <ColumnForm />;
     return null;
   };
   return renderPanel();
