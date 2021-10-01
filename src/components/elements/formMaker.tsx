@@ -35,6 +35,7 @@ const FormMaker = ({
       initialValues,
       onSubmit,
       validationSchema,
+      enableReinitialize: true,
       validateOnChange: false,
     });
 
