@@ -200,16 +200,10 @@ const TableLayout = ({
           actions.setTable(data?.wbMyTableByName);
           actions.setColumns(data?.wbMyTableByName?.columns);
           actions.setOrderBy(data?.wbMyTableByName?.columns[0]?.name);
-          if (data.wbMyTableByName.settings) {
-            if (
-              data.wbMyTableByName.settings.views &&
-              data.wbMyTableByName.settings.views.length > 0
-            ) {
-              actions.setViews(data.wbMyTableByName.settings.views);
-            }
-            if (data.wbMyTableByName.settings.defaultView)
-              actions.setDefaultView(data.wbMyTableByName.settings.defaultView);
-          }
+          actions.setViews(data.wbMyTableByName?.settings?.views);
+          actions.setDefaultView(
+            data.wbMyTableByName?.settings?.defaultView || 'Default View',
+          );
         }
       }
     };
