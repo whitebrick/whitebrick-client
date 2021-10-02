@@ -46,6 +46,8 @@ type GridPropsType = {
   foreignKeyColumns: any;
   referencedByColumns: any;
   filters: any;
+  rowData: any;
+  rowCount: number;
 };
 
 const Grid = ({
@@ -63,6 +65,8 @@ const Grid = ({
   foreignKeyColumns,
   referencedByColumns,
   filters,
+  rowData,
+  rowCount,
 }: GridPropsType) => {
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
@@ -280,7 +284,16 @@ const Grid = ({
       },
       {
         name: 'Delete Row',
-        action: () => onDeleteRow(params, schema, table, client),
+        action: () =>
+          onDeleteRow(
+            params,
+            schema,
+            table,
+            client,
+            rowData,
+            rowCount,
+            actions,
+          ),
       },
       'separator',
     ];
@@ -558,6 +571,8 @@ const mapStateToProps = state => ({
   foreignKeyColumns: state.foreignKeyColumns,
   referencedByColumns: state.referencedByColumns,
   filters: state.filters,
+  rowData: state.rowData,
+  rowCount: state.rowCount,
 });
 
 const mapDispatchToProps = dispatch => ({

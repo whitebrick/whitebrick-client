@@ -12,7 +12,15 @@ export const onEditRow = (params, actions) => {
   actions.setShow(true);
 };
 
-export const onDeleteRow = async (params, schema, table, client) => {
+export const onDeleteRow = async (
+  params,
+  schema,
+  table,
+  client,
+  rowData,
+  rowCount,
+  actions,
+) => {
   const variables = { where: {} };
   const { data } = params.node;
   Object.keys(data).forEach(key => {
@@ -42,5 +50,10 @@ export const onDeleteRow = async (params, schema, table, client) => {
     await client
       .request(operation)
       .finally(() => params.api.refreshServerSideStore(params));
+  } else {
+    rowData.splice(params.node.rowIndex, 1);
+    actions.setRows([...rowData]);
+    actions.setRowCount(rowCount - 1);
+    params.api.refreshServerSideStore(params);
   }
 };
