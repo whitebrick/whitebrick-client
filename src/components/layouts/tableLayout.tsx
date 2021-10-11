@@ -200,7 +200,7 @@ const TableLayout = ({
           actions.setTable(data?.wbMyTableByName);
           actions.setColumns(data?.wbMyTableByName?.columns);
           actions.setOrderBy(data?.wbMyTableByName?.columns[0]?.name);
-          actions.setViews(data.wbMyTableByName?.settings?.views);
+          actions.setViews(data.wbMyTableByName?.settings?.views || []);
           actions.setDefaultView(
             data.wbMyTableByName?.settings?.defaultView || 'Default View',
           );
