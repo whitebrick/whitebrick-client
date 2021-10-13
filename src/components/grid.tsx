@@ -48,6 +48,7 @@ type GridPropsType = {
   filters: any;
   rowData: any;
   rowCount: number;
+  gridParams: any;
 };
 
 const Grid = ({
@@ -67,6 +68,7 @@ const Grid = ({
   filters,
   rowData,
   rowCount,
+  gridParams,
 }: GridPropsType) => {
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
@@ -361,6 +363,29 @@ const Grid = ({
     return col.type;
   };
 
+  const getRequiredColumns = () => {
+    const names = [];
+    columns
+      .filter(col => col.isNullable === false && !col.default)
+      .map(col => names.push(col.name));
+    return names;
+  };
+
+  const hasRequiredCols = (variables, params) => {
+    const value: any = {
+      ok: false,
+      data: {},
+      insert: false,
+    };
+    const requiredCols = getRequiredColumns();
+    const values = params.data;
+    values[params.colDef.field] = params.newValue;
+    value.ok = requiredCols.every(col => Object.keys(values).includes(col));
+    value.data = values;
+    if (!params.oldValue) value.insert = true;
+    return value;
+  };
+
   const editValues = val => {
     let values = val;
     values = [...Array.from(new Set(values))];
@@ -388,18 +413,39 @@ const Grid = ({
           };
         }
       });
-      variables._set[params.colDef.field] = parseInt(params.newValue, 10)
-        ? parseInt(params.newValue, 10)
-        : params.newValue;
+      variables._set[params.colDef.field] =
+        getColumnType(params.colDef.field) === 'integer'
+          ? parseInt(params.newValue, 10)
+          : params.newValue;
       filteredParams.forEach(param => {
-        variables._set[param.colDef.field] = parseInt(param.newValue, 10)
-          ? parseInt(param.newValue, 10)
-          : param.newValue;
+        variables._set[param.colDef.field] =
+          getColumnType(param.colDef.field) === 'integer'
+            ? parseInt(params.newValue, 10)
+            : params.newValue;
       });
       values.splice(index, 1);
       values = values.filter(el => !filteredParams.includes(el));
       setChangedValues(values);
-      updateTableData(schema.name, table.name, variables, client, actions);
+
+      const hasRequiredColumns = hasRequiredCols(variables, params);
+      if (hasRequiredColumns.ok) {
+        if (hasRequiredColumns.insert) {
+          variables._set = hasRequiredColumns.data;
+          updateTableData(
+            schema.name,
+            table.name,
+            variables,
+            client,
+            actions,
+            true,
+          );
+        } else
+          updateTableData(schema.name, table.name, variables, client, actions);
+      } else {
+        rowData.splice(params.rowIndex, 1, hasRequiredColumns.data);
+        gridParams.successCallback([...rowData], rowCount);
+        actions.setRows(rowData);
+      }
     });
   };
 
@@ -573,6 +619,7 @@ const mapStateToProps = state => ({
   filters: state.filters,
   rowData: state.rowData,
   rowCount: state.rowCount,
+  gridParams: state.gridParams,
 });
 
 const mapDispatchToProps = dispatch => ({

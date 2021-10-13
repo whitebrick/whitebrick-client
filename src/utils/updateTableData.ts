@@ -6,9 +6,10 @@ export const updateTableData = async (
   variables,
   client,
   actions,
+  insert = false,
 ) => {
   let operation;
-  if (Object.keys(variables?.where).length > 0) {
+  if (Object.keys(variables?.where).length > 0 && !insert) {
     operation = gql.mutation({
       operation: ''.concat('update_', `${schemaName}_${tableName}`),
       variables: {
