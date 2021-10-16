@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   EditIcon,
   IconButton,
@@ -74,6 +74,7 @@ const TableLayout = ({
   rowData,
   gridParams,
 }: TableLayoutPropsType) => {
+  const ref = useRef(null);
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tableFields, setTableFields] = useState([]);
@@ -93,6 +94,30 @@ const TableLayout = ({
     'read_and_write_table_records',
     table?.role?.name,
   );
+
+  useEffect(() => {
+    const handleClickOutside = e => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        const lastRow = rowData[rowData.length - 1];
+        if (
+          gridParams &&
+          lastRow &&
+          Object.keys(lastRow)?.length === 0 &&
+          lastRow.constructor === Object
+        ) {
+          rowData.slice(rowCount - 1, 1);
+          gridParams.successCallback([...rowData], rowCount - 1);
+          actions.setRows(rowData);
+          actions.setRowCount(rowCount - 1);
+        }
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref, gridParams]);
 
   useEffect(() => {
     const getForeignKeyColumn = async fkc => {
@@ -405,7 +430,9 @@ const TableLayout = ({
                   </span>
                 </h3>
                 <p className="py-1">Total {rowCount} records</p>
-                <Tabs items={tabs} />
+                <div ref={ref}>
+                  <Tabs items={tabs} />
+                </div>
               </div>
             </div>
           </>
