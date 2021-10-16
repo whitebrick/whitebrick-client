@@ -566,6 +566,7 @@ const Grid = ({
         domLayout="autoHeight"
         animateRows
         allowContextMenuWithControlKey
+        stopEditingWhenCellsLoseFocus
         getContextMenuItems={getContextMenuItems}
         getMainMenuItems={getMainMenuItems}
         popupParent={document.querySelector('body')}
