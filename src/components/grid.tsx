@@ -152,7 +152,7 @@ const Grid = ({
           },
           fields: [{ aggregate: ['count'] }],
         });
-        if (fields.length > 0)
+        if (fields.length > 0) {
           client.subscriptionClient.request(subscription).subscribe({
             next({ data }) {
               client.subscriptionClient.request(operationAgg).subscribe({
@@ -171,7 +171,6 @@ const Grid = ({
                   )
                     params.api.showNoRowsOverlay();
                   else params.api.hideOverlay();
-                  params.columnApi.autoSizeAllColumns(false);
                 },
                 error(error) {
                   console.error(error);
@@ -183,10 +182,11 @@ const Grid = ({
               params.failCallback();
             },
           });
-        else {
+        } else {
           params.successCallback([], 0);
           params.api.showNoRowsOverlay();
         }
+        params.columnApi.autoSizeAllColumns(false);
       },
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -443,7 +443,6 @@ const Grid = ({
           updateTableData(schema.name, table.name, variables, client, actions);
       } else {
         rowData.splice(params.rowIndex, 1, hasRequiredColumns.data);
-        gridParams.successCallback([...rowData], rowCount);
         actions.setRows(rowData);
       }
     });
