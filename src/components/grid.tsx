@@ -4,7 +4,7 @@ import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import { bindActionCreators } from 'redux';
 import { ClientContext, useMutation } from 'graphql-hooks';
-
+import { toaster } from 'evergreen-ui';
 import {
   IServerSideGetRowsParams,
   GridReadyEvent,
@@ -376,11 +376,15 @@ const Grid = ({
       ok: false,
       data: {},
       insert: false,
+      fieldsRequired: [],
     };
     const requiredCols = getRequiredColumns();
     const values = params.data;
     values[params.colDef.field] = params.newValue;
     value.ok = requiredCols.every(col => Object.keys(values).includes(col));
+    value.fieldsRequired = requiredCols.filter(
+      col => !Object.keys(values).includes(col),
+    );
     value.data = values;
     if (!params.oldValue) value.insert = true;
     return value;
@@ -427,10 +431,10 @@ const Grid = ({
       values = values.filter(el => !filteredParams.includes(el));
       setChangedValues(values);
 
-      const hasRequiredColumns = hasRequiredCols(variables, params);
-      if (hasRequiredColumns.ok) {
-        if (hasRequiredColumns.insert) {
-          variables._set = hasRequiredColumns.data;
+      const rc = hasRequiredCols(variables, params);
+      if (rc.ok) {
+        if (rc.insert) {
+          variables._set = rc.data;
           updateTableData(
             schema.name,
             table.name,
@@ -442,7 +446,14 @@ const Grid = ({
         } else
           updateTableData(schema.name, table.name, variables, client, actions);
       } else {
-        rowData.splice(params.rowIndex, 1, hasRequiredColumns.data);
+        toaster.danger('Required fields are not found', {
+          description: `${
+            rc.fieldsRequired.length > 1
+              ? `${rc.fieldsRequired.join(', ')} fields are required!`
+              : `${rc.fieldsRequired.join(', ')} field is required!`
+          }`,
+        });
+        rowData.splice(params.rowIndex, 1, rc.data);
         actions.setRows(rowData);
       }
     });
