@@ -19,7 +19,7 @@ import {
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 // @ts-ignore
-import WhitebrickLogo from '../../images/whitebrick-logo.svg';
+import WhitebrickLogo from '../../images/whitebrick-logo-square.svg';
 import { actions } from '../../state/actions';
 import { SchemaItemType } from '../../types';
 
