@@ -10,6 +10,7 @@ import {
   GridReadyEvent,
   GridApi,
   GridSizeChangedEvent,
+  SortChangedEvent,
 } from 'ag-grid-community';
 import { connect } from 'react-redux';
 import * as gql from 'gql-query-builder';
@@ -48,7 +49,6 @@ type GridPropsType = {
   filters: any;
   rowData: any;
   rowCount: number;
-  gridParams: any;
 };
 
 const Grid = ({
@@ -68,11 +68,11 @@ const Grid = ({
   filters,
   rowData,
   rowCount,
-  gridParams,
 }: GridPropsType) => {
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
   const [changedValues, setChangedValues] = useState([]);
+  const [sortModel, setSortModel] = useState(null);
   const hasPermission = checkPermission('alter_table', table?.role?.name);
 
   const [removeOrDeleteColumnMutation] = useMutation(
@@ -136,7 +136,9 @@ const Grid = ({
               type: `${schema.name}_${table.name.concat('_bool_exp')}`,
             },
             order_by: {
-              value: { [orderBy]: `asc` },
+              value: {
+                [sortModel?.column || orderBy]: sortModel?.sort || `asc`,
+              },
               type: `[${schema.name}_${table.name.concat('_order_by!')}]`,
             },
           },
@@ -190,7 +192,7 @@ const Grid = ({
       },
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parsedFilters, fields]);
+  }, [parsedFilters, fields, sortModel]);
 
   const onGridReady = (params: GridReadyEvent) => {
     actions.setGridAPI(params.api);
@@ -211,6 +213,11 @@ const Grid = ({
         applyOrder: true,
       });
     }
+  };
+
+  const onSortChanged = (event: SortChangedEvent) => {
+    console.log(event.api.getSortModel().pop());
+    setSortModel(event.api.getSortModel().pop());
   };
 
   useEffect(() => {
@@ -571,6 +578,7 @@ const Grid = ({
         getMainMenuItems={getMainMenuItems}
         popupParent={document.querySelector('body')}
         onGridSizeChanged={onGridSizeChanged}
+        onSortChanged={onSortChanged}
         onGridReady={onGridReady}>
         <AgGridColumn headerName={table.label}>
           {columns.map(column => renderColumn(column))}
