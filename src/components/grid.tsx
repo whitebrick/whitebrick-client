@@ -72,7 +72,7 @@ const Grid = ({
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
   const [changedValues, setChangedValues] = useState([]);
-  const [sortModel, setSortModel] = useState(null);
+  const [sortModel, setSortModel] = useState({ colId: orderBy, sort: `asc` });
   const hasPermission = checkPermission('alter_table', table?.role?.name);
 
   const [removeOrDeleteColumnMutation] = useMutation(
@@ -137,7 +137,7 @@ const Grid = ({
             },
             order_by: {
               value: {
-                [sortModel?.column || orderBy]: sortModel?.sort || `asc`,
+                [sortModel.colId]: sortModel.sort,
               },
               type: `[${schema.name}_${table.name.concat('_order_by!')}]`,
             },
@@ -215,10 +215,8 @@ const Grid = ({
     }
   };
 
-  const onSortChanged = (event: SortChangedEvent) => {
-    console.log(event.api.getSortModel().pop());
+  const onSortChanged = (event: SortChangedEvent) =>
     setSortModel(event.api.getSortModel().pop());
-  };
 
   useEffect(() => {
     const datasource = createServerSideDatasource();
