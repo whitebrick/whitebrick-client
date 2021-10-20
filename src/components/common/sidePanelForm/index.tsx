@@ -25,7 +25,7 @@ const SidePanelForm = ({ type }: SidePanelFormPropsType) => {
       return <DatabaseForm />;
     if (type === 'createTable' || type === 'editTable') return <TableForm />;
     if (type === 'newRow' || type === 'editRow') return <RowForm />;
-    if (type === 'createColumn' || type === 'editColumn') return <ColumnForm />;
+    if (type === 'addColumn' || type === 'editColumn') return <ColumnForm />;
     return null;
   };
   return renderPanel();
