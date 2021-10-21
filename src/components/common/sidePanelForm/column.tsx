@@ -60,6 +60,11 @@ const columnForm = (
         type: 'checkbox',
       },
       {
+        name: 'isNotNullable',
+        label: 'Required?',
+        type: 'checkbox',
+      },
+      {
         name: 'autoIncrement',
         label: 'Auto Increment?',
         type: 'checkbox',
@@ -137,6 +142,7 @@ const ColumnForm = ({
           columnName: values.name,
           columnLabel: values.label,
           columnType: values.type,
+          isNotNullable: values.isNotNullable,
         },
       });
       if (!loading) {
@@ -192,6 +198,8 @@ const ColumnForm = ({
       if (values.name !== col.name) variables.newColumnName = values.name;
       if (values.label !== col.label) variables.newColumnLabel = values.label;
       if (values.type !== col.type) variables.newType = values.type;
+      if (values.isNotNullable !== col.isNotNullable)
+        variables.newIsNotNullable = values.isNotNullable;
       if (
         variables.newColumnName ||
         variables.newColumnLabel ||

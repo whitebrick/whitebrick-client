@@ -50,7 +50,7 @@ const rowForm = (
         name: column.name,
         label: column.label,
         type: 'number',
-        required: !column.isNullable,
+        required: column.isNotNullable,
         hint: getHint(column),
       });
     else
@@ -58,7 +58,7 @@ const rowForm = (
         name: column.name,
         label: column.label,
         type: 'text',
-        required: !column.isNullable,
+        required: column.isNotNullable,
         hint: getHint(column),
       });
   });

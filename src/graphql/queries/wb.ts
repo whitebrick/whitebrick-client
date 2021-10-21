@@ -45,7 +45,7 @@ export const SCHEMA_TABLE_BY_NAME_QUERY = `query ($schemaName: String!, $tableNa
       default
       label
       type
-      isNullable
+      isNotNullable
       isPrimaryKey
       foreignKeys {
         columnName
@@ -168,7 +168,7 @@ export const COLUMNS_BY_NAME_QUERY = `query ($schemaName: String!, $tableName: S
     default
     label
     type
-    isNullable
+    isNotNullable
     isPrimaryKey
     foreignKeys {
       columnName

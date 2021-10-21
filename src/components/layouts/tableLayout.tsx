@@ -393,7 +393,7 @@ const TableLayout = ({
         <NotFound
           name={
             cloudContext.userMessages[
-              error?.graphQLErrors[0].originalError.wbCode
+              error?.graphQLErrors?.[0]?.originalError?.wbCode
             ][0]
           }
         />

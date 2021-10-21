@@ -12,7 +12,7 @@ export type ColumnItemType = {
   name: string;
   label: string;
   type: string;
-  isNullable: boolean;
+  isNotNullable: boolean;
   isPrimaryKey: boolean;
   foreignKeys: ForeignKeyOrReferencedByItemType[];
   referencedBy: ForeignKeyOrReferencedByItemType[];

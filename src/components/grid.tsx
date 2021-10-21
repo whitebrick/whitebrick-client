@@ -371,7 +371,7 @@ const Grid = ({
   const getRequiredColumns = () => {
     const names = [];
     columns
-      .filter(col => col.isNullable === false && !col.default)
+      .filter(col => col.isNotNullable && !col.default)
       .map(col => names.push(col.name));
     return names;
   };

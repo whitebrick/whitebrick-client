@@ -37,8 +37,8 @@ export const REMOVE_OR_DELETE_TABLE_MUTATION = `mutation ($schemaName: String!, 
 }
 `;
 
-export const ADD_OR_CREATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $create: Boolean, $columnName: String!, $columnLabel: String!, $columnType: String){
-  wbAddOrCreateColumn(schemaName: $schemaName, tableName: $tableName, create: $create, columnName: $columnName, columnLabel: $columnLabel, columnType: $columnType)
+export const ADD_OR_CREATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $create: Boolean, $columnName: String!, $columnLabel: String!, $columnType: String, $isNotNullable: Boolean) {
+  wbAddOrCreateColumn(schemaName: $schemaName, tableName: $tableName, create: $create, columnName: $columnName, columnLabel: $columnLabel, columnType: $columnType, isNotNullable: $isNotNullable)
 }`;
 
 export const REMOVE_OR_DELETE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $columnName: String!, $del: Boolean){
@@ -57,8 +57,8 @@ export const REMOVE_OR_DELETE_FOREIGN_KEY = `mutation ($schemaName: String!, $ta
   wbRemoveOrDeleteForeignKey(schemaName: $schemaName, tableName: $tableName, columnNames: $columnNames, del: $del, parentTableName: $parentTableName)
 }`;
 
-export const UPDATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $columnName: String!, $newColumnName: String, $newColumnLabel: String, $newType: String){
-  wbUpdateColumn(schemaName: $schemaName, tableName: $tableName, columnName: $columnName, newColumnName: $newColumnName, newColumnLabel: $newColumnLabel, newType: $newType)
+export const UPDATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $columnName: String!, $newColumnName: String, $newColumnLabel: String, $newType: String, $newIsNotNullable: Boolean) {
+  wbUpdateColumn(schemaName: $schemaName, tableName: $tableName, columnName: $columnName, newColumnName: $newColumnName, newColumnLabel: $newColumnLabel, newType: $newType, newIsNotNullable: $newIsNotNullable)
 }`;
 
 export const CREATE_ORGANIZATION_MUTATION = `mutation ($name: String!, $label: String!) {
