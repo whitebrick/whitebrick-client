@@ -3,8 +3,9 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withAuthenticationRequired } from '@auth0/auth0-react';
 import * as Yup from 'yup';
-import { useMutation } from 'graphql-hooks';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import { GridApi } from 'ag-grid-community';
+import { toaster } from 'evergreen-ui';
 import { actions } from '../../../state/actions';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../../types';
 import FormMaker from '../../elements/formMaker';
@@ -15,6 +16,7 @@ import {
   CREATE_OR_DELETE_PRIMARY_KEYS,
   UPDATE_COLUMN_MUTATION,
 } from '../../../graphql/mutations/wb';
+import { COLUMNS_BY_NAME_QUERY } from '../../../graphql/queries/wb';
 
 type ColumnFormPropsType = {
   table: TableItemType;
@@ -118,6 +120,7 @@ const ColumnForm = ({
   const [isLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState(null);
 
+  const [fetchTableColumns] = useManualQuery(COLUMNS_BY_NAME_QUERY);
   const [addOrCreateColumn] = useMutation(ADD_OR_CREATE_COLUMN_MUTATION);
   const [createOrDeletePrimaryKeys] = useMutation(
     CREATE_OR_DELETE_PRIMARY_KEYS,
@@ -129,6 +132,23 @@ const ColumnForm = ({
   const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
 
   const value = getValues(type, formData, table, tables, cloudContext);
+
+  const refetchColumns = async () => {
+    const {
+      loading: fl,
+      data: fd,
+      error: fe,
+    } = await fetchTableColumns({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+      },
+    });
+    if (!fl) {
+      if (fe) setErrors(fe);
+      else actions.setColumns(fd.wbColumns);
+    }
+  };
 
   const onSave = async values => {
     setErrors(null);
@@ -184,9 +204,13 @@ const ColumnForm = ({
           });
           if (!loading && !error) {
             gridAPI.refreshCells({ force: true });
-            actions.setShow(false);
           }
-        } else actions.setShow(false);
+        }
+        refetchColumns().finally(() => {
+          setLoading(false);
+          gridAPI.refreshCells({ force: true });
+          actions.setShow(false);
+        });
       }
     } else {
       const variables: any = {
@@ -244,8 +268,15 @@ const ColumnForm = ({
               },
             });
           }
-          gridAPI.refreshCells({ force: true });
-          actions.setShow(false);
+          refetchColumns().finally(() => {
+            setLoading(false);
+            gridAPI.refreshCells({ force: true });
+            actions.setShow(false);
+            if (values.name !== col.name)
+              toaster.notify(
+                'This change has been added to the background queue. Please check back in a minute.',
+              );
+          });
         }
       }
     }
