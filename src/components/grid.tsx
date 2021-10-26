@@ -317,7 +317,7 @@ const Grid = ({
         action: () => onEditColumn(params, actions, columns),
       },
       {
-        name: 'Remove Column',
+        name: 'Delete Column',
         action: () =>
           onDeleteColumn(
             params.column.colId,
