@@ -119,6 +119,30 @@ const TableLayout = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, gridParams]);
 
+  const fetchSchemaTables = async (schemaName: string) => {
+    const variables: any = { schemaName };
+    const { loading, data, error } = await fetchSchemaTablesByName({
+      variables,
+    });
+    if (!loading) {
+      if (error) setError(error);
+      else actions.setTables(data.wbMyTables);
+    }
+  };
+
+  const fetchSchema = async () => {
+    const variables: any = { name: params.databaseName };
+    if (params.organization) variables.organizationName = params.organization;
+    const { loading, data, error } = await fetchSchemaByName({ variables });
+    if (!loading) {
+      if (error) setError(error);
+      else {
+        actions.setSchema(data.wbMySchemaByName);
+        await fetchSchemaTables(data.wbMySchemaByName.name);
+      }
+    }
+  };
+
   useEffect(() => {
     const getForeignKeyColumn = async fkc => {
       const cols = [];
@@ -182,30 +206,6 @@ const TableLayout = ({
       }
       setTableFields(fields);
       return tableFields;
-    };
-
-    const fetchSchemaTables = async (schemaName: string) => {
-      const variables: any = { schemaName };
-      const { loading, data, error } = await fetchSchemaTablesByName({
-        variables,
-      });
-      if (!loading) {
-        if (error) setError(error);
-        else actions.setTables(data.wbMyTables);
-      }
-    };
-
-    const fetchSchema = async () => {
-      const variables: any = { name: params.databaseName };
-      if (params.organization) variables.organizationName = params.organization;
-      const { loading, data, error } = await fetchSchemaByName({ variables });
-      if (!loading) {
-        if (error) setError(error);
-        else {
-          actions.setSchema(data.wbMySchemaByName);
-          await fetchSchemaTables(data.wbMySchemaByName.name);
-        }
-      }
     };
 
     const fetchSchemaTable = async () => {
@@ -430,9 +430,29 @@ const TableLayout = ({
                   </span>
                 </h3>
                 <p className="py-1">Total {rowCount} records</p>
-                <div ref={ref}>
-                  <Tabs items={tabs} />
-                </div>
+                {schema.status === 'Ready' ? (
+                  <div ref={ref}>
+                    <Tabs items={tabs} />
+                  </div>
+                ) : (
+                  <div className="h-100">
+                    <div
+                      className="d-flex align-items-center"
+                      style={{ minHeight: '50vh' }}>
+                      <div className="container text-center">
+                        <h5>
+                          Database is rebuilding - Please try again in a minute.
+                        </h5>
+                        <Button
+                          appearance="primary"
+                          className="mt-1"
+                          onClick={fetchSchema}>
+                          Reload
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </>

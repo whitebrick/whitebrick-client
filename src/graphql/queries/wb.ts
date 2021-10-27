@@ -4,6 +4,7 @@ export const SCHEMAS_QUERY = `query {
     label
     userOwnerEmail
     organizationOwnerName
+    status
     role{
       name
     }
@@ -16,6 +17,7 @@ export const SCHEMA_BY_NAME_QUERY = `query ($name: String!, $organizationName: S
     label
     userOwnerEmail
     organizationOwnerName
+    status
     role {
       name
     }
