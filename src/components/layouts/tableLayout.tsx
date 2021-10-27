@@ -54,6 +54,7 @@ type TableLayoutPropsType = {
   params: any;
   rowData: any;
   gridParams: any;
+  columns: ColumnItemType;
 };
 
 const TableLayout = ({
@@ -73,6 +74,7 @@ const TableLayout = ({
   params,
   rowData,
   gridParams,
+  columns,
 }: TableLayoutPropsType) => {
   const ref = useRef(null);
   const [isLoading, setLoading] = useState(true);
@@ -142,6 +144,11 @@ const TableLayout = ({
       }
     }
   };
+
+  useEffect(() => {
+    fetchSchema();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columns]);
 
   useEffect(() => {
     const getForeignKeyColumn = async fkc => {
@@ -479,6 +486,7 @@ const mapStateToProps = state => ({
   cloudContext: state.cloudContext,
   rowData: state.rowData,
   gridParams: state.gridParams,
+  columns: state.columns,
 });
 
 const mapDispatchToProps = dispatch => ({
