@@ -167,50 +167,52 @@ const ColumnForm = ({
       });
       if (!loading) {
         if (error) setErrors(error);
-        const columnNames = [];
-        columns
-          .filter(column => column.isPrimaryKey === true)
-          .map(c => columnNames.push(c.name));
-        if (formData.isPrimaryKey) {
-          const { loading: deleteLoading, error: deleteError } =
-            await createOrDeletePrimaryKeys({
-              variables: {
-                schemaName: schema.name,
-                tableName: table.name,
-                del: true,
-                columnNames,
-              },
-            });
-          if (!deleteLoading && !deleteError) {
-            await createOrDeletePrimaryKeys({
+        else {
+          const columnNames = [];
+          columns
+            .filter(column => column.isPrimaryKey === true)
+            .map(c => columnNames.push(c.name));
+          if (formData.isPrimaryKey) {
+            const { loading: deleteLoading, error: deleteError } =
+              await createOrDeletePrimaryKeys({
+                variables: {
+                  schemaName: schema.name,
+                  tableName: table.name,
+                  del: true,
+                  columnNames,
+                },
+              });
+            if (!deleteLoading && !deleteError) {
+              await createOrDeletePrimaryKeys({
+                variables: {
+                  schemaName: schema.name,
+                  tableName: table.name,
+                  columnNames: [values.name],
+                },
+              });
+            }
+          }
+          if (formData.table && formData.column) {
+            const { loading, error } = await createOrAddForeignKey({
               variables: {
                 schemaName: schema.name,
                 tableName: table.name,
                 columnNames: [values.name],
+                parentTableName: values.table,
+                parentColumnNames: [values.column],
+                create: true,
               },
             });
+            if (!loading && !error) {
+              gridAPI.refreshCells({ force: true });
+            }
           }
-        }
-        if (formData.table && formData.column) {
-          const { loading, error } = await createOrAddForeignKey({
-            variables: {
-              schemaName: schema.name,
-              tableName: table.name,
-              columnNames: [values.name],
-              parentTableName: values.table,
-              parentColumnNames: [values.column],
-              create: true,
-            },
-          });
-          if (!loading && !error) {
+          refetchColumns().finally(() => {
+            setLoading(false);
             gridAPI.refreshCells({ force: true });
-          }
+            actions.setShow(false);
+          });
         }
-        refetchColumns().finally(() => {
-          setLoading(false);
-          gridAPI.refreshCells({ force: true });
-          actions.setShow(false);
-        });
       }
     } else {
       const variables: any = {
@@ -234,49 +236,51 @@ const ColumnForm = ({
         });
         if (!loading) {
           if (error) setErrors(error);
-          if (values.autoIncrement) {
-            const vars: any = {
-              schemaName: schema.name,
-              tableName: table.name,
-              columnName: values.name,
-            };
-            if (formData.startSequenceNumber)
-              vars.nextSeqNumber = parseInt(values.startSequenceNumber, 10);
-            await addOrRemoveColumnSequence({ variables: vars });
-          } else if (values.default) {
-            await addOrRemoveColumnSequence({
-              variables: {
+          else {
+            if (values.autoIncrement) {
+              const vars: any = {
                 schemaName: schema.name,
                 tableName: table.name,
                 columnName: values.name,
-                remove: true,
-              },
+              };
+              if (formData.startSequenceNumber)
+                vars.nextSeqNumber = parseInt(values.startSequenceNumber, 10);
+              await addOrRemoveColumnSequence({ variables: vars });
+            } else if (values.default) {
+              await addOrRemoveColumnSequence({
+                variables: {
+                  schemaName: schema.name,
+                  tableName: table.name,
+                  columnName: values.name,
+                  remove: true,
+                },
+              });
+            }
+            if (
+              values.table !== formData.table &&
+              values.column !== formData.column
+            ) {
+              await createOrAddForeignKey({
+                variables: {
+                  schemaName: schema.name,
+                  tableName: table.name,
+                  columnNames: [values.name],
+                  parentTableName: values.table,
+                  parentColumnNames: [values.column],
+                  create: true,
+                },
+              });
+            }
+            refetchColumns().finally(() => {
+              setLoading(false);
+              gridAPI.refreshCells({ force: true });
+              actions.setShow(false);
+              if (values.name !== col.name)
+                toaster.notify(
+                  'This change has been added to the background queue. Please check back in a minute.',
+                );
             });
           }
-          if (
-            values.table !== formData.table &&
-            values.column !== formData.column
-          ) {
-            await createOrAddForeignKey({
-              variables: {
-                schemaName: schema.name,
-                tableName: table.name,
-                columnNames: [values.name],
-                parentTableName: values.table,
-                parentColumnNames: [values.column],
-                create: true,
-              },
-            });
-          }
-          refetchColumns().finally(() => {
-            setLoading(false);
-            gridAPI.refreshCells({ force: true });
-            actions.setShow(false);
-            if (values.name !== col.name)
-              toaster.notify(
-                'This change has been added to the background queue. Please check back in a minute.',
-              );
-          });
         }
       }
     }
