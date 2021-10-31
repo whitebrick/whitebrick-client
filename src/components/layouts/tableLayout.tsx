@@ -54,7 +54,7 @@ type TableLayoutPropsType = {
   params: any;
   rowData: any;
   gridParams: any;
-  columns: ColumnItemType;
+  columns: ColumnItemType[];
 };
 
 const TableLayout = ({
@@ -359,6 +359,7 @@ const TableLayout = ({
                     gridAPI.paginationGoToLastPage();
                   }}
                   className="mr-2"
+                  disabled={columns.length === 0}
                   iconBefore={PlusIcon}>
                   Add Row
                 </Button>

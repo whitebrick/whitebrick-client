@@ -172,7 +172,6 @@ const Grid = ({
                       .count === 0
                   )
                     params.api.showNoRowsOverlay();
-                  else params.api.hideOverlay();
                 },
                 error(error) {
                   console.error(error);
@@ -284,10 +283,12 @@ const Grid = ({
       {
         name: 'Add Row',
         action: () => onAddRow(actions),
+        disabled: columns.length === 0,
       },
       {
         name: 'Edit Row',
         action: () => onEditRow(params, actions),
+        disabled: columns.length === 0 || rowCount === 0,
       },
       {
         name: 'Delete Row',
@@ -301,6 +302,7 @@ const Grid = ({
             rowCount,
             actions,
           ),
+        disabled: rowCount === 0,
       },
       'separator',
     ];
@@ -315,6 +317,7 @@ const Grid = ({
       {
         name: 'Edit Column',
         action: () => onEditColumn(params, actions, columns),
+        disabled: columns.length === 0,
       },
       {
         name: 'Delete Column',
@@ -329,6 +332,7 @@ const Grid = ({
             gridAPI,
             removeOrDeleteColumnMutation,
           ),
+        disabled: columns.length === 0,
       },
       'separator',
     ];
