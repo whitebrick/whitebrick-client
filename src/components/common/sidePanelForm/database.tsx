@@ -113,7 +113,8 @@ const DatabaseForm = ({
       if (formData.label !== values.label)
         variables.newSchemaLabel = values.label;
       if (
-        formData.organization.value !== values.organization &&
+        values.organization &&
+        formData.organizationOwnerName !== values.organization &&
         values.organization !== '--'
       )
         variables.newOrganizationOwnerName = values.organization;
