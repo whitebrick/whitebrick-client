@@ -211,6 +211,7 @@ const ColumnForm = ({
             setLoading(false);
             gridAPI.refreshCells({ force: true });
             actions.setShow(false);
+            window.location.reload();
           });
         }
       }

@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import { bindActionCreators } from 'redux';
-import { ClientContext, useMutation } from 'graphql-hooks';
+import { ClientContext, useManualQuery, useMutation } from 'graphql-hooks';
 import { toaster } from 'evergreen-ui';
 import {
   IServerSideGetRowsParams,
@@ -18,7 +18,12 @@ import { actions } from '../state/actions';
 import ForeignKeyCellRenderer from './cell/renderers/foreignKey';
 import PrimaryKeyCellRenderer from './cell/renderers/primaryKey';
 import ForeignKeyEditor from './cell/editors/foreignKey';
-import { ColumnItemType, SchemaItemType, TableItemType } from '../types';
+import {
+  ColumnItemType,
+  OrganizationItemType,
+  SchemaItemType,
+  TableItemType,
+} from '../types';
 import { getQueryParams } from '../utils/queryParams';
 import {
   onAddColumn,
@@ -31,6 +36,7 @@ import {
 import { REMOVE_OR_DELETE_COLUMN_MUTATION } from '../graphql/mutations/wb';
 import { updateTableData } from '../utils/updateTableData';
 import { checkPermission } from '../utils/checkPermission';
+import { SCHEMA_BY_NAME_QUERY } from '../graphql/queries/wb';
 
 type GridPropsType = {
   table: TableItemType;
@@ -49,6 +55,7 @@ type GridPropsType = {
   filters: any;
   rowData: any;
   rowCount: number;
+  organization: OrganizationItemType;
 };
 
 const Grid = ({
@@ -68,6 +75,7 @@ const Grid = ({
   filters,
   rowData,
   rowCount,
+  organization,
 }: GridPropsType) => {
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
@@ -75,6 +83,7 @@ const Grid = ({
   const [sortModel, setSortModel] = useState({ colId: orderBy, sort: `asc` });
   const hasPermission = checkPermission('alter_table', table?.role?.name);
 
+  const [fetchSchemaByName] = useManualQuery(SCHEMA_BY_NAME_QUERY);
   const [removeOrDeleteColumnMutation] = useMutation(
     REMOVE_OR_DELETE_COLUMN_MUTATION,
   );
@@ -218,14 +227,27 @@ const Grid = ({
     setSortModel(event.api.getSortModel().pop());
 
   useEffect(() => {
-    const datasource = createServerSideDatasource();
-    if (gridAPI) gridAPI.setServerSideDatasource(datasource);
+    const fetchSchema = async () => {
+      const variables: any = { name: schema.name };
+      if (organization.name) variables.organizationName = organization.name;
+      const { data } = await fetchSchemaByName({ variables });
+      return data.wbMySchemaByName;
+    };
+    fetchSchema().then(s => {
+      if (s.status === 'Ready') {
+        const datasource = createServerSideDatasource();
+        if (gridAPI) gridAPI.setServerSideDatasource(datasource);
+      }
+    });
   }, [
     createServerSideDatasource,
+    schema,
     gridAPI,
     columns,
     foreignKeyColumns,
     referencedByColumns,
+    fetchSchemaByName,
+    organization.name,
   ]);
 
   useEffect(() => {
@@ -641,6 +663,7 @@ const mapStateToProps = state => ({
   rowData: state.rowData,
   rowCount: state.rowCount,
   gridParams: state.gridParams,
+  organization: state.organization,
 });
 
 const mapDispatchToProps = dispatch => ({

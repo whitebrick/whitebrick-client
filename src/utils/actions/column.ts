@@ -43,5 +43,6 @@ export const onDeleteColumn = async (
     fields.splice(index, 1);
     actions.setColumns(columns);
     gridAPI.refreshCells({ force: true });
+    window.location.reload();
   }
 };
