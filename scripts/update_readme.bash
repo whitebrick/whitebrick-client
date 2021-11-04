@@ -58,10 +58,10 @@ do
   update_txt "$i" "$FROM_FILES_CLOUD" "$TO_FILE"
 done
 
-# for i in "${PARTIALS_WEB[@]}"
-# do
-#   update_txt "$i" "$FROM_FILES_WEB" "$TO_FILE"
-# done
+for i in "${PARTIALS_WEB[@]}"
+do
+  update_txt "$i" "$FROM_FILES_WEB" "$TO_FILE"
+done
 
 # copy images
 cp $FROM_IMAGES $TO_IMAGES

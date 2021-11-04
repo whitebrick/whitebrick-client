@@ -77,43 +77,47 @@ Whitebrick comprises a [front end Gatsby Jamstack](https://github.com/whitebrick
 
 ### Running Locally
 
-1. #### Install Gatsby
+1. **Install Gatsby**
 
-```
-npm init gatsby
-```
+    ```
+    npm init gatsby
+    ```
 
-Further information from Gatsby [here](https://www.gatsbyjs.com/docs/quick-start/)
+    Further information from Gatsby [here](https://www.gatsbyjs.com/docs/quick-start/)
 
-2. #### Clone this repository
+2. **Clone this repository**
 
-```
-git clone git@github.com:whitebrick/whitebrick.git
-```
+    ```
+    git clone git@github.com:whitebrick/whitebrick.git
+    ```
 
-3. #### Configure the Client
+3. **Configure the Client**
 
-```
-cp .env.example .env.development
-vi .env.development
+    ```
+    cp .env.example .env.development
+    vi .env.development
 
-GATSBY_HASURA_GRAPHQL_URL=https://graph.whitebrick.com/v1/graphql
-GATSBY_HASURA_GRAPHQL_WSS_URL=wss://graph.whitebrick.com/v1/graphql
-GATSBY_AUTH0_DOMAIN=auth.whitebrick.com
-GATSBY_AUTH0_CLIENT_ID=sc0K4pJGgyNZ5x9L27POwgfXPsCZPtJZ
-GATSBY_AUTH0_CALLBACK=https://whitebrick.com/home/index.html
-GATSBY_AUTH0_AUDIENCE=https://production-whitebrick.us.auth0.com/api/v2/
-# IF HOSTING YOUR OWN CLOUD BACK END:
-# GATSBY_HASURA_GRAPHQL_ADMIN_SECRET=MyHasuraSecret
-```
+    GATSBY_HASURA_GRAPHQL_URL=https://graph.whitebrick.com/v1/graphql
+    GATSBY_HASURA_GRAPHQL_WSS_URL=wss://graph.whitebrick.com/v1/graphql
+    GATSBY_AUTH0_DOMAIN=auth.whitebrick.com
+    GATSBY_AUTH0_CLIENT_ID=sc0K4pJGgyNZ5x9L27POwgfXPsCZPtJZ
+    GATSBY_AUTH0_CALLBACK=https://whitebrick.com/home/index.html
+    GATSBY_AUTH0_AUDIENCE=https://production-whitebrick.us.auth0.com/api/v2/
+    # IF HOSTING YOUR OWN CLOUD BACK END:
+    # GATSBY_HASURA_GRAPHQL_ADMIN_SECRET=MyHasuraSecret
+    ```
 
-4. #### Start Gatsby
+4. **Start Gatsby**
 
-```
-npm run develop
-```
+    ```
+    npm run develop
+    ```
 
-Gatsby will start a hot-reloading development environment accessible by default at http://localhost:8000.
+    Gatsby will start a hot-reloading development environment accessible by default at http://localhost:8000.
+
+### Gatsby Shadowing
+
+TBD
 
 <!-- END:FRONTEND_SETUP ================================================== -->
 
