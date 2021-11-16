@@ -54,7 +54,7 @@ Hosted demo at [whitebrick.com](https://whitebrick.com)
 
 <!-- START:LICENSING ================================================== -->
 
-Whitebrick is [licensed](https://github.com/whitebrick/whitebrick-cloud/blob/main/LICENSE) under the Apache License v2.0 however the dependencies use a variety of different licenses. We are working on a simple guide to outline the license information and options by use case - TBA.
+Whitebrick is [licensed](https://github.com/whitebrick/whitebrick-cloud/blob/main/LICENSE) under the Apache License v2.0 however the dependencies use a variety of different licenses. We are working on a simple guide to outline the license information and options by use case - TBD.
 
 <!-- END:LICENSING ================================================== -->
 
@@ -77,8 +77,8 @@ Whitebrick comprises a [front end Gatsby Jamstack](https://github.com/whitebrick
 
 ### Hasura
 
-Hasura is a fast, reliable and secure server application that automatically wraps a GraphQL API around a standard PostgreSQL relational database.
-Hasura is written in Haskell and can be easily deployed straight from a Docker image.
+Hasura is a server application that automatically wraps a GraphQL API around a standard PostgreSQL relational database.
+Hasura is written in Haskell and can be easily deployed directly from a Docker image.
 The server comes with a web GUI admin console that allows the underlying database to be browsed and _tracked_ so that it can be accessed over GraphQL.
 Hasura also provides a WebSocket endpoint for subscription queries.
 
