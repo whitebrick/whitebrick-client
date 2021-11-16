@@ -54,7 +54,7 @@ Hosted demo at [whitebrick.com](https://whitebrick.com)
 
 <!-- START:LICENSING ================================================== -->
 
-Whitebrick is [licensed](https://github.com/whitebrick/whitebrick-cloud/blob/main/LICENSE) under the Apache License v2.0 however the dependencies use a variety of different licenses. We are working on a simple guide to outline the license information and options by use case - TBD.
+Whitebrick is [licensed](https://github.com/whitebrick/whitebrick-cloud/blob/main/LICENSE) under the MIT License however the dependencies use a variety of different licenses. We are working on a simple guide to outline the license information and options by use case - TBD.
 
 <!-- END:LICENSING ================================================== -->
 
