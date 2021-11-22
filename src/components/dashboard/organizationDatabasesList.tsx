@@ -62,7 +62,7 @@ const OrganizationDatabasesList = ({
         {schemas.filter(
           schema => schema.organizationOwnerName === organization.name,
         ).length > 0 ? (
-          <div className="row">
+          <div className="d-flex flex-row">
             {schemas
               .filter(
                 schema => schema.organizationOwnerName === organization.name,

@@ -34,7 +34,7 @@ const MyDatabases = ({
           <h6>{name}</h6>
         </div>
         <div className="card-body">
-          <div className="row">
+          <div className="d-flex flex-row">
             {filteredSchemas.map(schema => (
               <ContextMenu type="schema" item={schema} key={schema.name} />
             ))}
