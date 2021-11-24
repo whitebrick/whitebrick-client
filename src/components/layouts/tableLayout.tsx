@@ -80,6 +80,7 @@ const TableLayout = ({
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tableFields, setTableFields] = useState([]);
+  const [newRow, setNewRow] = useState(false);
 
   const [fetchSchemaTablesByName] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
@@ -278,6 +279,24 @@ const TableLayout = ({
       });
   };
 
+  const addRow = () => {
+    rowData.push({});
+    gridParams.successCallback([...rowData], rowCount + 1);
+    actions.setRows(rowData);
+    actions.setRowCount(rowCount + 1);
+  };
+
+  // watching for state change of rowData
+  useEffect(() => {
+    if (newRow === true) {
+      setTimeout(function () {
+        addRow();
+        setNewRow(false);
+      }, 1000);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowData]);
+
   const saveView = (toView = null) => {
     if (toView) {
       let viewObj = views.filter(view => view.name === toView)[0];
@@ -352,11 +371,14 @@ const TableLayout = ({
               {hasRWPermission && (
                 <Button
                   onClick={() => {
-                    rowData.push({});
-                    gridParams.successCallback([...rowData], rowCount + 1);
-                    actions.setRows(rowData);
-                    actions.setRowCount(rowCount + 1);
                     gridAPI.paginationGoToLastPage();
+                    // if rowData.length < 100, that means that partial store
+                    // already has the required records. So we just add the row.
+
+                    if (rowData.length < 100) addRow();
+                    // if not, then it will fetch the new records and we need
+                    // to wait for updated rowData before adding the newRow.
+                    else setNewRow(true);
                   }}
                   className="mr-2"
                   disabled={columns.length === 0}
