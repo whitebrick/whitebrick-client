@@ -77,6 +77,7 @@ const TableLayout = ({
   columns,
 }: TableLayoutPropsType) => {
   const ref = useRef(null);
+  const PARTIAL_STORE_DEFAULT_LENGTH = 100;
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tableFields, setTableFields] = useState([]);
@@ -375,7 +376,7 @@ const TableLayout = ({
                     // if rowData.length < 100, that means that partial store
                     // already has the required records. So we just add the row.
 
-                    if (rowData.length < 100) addRow();
+                    if (rowData.length < PARTIAL_STORE_DEFAULT_LENGTH) addRow();
                     // if not, then it will fetch the new records and we need
                     // to wait for updated rowData before adding the newRow.
                     else setNewRow(true);
