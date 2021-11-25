@@ -544,6 +544,7 @@ const Grid = ({
         headerTooltip={column.label}
         valueGetter={params => valueGetter(params, tableName, column, type)}
         editable={!type && hasPermission}
+        singleClickEdit
       />
     );
   };
@@ -559,7 +560,6 @@ const Grid = ({
         rowModelType="serverSide"
         // @ts-ignore
         serverSideStoreType="partial"
-        singleClickEdit
         pagination
         paginationPageSize={limit}
         enterMovesDown
@@ -597,7 +597,6 @@ const Grid = ({
         domLayout="autoHeight"
         animateRows
         allowContextMenuWithControlKey
-        stopEditingWhenCellsLoseFocus
         getContextMenuItems={getContextMenuItems}
         getMainMenuItems={getMainMenuItems}
         popupParent={document.querySelector('body')}
