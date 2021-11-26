@@ -80,6 +80,7 @@ const Grid = ({
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
   const [changedValues, setChangedValues] = useState([]);
+  const [isGridReady, setIsGridReady] = useState(false);
   const [sortModel, setSortModel] = useState({ colId: orderBy, sort: `asc` });
   const hasPermission = checkPermission('alter_table', table?.role?.name);
 
@@ -203,6 +204,7 @@ const Grid = ({
   }, [parsedFilters, fields, sortModel]);
 
   const onGridReady = (params: GridReadyEvent) => {
+    setIsGridReady(true);
     actions.setGridAPI(params.api);
     actions.setColumnAPI(params.columnApi);
     if (views.length <= 0) {
@@ -234,11 +236,12 @@ const Grid = ({
       return data.wbMySchemaByName;
     };
     fetchSchema().then(s => {
-      if (s.status === 'Ready') {
+      if (s.status === 'Ready' && isGridReady) {
         const datasource = createServerSideDatasource();
         if (gridAPI) gridAPI.setServerSideDatasource(datasource);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     createServerSideDatasource,
     schema,

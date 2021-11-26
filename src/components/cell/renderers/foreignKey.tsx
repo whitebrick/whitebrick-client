@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Badge, Tooltip } from 'evergreen-ui';
-import { ColDef } from 'ag-grid-community';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import ViewForeignKeyData from '../../common/viewForeignKeyData';
