@@ -3,6 +3,7 @@
   "private": false,
   "description": "Whitebrick Gastbsy Theme - Front End Jamstack Client for the Whitebrick No Code DB",
   "version": "0.1.4",
+  "homepage": "https://whitebrick.com",
   "dependencies": {
     "@auth0/auth0-react": "^1.5.0",
     "@lifeomic/axios-fetch": "^2.0.2",
@@ -69,7 +70,7 @@
   "keywords": [
     "gatsby"
   ],
-  "license": "0BSD",
+  "license": "MIT",
   "scripts": {
     "build": "gatsby build",
     "build:prod": "ACTIVE_ENV='prod' gatsby build",
@@ -104,6 +105,7 @@
     "url": "https://github.com/whitebrick/whitebrick"
   },
   "bugs": {
-    "url": "https://github.com/whitebrick/whitebrick/issues"
+    "url": "https://github.com/whitebrick/whitebrick/issues",
+    "email": "support@whitebrick.com"
   }
 }
