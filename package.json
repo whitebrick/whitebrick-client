@@ -85,7 +85,7 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "type-check": "tsc",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
+    "test": "echo \"-- Whitebrick Tests TBD --\" ",
     "prepare": "husky install",
     "postinstall": "husky install .github/husky"
   },
