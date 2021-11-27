@@ -30,7 +30,7 @@ export const onDeleteRow = async (
       data[key]
     ) {
       variables.where[key] = {
-        _eq: parseInt(data[key], 10) ? parseInt(data[key], 10) : data[key],
+        _eq: data[key],
       };
     }
   });
