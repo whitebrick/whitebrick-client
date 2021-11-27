@@ -466,6 +466,11 @@ const Grid = ({
       setChangedValues(values);
 
       const rc = hasRequiredCols(variables, params);
+      const { field } = params.colDef;
+      if (getColumnType(field) === 'integer') {
+        rc.data[field] = parseInt(rc.data[field], 10);
+      }
+
       if (rc.ok) {
         if (rc.insert) {
           variables._set = rc.data;
