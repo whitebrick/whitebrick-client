@@ -1,6 +1,6 @@
 {
   "name": "whitebrick",
-  "private": true,
+  "private": false,
   "description": "Whitebrick Gastbsy Theme - Front End Jamstack Client for the Whitebrick No Code DB",
   "version": "0.1.2",
   "dependencies": {
