@@ -10,7 +10,7 @@ fi
 
 FROM_FILES_CLOUD="../whitebrick-cloud/*.md"
 FROM_FILES_WEB="../whitebrick-web/docs/docs/*.md"
-TO_FILE="README.md"
+TO_FILE=".github/README.md"
 FROM_IMAGES="../whitebrick-cloud/doc/whitebrick-*.png"
 TO_IMAGES="doc/"
 

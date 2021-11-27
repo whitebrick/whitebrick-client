@@ -1,0 +1,16 @@
+.DS_Store
+.cache
+.env.development
+.env.prod
+.env.staging
+.git
+.github
+.gitignore
+.husky
+.npmignore
+custom-example
+deploy
+doc
+node_modules
+public
+scripts
