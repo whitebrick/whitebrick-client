@@ -86,9 +86,7 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "type-check": "tsc",
-    "test": "echo \"-- Whitebrick Tests TBD --\" ",
-    "prepare": "husky install",
-    "postinstall": "husky install .github/husky"
+    "test": "echo \"-- Whitebrick Tests TBD --\" "
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
