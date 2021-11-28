@@ -2,7 +2,7 @@
   "name": "gatsby-theme-whitebrick",
   "private": false,
   "description": "Whitebrick Gastbsy Theme - Front End Jamstack Client for the Whitebrick No Code DB",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "homepage": "https://whitebrick.com",
   "dependencies": {
     "@auth0/auth0-react": "^1.5.0",
