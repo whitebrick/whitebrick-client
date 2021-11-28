@@ -9,6 +9,7 @@ import {
   Button,
   Popover,
   PlusIcon,
+  TrashIcon,
 } from 'evergreen-ui';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -78,6 +79,7 @@ const TableLayout = ({
 }: TableLayoutPropsType) => {
   const ref = useRef(null);
   const PARTIAL_STORE_DEFAULT_LENGTH = 100;
+  const DEFAULT_VIEW = 'Default View';
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [tableFields, setTableFields] = useState([]);
@@ -328,6 +330,62 @@ const TableLayout = ({
     saveSettingsToDB();
   };
 
+  const SaveViewLabel = {
+    borderTopRightRadius: '0px',
+    borderBottomRightRadius: '0px',
+  };
+
+  const DeleteViewStyle = {
+    borderTopLeftRadius: '0px',
+    borderBottomLeftRadius: '0px',
+    padding: '0px',
+    width: '25px',
+    minWidth: '25px',
+  };
+
+  const deleteView = (view: any) => {
+    const newViews = [];
+    const DEFAULT_VIEW_OBJ = [];
+
+    // iterate through views and push all views, except the
+    // one to be deleted, into newViews.
+    views.forEach(function (obj) {
+      if (obj.name !== view) newViews.push(obj);
+
+      // Keep a record of default view for re-applying the columns
+      // later on
+      if (obj.name === DEFAULT_VIEW) DEFAULT_VIEW_OBJ.push(obj);
+    });
+
+    const updateSettingsToDB = async () => {
+      const { loading, error } = await saveUserTableSettings({
+        variables: {
+          schemaName: schema.name,
+          tableName: table.name,
+          settings: {
+            newViews,
+            DEFAULT_VIEW,
+          },
+        },
+      });
+      if (!loading && !error)
+        toaster.success('View sucessfully removed !', {
+          duration: 10,
+        });
+    };
+
+    updateSettingsToDB().then(() => {
+      actions.setViews(newViews);
+
+      // Update view on grid to default view and set its columns accordingly
+      actions.setDefaultView(DEFAULT_VIEW);
+      columnAPI.applyColumnState({
+        state: DEFAULT_VIEW_OBJ[0].state,
+        applyOrder: true,
+      });
+    });
+  };
+
   const tabs = [
     {
       title: 'Data',
@@ -393,9 +451,19 @@ const TableLayout = ({
                 shouldCloseOnExternalClick={false}>
                 <IconButton icon={FilterListIcon} className="mr-2" />
               </Popover>
-              <Button onClick={() => saveView(defaultView)} className="mr-2">
+              <Button
+                onClick={() => saveView(defaultView)}
+                style={SaveViewLabel}>
                 Save to {defaultView}
               </Button>
+              <IconButton
+                disabled={defaultView === DEFAULT_VIEW}
+                icon={TrashIcon}
+                intent="danger"
+                style={DeleteViewStyle}
+                className="mr-2"
+                onClick={() => deleteView(defaultView)}
+              />
               <Button
                 onClick={() => {
                   gridAPI.setSideBarVisible(!gridAPI.isSideBarVisible());

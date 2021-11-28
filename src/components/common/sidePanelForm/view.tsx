@@ -89,7 +89,7 @@ const ViewForm = ({
       actions.setView(viewObj);
       actions.setDefaultView(name);
     }
-    saveSettingsToDB();
+    saveSettingsToDB().then(() => actions.setShow(false));
   };
 
   return (
