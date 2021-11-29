@@ -11,6 +11,7 @@ import {
   GridApi,
   GridSizeChangedEvent,
   SortChangedEvent,
+  ViewportChangedEvent,
 } from 'ag-grid-community';
 import { connect } from 'react-redux';
 import * as gql from 'gql-query-builder';
@@ -223,6 +224,17 @@ const Grid = ({
         applyOrder: true,
       });
     }
+  };
+
+  const onViewportChanged = (params: ViewportChangedEvent) => {
+    const columnsToHide = [];
+    const view = views.filter(view => view.name === defaultView)[0];
+
+    // find the columns with attribute hide=true to forcefully hide them
+    view?.state?.forEach(function (obj) {
+      if (obj.hide === true) columnsToHide.push(obj.colId);
+    });
+    params.columnApi.setColumnsVisible(columnsToHide, false);
   };
 
   const onSortChanged = (event: SortChangedEvent) =>
@@ -610,7 +622,8 @@ const Grid = ({
         popupParent={document.querySelector('body')}
         onGridSizeChanged={onGridSizeChanged}
         onSortChanged={onSortChanged}
-        onGridReady={onGridReady}>
+        onGridReady={onGridReady}
+        onViewportChanged={onViewportChanged}>
         <AgGridColumn headerName={table.label}>
           {columns.map(column => renderColumn(column))}
         </AgGridColumn>
