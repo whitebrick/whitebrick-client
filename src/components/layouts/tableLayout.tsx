@@ -35,6 +35,7 @@ import Layout from './layout';
 import NotFound from '../notFound';
 import FilterPane from '../common/filters/filterPane';
 import Breadcrumb from '../common/breadcrumb';
+import ViewButton from '../common/viewButton';
 import { checkPermission } from '../../utils/checkPermission';
 import { getSchemaValue } from '../../utils/select';
 
@@ -392,29 +393,7 @@ const TableLayout = ({
       element: (
         <>
           <div>
-            {views.length > 0 &&
-              views.map(view => (
-                <div
-                  key={view.name}
-                  onClick={() => {
-                    columnAPI.applyColumnState({
-                      state: view.state,
-                      applyOrder: true,
-                    });
-                    actions.setLimit(view.limit);
-                    actions.setOrderBy(view.orderBy);
-                    actions.setDefaultView(view.name);
-                  }}
-                  aria-hidden="true"
-                  className={`badge badge-pill mr-1 p-2 ${
-                    defaultView === view.name
-                      ? 'badge-primary'
-                      : 'badge-secondary'
-                  }`}
-                  style={{ cursor: 'pointer' }}>
-                  {view.name}
-                </div>
-              ))}
+            {views.length > 0 && views.map(view => <ViewButton view={view} />)}
             <div
               onClick={() => {
                 actions.setType('view');
