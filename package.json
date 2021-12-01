@@ -28,6 +28,7 @@
     "graphql-hooks": "^5.1.1",
     "gravatar": "^1.8.1",
     "isomorphic-fetch": "^3.0.0",
+    "popper.js": "^1.16.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-avatar": "^3.10.0",
