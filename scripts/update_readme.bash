@@ -11,8 +11,8 @@ fi
 FROM_FILES_CLOUD="../whitebrick-cloud/*.md"
 FROM_FILES_WEB="../whitebrick-web/docs/docs/*.md"
 TO_FILE=".github/README.md"
-FROM_IMAGES="../whitebrick-cloud/doc/whitebrick-*.png"
-TO_IMAGES="doc/"
+#FROM_IMAGES="../whitebrick-cloud/doc/whitebrick-*.png"
+#TO_IMAGES="doc/"
 
 PARTIALS_CLOUD=(
   "HEADER"
@@ -65,7 +65,7 @@ do
 done
 
 # copy images
-cp $FROM_IMAGES $TO_IMAGES
+#cp $FROM_IMAGES $TO_IMAGES
 
 gsed -i 's/__BT__/`/g' $TO_FILE
 gsed -i "s/__SQ__/'/g" $TO_FILE

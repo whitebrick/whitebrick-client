@@ -1,4 +1,4 @@
-![whitebrick logo](../doc/whitebrick-logo-white-hz-sm.png)
+![whitebrick logo](https://hello.whitebrick.com/assets/whitebrick-logo-white-hz-sm.png)
 
 # whitebrick (front end) BETA
 
@@ -6,15 +6,15 @@
 
 ### Open Source Airtable Alternative (No Code DB)
 
-| ![Screenshot](../doc/whitebrick-landing-screenshot-1.png) | ![Screenshot](../doc/whitebrick-landing-screenshot-2.png) | ![Screenshot](../doc/whitebrick-landing-screenshot-3.png) | ![Screenshot](../doc/whitebrick-landing-screenshot-4.png) |
-| :-------------------------------------------------------: | :-------------------------------------------------------: | :-------------------------------------------------------: | :-------------------------------------------------------: |
-|                <sub>Adding a record</sub>                 |               <sub>Creating a column</sub>                |                 <sub>Creating a DB</sub>                  |                <sub>Managing access</sub>                 |
+| ![Screenshot](https://hello.whitebrick.com/assets/whitebrick-landing-screenshot-1.png) | ![Screenshot](https://hello.whitebrick.com/assets/whitebrick-landing-screenshot-2.png) | ![Screenshot](https://hello.whitebrick.com/assets/whitebrick-landing-screenshot-3.png) | ![Screenshot](https://hello.whitebrick.com/assets/whitebrick-landing-screenshot-4.png) |
+| :------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
+|                               <sub>Adding a record</sub>                               |                              <sub>Creating a column</sub>                              |                                <sub>Creating a DB</sub>                                |                               <sub>Managing access</sub>                               |
 
 #### Whitebrick is a lightweight No Code Database with 3 points of difference:
 
 1. The front end uses a [Gatsby static Jamstack](https://www.gatsbyjs.com/) client for dead easy customization and deployment.
 2. The back end is a set of [Serverless functions](https://www.serverless.com/) for making DDL calls to [PostgreSQL](https://www.postgresql.org/) and configuring [Hasura GraphQL server](https://hasura.io/).
-3. The [PostgreSQL](https://www.postgresql.org/) database schemas can be accessed directly with **_psql_** for data import/export and integrations with other tools.
+3. The [PostgreSQL](https://www.postgresql.org/) database schemas can be accessed directly with psql for data import/export and integrations with other tools.
 
 ##### Rather than reinventing the wheel Whitebrick stitches together the best-in-breed open source apps:
 
@@ -22,7 +22,7 @@
 
 ---
 
-#### Current Project status as of November:
+#### Current Project status as of December:
 
 We're currently fixing bugs and trying to get the Beta release stable.
 
@@ -65,7 +65,7 @@ Whitebrick is [licensed](https://github.com/whitebrick/whitebrick-cloud/blob/mai
 - The back end repository can be found [here](https://github.com/whitebrick/whitebrick-cloud)
 - Documentation can be found [here](https://hello.whitebrick.com/docs)
 
-![whitebrick-cloud system diagram](../doc/whitebrick-diagram.png)
+![whitebrick-cloud system diagram](https://hello.whitebrick.com/assets/whitebrick-diagram.png)
 
 <!-- START:SUMMARY ================================================== -->
 
@@ -114,37 +114,57 @@ The Whitebrick front end is statically compiled Jamstack client written in Gatsb
 
 <!-- START:FRONTEND_SETUP ================================================== -->
 
-### Running Locally
+### Getting Started with Shadowing
 
-1. **Install Gatsby**
+The Whitebrick front end is packaged as a [Gatsby Theme](https://www.gatsbyjs.com/docs/themes/) that can be installed from `npm`. Gatsby Themes are customized using a system called [Shadowing](https://www.gatsbyjs.com/docs/how-to/plugins-and-themes/shadowing/) that allows individual pages, components and assets to be overridden by conforming to a specific directory structure. The advantage of this is that the Whitebrick client _Theme_ can be maintained and updated independently of your customizations.
+
+The easiest way to get started is to use our Gastby _Starter_ that installs our Gatsby _Theme_ and also includes a simple example of overriding the header and branding.
+
+1. **Clone the Whitebrick Starter Repository**
 
    ```
-   npm init gatsby
+   git clone git@github.com:whitebrick/gatsby-starter-whitebrick.git
    ```
 
-   Further information from Gatsby [here](https://www.gatsbyjs.com/docs/quick-start/)
+2. **Install Packages**
 
-2. **Clone this repository**
+   ```
+   cd gatsby-starter-whitebrick
+   npm install
+   ```
+
+3. **Start Gatsby**
+
+   ```
+   npm run develop
+   ```
+
+   Gatsby will start a hot-reloading development environment accessible by default at `http://localhost:8000`.
+
+4. **Customize**
+
+   Copy or add files to the `gatsby-starter-whitebrick/src` directory to make changes by overriding the corresponding [Whitebrick Theme files](https://github.com/whitebrick/whitebrick/tree/main/src).
+
+### Forking & Contributing
+
+To run the Whitebrick client independently (rather than as a Theme) simple clone the Whitebrick [repository](https://github.com/whitebrick/whitebrick), configure the `.env` and run Gatsby directly.
+
+1. **Clone or Fork the Whitebrick Client Repository**
 
    ```
    git clone git@github.com:whitebrick/whitebrick.git
    ```
 
+2. **Install Packages**
+
+   ```
+   cd whitebrick
+   npm install
+   ```
+
 3. **Configure the Client**
 
-   ```
-   cp .env.example .env.development
-   vi .env.development
-
-   GATSBY_HASURA_GRAPHQL_URL=https://graph.whitebrick.com/v1/graphql
-   GATSBY_HASURA_GRAPHQL_WSS_URL=wss://graph.whitebrick.com/v1/graphql
-   GATSBY_AUTH0_DOMAIN=auth.whitebrick.com
-   GATSBY_AUTH0_CLIENT_ID=sc0K4pJGgyNZ5x9L27POwgfXPsCZPtJZ
-   GATSBY_AUTH0_CALLBACK=https://whitebrick.com/home/index.html
-   GATSBY_AUTH0_AUDIENCE=https://production-whitebrick.us.auth0.com/api/v2/
-   # IF HOSTING YOUR OWN CLOUD BACK END:
-   # GATSBY_HASURA_GRAPHQL_ADMIN_SECRET=MyHasuraSecret
-   ```
+   The `.env.development` is provided with default values - see `.env.example` for additional options.
 
 4. **Start Gatsby**
 
@@ -152,11 +172,11 @@ The Whitebrick front end is statically compiled Jamstack client written in Gatsb
    npm run develop
    ```
 
-   Gatsby will start a hot-reloading development environment accessible by default at http://localhost:8000.
+   Gatsby will start a hot-reloading development environment accessible by default at `http://localhost:8000`.
 
-### Gatsby Shadowing
+5. **Develop and Submit Pool Request**
 
-TBD
+   Submit Pull Requests from the [Whitebrick GitHub](https://github.com/whitebrick/whitebrick) repository
 
 <!-- END:FRONTEND_SETUP ================================================== -->
 
