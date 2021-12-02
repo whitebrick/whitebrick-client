@@ -393,7 +393,11 @@ const TableLayout = ({
       element: (
         <>
           <div>
-            {views.length > 0 && views.map(view => <ViewButton view={view} />)}
+            {views.length > 0 &&
+              views.map((view, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <ViewButton view={view} key={index} />
+              ))}
             <div
               onClick={() => {
                 actions.setType('view');
