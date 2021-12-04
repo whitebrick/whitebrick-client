@@ -56,8 +56,10 @@ const FormMaker = ({
             className="mb-4"
           />
         )}
-        {fields.map(field => (
+        {fields.map((field, index) => (
           <Field
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
             {...field}
             values={values}
             errors={errors}
