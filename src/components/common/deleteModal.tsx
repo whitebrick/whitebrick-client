@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { TextInputField, Dialog } from 'evergreen-ui';
 import { useMutation, useManualQuery } from 'graphql-hooks';
+import { navigate } from 'gatsby';
 import { SchemaItemType } from '../../types';
 import { actions } from '../../state/actions';
 import {
@@ -21,12 +22,14 @@ type DeleteModalType = {
   setShow: any;
   type: string;
   org?: any;
+  navigateBack?: boolean;
 };
 
 const defaultProps = {
   org: null,
   table: null,
   singleSchema: null,
+  navigateBack: false,
 };
 
 const DeleteModal = ({
@@ -38,6 +41,7 @@ const DeleteModal = ({
   type,
   org,
   table,
+  navigateBack,
 }: DeleteModalType) => {
   const [value, setValue] = useState('');
   const [error, setError] = useState(false);
@@ -113,8 +117,16 @@ const DeleteModal = ({
           del: true,
         },
       });
-      actions.setTable('');
-      refetchTables().finally(() => setShow(false));
+      if (navigateBack) {
+        navigate(
+          schema.organizationOwnerName
+            ? `/${schema.organizationOwnerName}/${schema.name}/`
+            : `/db/${schema.name}/`,
+        );
+      } else {
+        actions.setTable('');
+        refetchTables().finally(() => setShow(false));
+      }
     } else {
       setError(true);
     }

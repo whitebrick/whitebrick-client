@@ -24,6 +24,7 @@ import Seo from '../seo';
 
 import Tabs from '../elements/tabs';
 import Members from '../common/members';
+import DeleteModal from '../common/deleteModal';
 import {
   SCHEMA_BY_NAME_QUERY,
   SCHEMA_TABLE_BY_NAME_QUERY,
@@ -85,6 +86,7 @@ const TableLayout = ({
   const [error, setError] = useState(null);
   const [tableFields, setTableFields] = useState([]);
   const [newRow, setNewRow] = useState(false);
+  const [deleteTable, setDeleteTable] = useState(false);
 
   const [fetchSchemaTablesByName] = useManualQuery(SCHEMA_TABLES_QUERY);
   const [fetchSchemaTableByName] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
@@ -496,18 +498,35 @@ const TableLayout = ({
                   <span>
                     {table.label}
                     {canAlter && (
-                      <IconButton
-                        icon={EditIcon}
-                        appearance="minimal"
-                        onClick={() => {
-                          actions.setType('editTable');
-                          actions.setFormData({
-                            ...table,
-                            schema: getSchemaValue(schema.name),
-                          });
-                          actions.setShow(true);
-                        }}
-                      />
+                      <>
+                        <IconButton
+                          icon={EditIcon}
+                          appearance="minimal"
+                          onClick={() => {
+                            actions.setType('editTable');
+                            actions.setFormData({
+                              ...table,
+                              schema: getSchemaValue(schema.name),
+                            });
+                            actions.setShow(true);
+                          }}
+                        />
+                        <IconButton
+                          icon={TrashIcon}
+                          appearance="minimal"
+                          onClick={() => setDeleteTable(true)}
+                          intent="danger"
+                        />
+                        {deleteTable && (
+                          <DeleteModal
+                            show={deleteTable}
+                            setShow={setDeleteTable}
+                            type="table"
+                            table={table}
+                            navigateBack
+                          />
+                        )}
+                      </>
                     )}
                   </span>
                 </h3>
