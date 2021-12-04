@@ -45,6 +45,7 @@ const DeleteModal = ({
 }: DeleteModalType) => {
   const [value, setValue] = useState('');
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [removeOrDeleteSchemaMutation] = useMutation(
     REMOVE_OR_DELETE_SCHEMA_MUTATION,
@@ -87,36 +88,39 @@ const DeleteModal = ({
       : table.name;
 
   const onSave = async () => {
+    setIsLoading(true);
     if (type === 'organization') {
       if (value === name) {
         await deleteOrganizationMutation({
           variables: { name },
-        });
+        }).then(() => setIsLoading(false));
         window.location.replace('/');
       } else {
         setError(true);
       }
     } else if (type === 'schema') {
       if (value === name) {
+        setIsLoading(true);
         await removeOrDeleteSchemaMutation({
           variables: {
             name,
             del: true,
           },
-        });
+        }).then(() => setIsLoading(false));
         actions.setSchema({});
         refetchSchemas().finally(() => setShow(false));
       } else {
         setError(true);
       }
     } else if (value === name) {
+      setIsLoading(true);
       await removeOrDeleteTableMutation({
         variables: {
           schemaName: schema.name,
           tableName: name,
           del: true,
         },
-      });
+      }).then(() => setIsLoading(false));
       if (navigateBack) {
         navigate(
           schema.organizationOwnerName
@@ -139,8 +143,10 @@ const DeleteModal = ({
       intent="danger"
       onConfirm={onSave}
       confirmLabel="Delete"
+      isConfirmLoading={isLoading}
       isConfirmDisabled={name !== value}
-      onCancel={() => setShow(false)}>
+      onCancel={() => setShow(false)}
+      shouldCloseOnOverlayClick={false}>
       <TextInputField
         label="Confirm action"
         description={`Enter '${name}' to confirm delete`}
