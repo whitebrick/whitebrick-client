@@ -366,8 +366,8 @@ const TableLayout = ({
           schemaName: schema.name,
           tableName: table.name,
           settings: {
-            newViews,
-            DEFAULT_VIEW,
+            views: newViews,
+            defaultView: DEFAULT_VIEW,
           },
         },
       });
