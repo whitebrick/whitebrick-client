@@ -546,10 +546,16 @@ const TableLayout = ({
                         </h5>
                         <Button
                           appearance="primary"
-                          className="mt-1"
+                          className="my-1"
                           onClick={fetchSchema}>
                           Reload
                         </Button>
+                        <p>
+                          Schema {schema.name} status=
+                          <strong>{schema.status} </strong>at{' '}
+                          {Date().toLocaleLowerCase()}
+                          <p>(Progress indicator coming soon!)</p>
+                        </p>
                       </div>
                     </div>
                   </div>
