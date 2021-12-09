@@ -127,6 +127,12 @@ export const actions = {
       payload: { table },
     };
   },
+  setIsTableBuilding(isTableBuilding) {
+    return {
+      type: types.SET_IS_TABLE_BUILDING,
+      payload: { isTableBuilding },
+    };
+  },
   setRowCount(rowCount) {
     return {
       type: types.SET_ROW_COUNT,

@@ -48,6 +48,11 @@ export default function gridReducer(state: any = {}, action) {
         ...state,
         accessToken: payload.accessToken,
       };
+    case types.SET_IS_TABLE_BUILDING:
+      return {
+        ...state,
+        isTableBuilding: payload.isTableBuilding,
+      };
     case types.SET_ROWS:
       return {
         ...state,

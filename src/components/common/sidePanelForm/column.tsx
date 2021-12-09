@@ -154,6 +154,7 @@ const ColumnForm = ({
     setErrors(null);
     setLoading(true);
     if (type === 'addColumn') {
+      actions.setIsTableBuilding(true);
       const { loading, error } = await addOrCreateColumn({
         variables: {
           schemaName: schema.name,

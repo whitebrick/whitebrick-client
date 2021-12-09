@@ -58,6 +58,7 @@ type TableLayoutPropsType = {
   rowData: any;
   gridParams: any;
   columns: ColumnItemType[];
+  isTableBuilding: boolean;
 };
 
 const TableLayout = ({
@@ -78,6 +79,7 @@ const TableLayout = ({
   rowData,
   gridParams,
   columns,
+  isTableBuilding,
 }: TableLayoutPropsType) => {
   const ref = useRef(null);
   const PARTIAL_STORE_DEFAULT_LENGTH = 100;
@@ -153,7 +155,7 @@ const TableLayout = ({
   };
 
   useEffect(() => {
-    fetchSchema();
+    if (!isTableBuilding) fetchSchema();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columns]);
 
@@ -547,14 +549,18 @@ const TableLayout = ({
                         <Button
                           appearance="primary"
                           className="my-1"
-                          onClick={fetchSchema}>
+                          onClick={() => {
+                            actions.setIsTableBuilding(false);
+                            fetchSchema();
+                          }}>
                           Reload
                         </Button>
                         <p>
                           Schema {schema.name} status=
                           <strong>{schema.status} </strong>at{' '}
                           {Date().toLocaleLowerCase()}
-                          <p>(Progress indicator coming soon!)</p>
+                          <br />
+                          <span>(Progress indicator coming soon!)</span>
                         </p>
                       </div>
                     </div>
@@ -587,6 +593,7 @@ const mapStateToProps = state => ({
   rowData: state.rowData,
   gridParams: state.gridParams,
   columns: state.columns,
+  isTableBuilding: state.isTableBuilding,
 });
 
 const mapDispatchToProps = dispatch => ({

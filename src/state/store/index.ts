@@ -30,6 +30,7 @@ const initialState = {
   organizations: [],
   defaultView: 'Default View',
   sendAdminSecret: false,
+  isTableBuilding: false,
   columnAPI: null,
   gridAPI: null,
   gridParams: null,

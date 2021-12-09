@@ -57,6 +57,7 @@ type GridPropsType = {
   rowData: any;
   rowCount: number;
   organization: OrganizationItemType;
+  isTableBuilding: boolean;
 };
 
 const Grid = ({
@@ -77,6 +78,7 @@ const Grid = ({
   rowData,
   rowCount,
   organization,
+  isTableBuilding,
 }: GridPropsType) => {
   const client = useContext(ClientContext);
   const [parsedFilters, setParsedFilters] = useState({});
@@ -247,12 +249,14 @@ const Grid = ({
       const { data } = await fetchSchemaByName({ variables });
       return data.wbMySchemaByName;
     };
-    fetchSchema().then(s => {
-      if (s.status === 'Ready' && isGridReady) {
-        const datasource = createServerSideDatasource();
-        if (gridAPI) gridAPI.setServerSideDatasource(datasource);
-      }
-    });
+    if (!isTableBuilding) {
+      fetchSchema().then(s => {
+        if (s.status === 'Ready' && isGridReady) {
+          const datasource = createServerSideDatasource();
+          if (gridAPI) gridAPI.setServerSideDatasource(datasource);
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     createServerSideDatasource,
@@ -684,6 +688,7 @@ const mapStateToProps = state => ({
   rowCount: state.rowCount,
   gridParams: state.gridParams,
   organization: state.organization,
+  isTableBuilding: state.isTableBuilding,
 });
 
 const mapDispatchToProps = dispatch => ({
