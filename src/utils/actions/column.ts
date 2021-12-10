@@ -37,6 +37,7 @@ export const onDeleteColumn = async (
     },
   });
   if (!loading && !error) {
+    actions.setIsTableBuilding(true);
     const col = columns.filter(c => c.name === colID)[0];
     const index = columns.indexOf(col);
     columns.splice(index, 1);
