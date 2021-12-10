@@ -9,6 +9,7 @@ import { toaster } from 'evergreen-ui';
 import { actions } from '../../../state/actions';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../../types';
 import FormMaker from '../../elements/formMaker';
+import { placeholders } from './placeholders';
 import {
   ADD_OR_CREATE_COLUMN_MUTATION,
   ADD_OR_REMOVE_COLUMN_SEQUENCE,
@@ -47,8 +48,20 @@ const columnForm = (
 ) => {
   return {
     fields: [
-      { name: 'name', label: 'Column Name', type: 'text', required: true },
-      { name: 'label', label: 'Column Label', type: 'text', required: true },
+      {
+        name: 'name',
+        label: 'Column Name',
+        type: 'text',
+        placeholder: `${placeholders.columnName}`,
+        required: true,
+      },
+      {
+        name: 'label',
+        label: 'Column Label',
+        type: 'text',
+        placeholder: `${placeholders.columnLabel}`,
+        required: true,
+      },
       {
         name: 'type',
         label: 'Column Type',

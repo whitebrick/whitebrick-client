@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import { actions } from '../../../state/actions';
 import { OrganizationItemType } from '../../../types';
 import FormMaker from '../../elements/formMaker';
+import { placeholders } from './placeholders';
 import {
   CREATE_ORGANIZATION_MUTATION,
   UPDATE_ORGANIZATION_MUTATION,
@@ -21,11 +22,18 @@ type OrganizationFormPropsType = {
 const organizationForm = (formData: any = null) => {
   return {
     fields: [
-      { name: 'name', label: 'Name', type: 'text', required: true },
+      {
+        name: 'name',
+        label: 'Name',
+        type: 'text',
+        placeholder: `${placeholders.orgName}`,
+        required: true,
+      },
       {
         name: 'label',
         label: 'Label',
         type: 'text',
+        placeholder: `${placeholders.orgLabel}`,
         required: true,
       },
     ],

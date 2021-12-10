@@ -7,6 +7,7 @@ import { useManualQuery, useMutation } from 'graphql-hooks';
 import { actions } from '../../../state/actions';
 import { OrganizationItemType } from '../../../types';
 import FormMaker from '../../elements/formMaker';
+import { placeholders } from './placeholders';
 import {
   CREATE_SCHEMA_MUTATION,
   UPDATE_SCHEMA_MUTATION,
@@ -34,11 +35,18 @@ const databaseForm = (
         type: 'select',
         options: parseOptions(organizations),
       },
-      { name: 'name', label: 'Name', type: 'text', required: true },
+      {
+        name: 'name',
+        label: 'Name',
+        type: 'text',
+        placeholder: `${placeholders.databaseName}`,
+        required: true,
+      },
       {
         name: 'label',
         label: 'Label',
         type: 'text',
+        placeholder: `${placeholders.databaseLabel}`,
         required: true,
       },
     ],

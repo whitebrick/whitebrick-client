@@ -29,6 +29,7 @@ type FieldPropsType = {
     | 'select'
     | 'checkbox'
     | 'foreignKeyButton';
+  placeholder: string;
   options?: any;
   readOnly?: boolean;
   render?: any;
@@ -58,6 +59,7 @@ const Field = ({
   required,
   hint,
   type,
+  placeholder,
   options,
   readOnly,
   render,
@@ -129,7 +131,7 @@ const Field = ({
           key={label}
           name={name}
           label={label}
-          placeholder={`Enter ${label}`}
+          placeholder={placeholder}
           hint={hint}
           value={values[name]}
           onChange={handleChange}

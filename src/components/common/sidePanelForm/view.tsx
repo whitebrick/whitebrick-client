@@ -7,6 +7,7 @@ import { ColumnApi } from 'ag-grid-community';
 import { useMutation } from 'graphql-hooks';
 import * as Yup from 'yup';
 import FormMaker from '../../elements/formMaker';
+import { placeholders } from './placeholders';
 import { SchemaItemType, TableItemType } from '../../../types';
 import { actions } from '../../../state/actions';
 import { SAVE_TABLE_USER_SETTINGS } from '../../../graphql/mutations/wb';
@@ -102,6 +103,7 @@ const ViewForm = ({
           name: 'name',
           label: 'Name of the view',
           type: 'text',
+          placeholder: `${placeholders.viewName}`,
           required: true,
         },
       ]}
