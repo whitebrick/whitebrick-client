@@ -28,6 +28,12 @@ export const onDeleteColumn = async (
   gridAPI,
   removeOrDeleteColumnMutation,
 ) => {
+  // Activate spinner
+  const elements = document.getElementsByClassName(
+    'loader',
+  ) as HTMLCollectionOf<HTMLElement>;
+  elements[colID].style.visibility = 'visible';
+
   const { loading, error } = await removeOrDeleteColumnMutation({
     variables: {
       schemaName: schema.name,
