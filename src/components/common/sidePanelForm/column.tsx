@@ -34,8 +34,8 @@ type ColumnFormPropsType = {
 
 const parseColumnTypes = (types: any) => {
   const opts = [];
-  Object.keys(types).map(label =>
-    opts.push({ key: types[label], value: label }),
+  Object.entries(types).map((arr: any) =>
+    opts.push({ key: arr[0], value: arr[1].pgType }),
   );
   return opts;
 };
