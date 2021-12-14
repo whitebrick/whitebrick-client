@@ -53,6 +53,11 @@ export default function gridReducer(state: any = {}, action) {
         ...state,
         isTableBuilding: payload.isTableBuilding,
       };
+    case types.SET_COLUMN_FIELDS:
+      return {
+        ...state,
+        columnFields: payload.columnFields,
+      };
     case types.SET_ROWS:
       return {
         ...state,
