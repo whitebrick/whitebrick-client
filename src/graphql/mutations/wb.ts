@@ -37,8 +37,8 @@ export const REMOVE_OR_DELETE_TABLE_MUTATION = `mutation ($schemaName: String!, 
 }
 `;
 
-export const ADD_OR_CREATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $create: Boolean, $columnName: String!, $columnLabel: String!, $columnType: String, $isNotNullable: Boolean) {
-  wbAddOrCreateColumn(schemaName: $schemaName, tableName: $tableName, create: $create, columnName: $columnName, columnLabel: $columnLabel, columnType: $columnType, isNotNullable: $isNotNullable)
+export const ADD_OR_CREATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $create: Boolean, $columnName: String!, $columnLabel: String!, $columnType: String, $isNotNullable: Boolean, $skipTracking: Boolean) {
+  wbAddOrCreateColumn(schemaName: $schemaName, tableName: $tableName, create: $create, columnName: $columnName, columnLabel: $columnLabel, columnType: $columnType, isNotNullable: $isNotNullable, skipTracking: $skipTracking)
 }`;
 
 export const REMOVE_OR_DELETE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $columnName: String!, $del: Boolean){
@@ -119,3 +119,7 @@ export const ADD_OR_REMOVE_COLUMN_SEQUENCE = `mutation ($columnName: String!, $s
   wbAddOrRemoveColumnSequence(columnName: $columnName, schemaName: $schemaName, tableName: $tableName, nextSeqNumber: $nextSeqNumber, remove: $remove)
 }
 `;
+
+export const RETRACK_TABLE = `mutation ($schemaName: String!, $tableName: String!) {
+  wbRetrackTable(schemaName: $schemaName, tableName: $tableName)
+}`;

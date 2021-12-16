@@ -32,7 +32,9 @@ export const onDeleteColumn = async (
   const elements = document.getElementsByClassName(
     'loader',
   ) as HTMLCollectionOf<HTMLElement>;
-  elements[colID].style.visibility = 'visible';
+  if (elements[colID]) {
+    elements[colID].style.visibility = 'visible';
+  }
 
   const { loading, error } = await removeOrDeleteColumnMutation({
     variables: {

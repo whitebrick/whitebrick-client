@@ -100,6 +100,7 @@ const SidePanel = ({
               display="flex"
               alignItems="center"
               paddingY={50}
+              paddingX={10}
               justifyContent="center">
               {children}
             </Card>

@@ -16,6 +16,7 @@ import {
   CREATE_OR_ADD_FOREIGN_KEY,
   CREATE_OR_DELETE_PRIMARY_KEYS,
   UPDATE_COLUMN_MUTATION,
+  RETRACK_TABLE,
 } from '../../../graphql/mutations/wb';
 import { COLUMNS_BY_NAME_QUERY } from '../../../graphql/queries/wb';
 
@@ -30,6 +31,7 @@ type ColumnFormPropsType = {
   formData: any;
   gridAPI: GridApi;
   actions: any;
+  columnFields: any;
 };
 
 const parseColumnTypes = (types: any) => {
@@ -129,6 +131,7 @@ const ColumnForm = ({
   columns,
   gridAPI,
   actions,
+  columnFields,
 }: ColumnFormPropsType) => {
   const [isLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState(null);
@@ -143,6 +146,7 @@ const ColumnForm = ({
     ADD_OR_REMOVE_COLUMN_SEQUENCE,
   );
   const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
+  const [retrackTable] = useMutation(RETRACK_TABLE);
 
   const value = getValues(type, formData, table, tables, cloudContext);
 
@@ -163,31 +167,64 @@ const ColumnForm = ({
     }
   };
 
+  const Retrack = async () => {
+    const { loading, error } = await retrackTable({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+      },
+    });
+    if (!loading && !error) {
+      refetchColumns().finally(() => {
+        setLoading(false);
+        actions.setColumnFields(1);
+        gridAPI.refreshCells({ force: true });
+        actions.setShow(false);
+        window.location.reload();
+      });
+    }
+  };
+
   const onSave = async values => {
     setErrors(null);
     setLoading(true);
     if (type === 'addColumn') {
       actions.setIsTableBuilding(true);
-      const { loading, error } = await addOrCreateColumn({
-        variables: {
-          schemaName: schema.name,
-          tableName: table.name,
-          create: true,
-          columnName: values.name,
-          columnLabel: values.label,
-          columnType: values.type,
-          isNotNullable: values.isNotNullable,
-        },
-      });
-      if (!loading) {
-        if (error) setErrors(error);
-        else {
-          const columnNames = [];
-          columns
-            .filter(column => column.isPrimaryKey === true)
-            .map(c => columnNames.push(c.name));
-          if (formData.isPrimaryKey) {
-            const { loading: deleteLoading, error: deleteError } =
+      for (let i = 0; i < columnFields; i += 1) {
+        const isPrimaryKey =
+          i === 0 ? values.isPrimaryKey : values[`isPrimaryKey_${i}`];
+        const hasTable = i === 0 ? values.table : values[`table_${i}`];
+        const hasColumn = i === 0 ? values.column : values[`column_${i}`];
+
+        // eslint-disable-next-line no-await-in-loop
+        const { loading, error } = await addOrCreateColumn({
+          variables: {
+            schemaName: schema.name,
+            tableName: table.name,
+            create: true,
+            columnName: i === 0 ? values.name : values[`name_${i}`],
+            columnLabel: i === 0 ? values.label : values[`label_${i}`],
+            columnType: i === 0 ? values.type : values[`type_${i}`],
+            isNotNullable:
+              i === 0 ? values.isNotNullable : values[`isNotNullable_${i}`],
+            skipTracking: true,
+          },
+        });
+        if (!loading && !error) {
+          toaster.success(
+            `Column ${i === 0 ? values.name : values[`name_${i}`]} created...`,
+            { duration: 2 },
+          );
+        }
+        if (!loading) {
+          if (error) setErrors(error);
+          else {
+            const columnNames = [];
+            columns
+              .filter(column => column.isPrimaryKey === true)
+              .map(c => columnNames.push(c.name));
+            if (isPrimaryKey) {
+              // eslint-disable-next-line no-await-in-loop
               await createOrDeletePrimaryKeys({
                 variables: {
                   schemaName: schema.name,
@@ -195,40 +232,54 @@ const ColumnForm = ({
                   del: true,
                   columnNames,
                 },
-              });
-            if (!deleteLoading && !deleteError) {
-              await createOrDeletePrimaryKeys({
+              })
+                .catch(e => setErrors(e))
+                .then(async () => {
+                  await createOrDeletePrimaryKeys({
+                    variables: {
+                      schemaName: schema.name,
+                      tableName: table.name,
+                      columnNames:
+                        i === 0 ? values.name : [values[`name_${i}`]],
+                    },
+                  })
+                    .catch(e => setErrors(e))
+                    .then(() =>
+                      toaster.notify(
+                        `Primary Key ${
+                          i === 0 ? values.name : values[`name_${i}`]
+                        } created...`,
+                        { duration: 2 },
+                      ),
+                    );
+                });
+            }
+            if (hasTable && hasColumn) {
+              // eslint-disable-next-line no-await-in-loop
+              const { loading, error } = await createOrAddForeignKey({
                 variables: {
                   schemaName: schema.name,
                   tableName: table.name,
-                  columnNames: [values.name],
+                  columnNames: i === 0 ? [values.name] : [values[`name_${i}`]],
+                  parentTableName: hasTable,
+                  parentColumnNames: [hasColumn],
+                  create: true,
                 },
               });
+              if (!loading && !error) {
+                toaster.notify(
+                  `Foreign Key ${
+                    i === 0 ? values.name : values[`name_${i}`]
+                  } created...`,
+                  { duration: 2 },
+                );
+                gridAPI.refreshCells({ force: true });
+              }
             }
           }
-          if (formData.table && formData.column) {
-            const { loading, error } = await createOrAddForeignKey({
-              variables: {
-                schemaName: schema.name,
-                tableName: table.name,
-                columnNames: [values.name],
-                parentTableName: values.table,
-                parentColumnNames: [values.column],
-                create: true,
-              },
-            });
-            if (!loading && !error) {
-              gridAPI.refreshCells({ force: true });
-            }
-          }
-          refetchColumns().finally(() => {
-            setLoading(false);
-            gridAPI.refreshCells({ force: true });
-            actions.setShow(false);
-            window.location.reload();
-          });
         }
       }
+      Retrack();
     } else {
       const variables: any = {
         schemaName: schema.name,
@@ -309,6 +360,7 @@ const ColumnForm = ({
       name={value.name}
       fields={value.fields}
       initialValues={value.initialValues}
+      columnType={type}
       validationSchema={value.validationSchema}
       onSubmit={onSave}
     />
@@ -325,6 +377,7 @@ const mapStateToProps = state => ({
   columns: state.columns,
   cloudContext: state.cloudContext,
   gridAPI: state.gridAPI,
+  columnFields: state.columnFields,
 });
 
 const mapDispatchToProps = dispatch => ({

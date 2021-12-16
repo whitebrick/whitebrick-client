@@ -352,7 +352,7 @@ const Grid = ({
   const columnActions = params => {
     return [
       {
-        name: 'Add Column',
+        name: 'Add Columns',
         action: () => onAddColumn(params, actions),
       },
       {

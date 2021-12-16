@@ -25,6 +25,7 @@ const initialState = {
   limit: 10,
   offset: 0,
   views: [],
+  columnFields: 1,
   cloudContext: {},
   organization: {},
   organizations: [],
