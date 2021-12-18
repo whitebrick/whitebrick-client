@@ -185,6 +185,65 @@ const ColumnForm = ({
     }
   };
 
+  const updatePrimaryKey = async values => {
+    const { loading, error } = await createOrDeletePrimaryKeys({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+        columnNames: values.name,
+        del: !values.isPrimaryKey,
+      },
+    });
+    if (!loading) {
+      if (error) {
+        setErrors(error);
+        setLoading(false);
+        throw error;
+      } else if (values.isPrimaryKey) {
+        toaster.notify('Primary Key created...', { duration: 2 });
+      } else {
+        toaster.danger('Primary Key deleted...', { duration: 2 });
+      }
+    }
+  };
+
+  const updateForeignKey = async values => {
+    const { loading, error } = await createOrAddForeignKey({
+      variables: {
+        schemaName: schema.name,
+        tableName: table.name,
+        columnNames: [values.name],
+        parentTableName: values.table,
+        parentColumnNames: [values.column],
+        create: true,
+      },
+    });
+    if (!loading) {
+      if (error) {
+        setErrors(error);
+        setLoading(false);
+        throw error;
+      } else {
+        toaster.notify('Foreign key created...', { duration: 2 });
+      }
+    }
+  };
+
+  const updateColumnInfo = async variables => {
+    const { loading, error } = await updateColumn({
+      variables,
+    });
+    if (!loading) {
+      if (error) {
+        setErrors(error);
+        setLoading(false);
+        throw error;
+      } else {
+        toaster.success('Column updated...', { duration: 2 });
+      }
+    }
+  };
+
   const onSave = async values => {
     setErrors(null);
     setLoading(true);
@@ -285,24 +344,34 @@ const ColumnForm = ({
         schemaName: schema.name,
         tableName: table.name,
         columnName: column,
+        skipTracking: true,
       };
+      const updatedPK = values.isPrimaryKey !== formData.isPrimaryKey;
+      const updatedFK = !!(
+        values.table !== formData.table && values.column !== formData.column
+      );
       const col = columns.filter(c => c.name === column)[0];
       if (values.name !== col.name) variables.newColumnName = values.name;
       if (values.label !== col.label) variables.newColumnLabel = values.label;
       if (values.type !== col.type) variables.newType = values.type;
       if (values.isNotNullable !== col.isNotNullable)
         variables.newIsNotNullable = values.isNotNullable;
+
       if (
-        variables.newColumnName ||
-        variables.newColumnLabel ||
-        variables.newType
+        (variables.newColumnName ||
+          variables.newColumnLabel ||
+          variables.newType) &&
+        (updatedPK || updatedFK)
       ) {
         const { loading, error } = await updateColumn({
           variables,
         });
         if (!loading) {
-          if (error) setErrors(error);
-          else {
+          if (error) {
+            setErrors(error);
+            setLoading(false);
+            throw error;
+          } else {
             if (values.autoIncrement) {
               const vars: any = {
                 schemaName: schema.name,
@@ -321,34 +390,48 @@ const ColumnForm = ({
                   remove: true,
                 },
               });
+            } else if (updatedPK) {
+              await updatePrimaryKey(values);
+            } else if (updatedFK) {
+              await updateForeignKey(values);
             }
-            if (
-              values.table !== formData.table &&
-              values.column !== formData.column
-            ) {
-              await createOrAddForeignKey({
-                variables: {
-                  schemaName: schema.name,
-                  tableName: table.name,
-                  columnNames: [values.name],
-                  parentTableName: values.table,
-                  parentColumnNames: [values.column],
-                  create: true,
-                },
-              });
-            }
+
             refetchColumns().finally(() => {
               setLoading(false);
               gridAPI.refreshCells({ force: true });
               actions.setShow(false);
-              if (values.name !== col.name)
-                toaster.notify(
-                  'This change has been added to the background queue. Please check back in a minute.',
-                );
+              if (values.name !== col.name) {
+                Retrack();
+              }
             });
           }
         }
+      } else if (values.isPrimaryKey !== formData.isPrimaryKey) {
+        // In case only primary key has to be updated.
+        await updatePrimaryKey(values);
+      } else if (
+        values.table !== formData.table &&
+        values.column !== formData.column
+      ) {
+        // In case only foreign key has to be updated.
+        await updateForeignKey(values);
+      } else if (
+        variables.newColumnName ||
+        variables.newColumnLabel ||
+        variables.newType
+      ) {
+        // In case only column details (name, label, type) has to be updated
+        await updateColumnInfo(variables);
       }
+
+      refetchColumns().finally(() => {
+        setLoading(false);
+        gridAPI.refreshCells({ force: true });
+        actions.setShow(false);
+        if (values.name !== col.name) {
+          Retrack();
+        }
+      });
     }
   };
 
@@ -356,6 +439,7 @@ const ColumnForm = ({
     <FormMaker
       key={value.name + type}
       errors={errors}
+      setErrors={setErrors}
       isLoading={isLoading}
       name={value.name}
       fields={value.fields}

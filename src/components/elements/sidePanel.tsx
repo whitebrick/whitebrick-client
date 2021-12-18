@@ -13,6 +13,7 @@ type SidePanelPropsType = {
   description?: string;
   show: boolean;
   setShow: (value: boolean) => void;
+  setErrors: (value: null) => void;
   values?: any;
   onSave?: () => void;
   children: React.ReactNode;
@@ -35,6 +36,7 @@ const SidePanel = ({
   description = null,
   show,
   setShow,
+  setErrors,
   onSave,
   values,
   children,
@@ -46,7 +48,10 @@ const SidePanel = ({
     <div>
       <SideSheet
         isShown={show}
-        onCloseComplete={() => setShow(false)}
+        onCloseComplete={() => {
+          setShow(false);
+          setErrors(null);
+        }}
         preventBodyScrolling
         containerProps={{
           display: 'flex',

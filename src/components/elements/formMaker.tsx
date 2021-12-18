@@ -15,6 +15,7 @@ type FormMakerPropsType = {
   initialValues: any;
   validationSchema: any;
   onSubmit: (values: any) => void;
+  setErrors: (value: null) => void;
   isLoading: boolean;
   actions: any;
   columnFields: any;
@@ -33,6 +34,7 @@ const FormMaker = ({
   initialValues,
   validationSchema,
   onSubmit,
+  setErrors,
   isLoading,
   actions,
   columnFields,
@@ -68,6 +70,7 @@ const FormMaker = ({
       isLoading={isLoading}
       setShow={actions.setShow}
       values={values}
+      setErrors={setErrors}
       validateForm={validateForm}
       onSave={handleSubmit}>
       <div className="w-75" style={{ position: 'relative' }}>
