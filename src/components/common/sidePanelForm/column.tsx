@@ -276,8 +276,11 @@ const ColumnForm = ({
           );
         }
         if (!loading) {
-          if (error) setErrors(error);
-          else {
+          if (error) {
+            setErrors(error);
+            setLoading(false);
+            throw error;
+          } else {
             const columnNames = [];
             columns
               .filter(column => column.isPrimaryKey === true)
@@ -292,7 +295,11 @@ const ColumnForm = ({
                   columnNames,
                 },
               })
-                .catch(e => setErrors(e))
+                .catch(e => {
+                  setErrors(e);
+                  setLoading(false);
+                  throw e;
+                })
                 .then(async () => {
                   await createOrDeletePrimaryKeys({
                     variables: {
@@ -312,8 +319,7 @@ const ColumnForm = ({
                       ),
                     );
                 });
-            }
-            if (hasTable && hasColumn) {
+            } else if (hasTable && hasColumn) {
               // eslint-disable-next-line no-await-in-loop
               const { loading, error } = await createOrAddForeignKey({
                 variables: {
@@ -325,14 +331,19 @@ const ColumnForm = ({
                   create: true,
                 },
               });
-              if (!loading && !error) {
-                toaster.notify(
-                  `Foreign Key ${
-                    i === 0 ? values.name : values[`name_${i}`]
-                  } created...`,
-                  { duration: 2 },
-                );
-                gridAPI.refreshCells({ force: true });
+              if (!loading) {
+                if (error) {
+                  setErrors(error);
+                  setLoading(false);
+                  throw error;
+                } else {
+                  toaster.notify(
+                    `Foreign Key ${
+                      i === 0 ? values.name : values[`name_${i}`]
+                    } created...`,
+                    { duration: 2 },
+                  );
+                }
               }
             }
           }
