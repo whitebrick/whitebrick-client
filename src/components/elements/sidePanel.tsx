@@ -13,7 +13,7 @@ type SidePanelPropsType = {
   description?: string;
   show: boolean;
   setShow: (value: boolean) => void;
-  setErrors: (value: null) => void;
+  setErrors?: (value: null) => void;
   values?: any;
   onSave?: () => void;
   children: React.ReactNode;
@@ -29,6 +29,7 @@ const defaultProps = {
   renderSaveButton: true,
   validateForm: null,
   values: {},
+  setErrors: () => ({}),
 };
 
 const SidePanel = ({
