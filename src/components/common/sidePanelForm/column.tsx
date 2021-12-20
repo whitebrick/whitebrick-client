@@ -17,6 +17,7 @@ import {
   CREATE_OR_DELETE_PRIMARY_KEYS,
   UPDATE_COLUMN_MUTATION,
   RETRACK_TABLE,
+  INIT_TABLE_DATA,
 } from '../../../graphql/mutations/wb';
 import { COLUMNS_BY_NAME_QUERY } from '../../../graphql/queries/wb';
 
@@ -147,6 +148,7 @@ const ColumnForm = ({
   );
   const [createOrAddForeignKey] = useMutation(CREATE_OR_ADD_FOREIGN_KEY);
   const [retrackTable] = useMutation(RETRACK_TABLE);
+  const [initTableData] = useMutation(INIT_TABLE_DATA);
 
   const value = getValues(type, formData, table, tables, cloudContext);
 
@@ -349,7 +351,17 @@ const ColumnForm = ({
           }
         }
       }
-      Retrack();
+      if (columns.length === 0) {
+        console.log(columns.length);
+        await initTableData({
+          variables: {
+            schemaName: schema.name,
+            tableName: table.name,
+          },
+        }).then(() => Retrack());
+      } else {
+        Retrack();
+      }
     } else {
       const variables: any = {
         schemaName: schema.name,

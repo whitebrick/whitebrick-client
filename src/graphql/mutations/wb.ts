@@ -123,3 +123,7 @@ export const ADD_OR_REMOVE_COLUMN_SEQUENCE = `mutation ($columnName: String!, $s
 export const RETRACK_TABLE = `mutation ($schemaName: String!, $tableName: String!) {
   wbRetrackTable(schemaName: $schemaName, tableName: $tableName)
 }`;
+
+export const INIT_TABLE_DATA = `mutation ($schemaName: String!, $tableName: String!) {
+  wbInitTableData(schemaName: $schemaName, tableName: $tableName)
+}`;

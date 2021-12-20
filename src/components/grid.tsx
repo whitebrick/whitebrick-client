@@ -172,19 +172,23 @@ const Grid = ({
             next({ data }) {
               client.subscriptionClient.request(operationAgg).subscribe({
                 next({ data: c }) {
-                  actions.setRows(data[`${schema.name}_${table.name}`]);
-                  actions.setRowCount(
-                    c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-                  );
-                  params.successCallback(
-                    data[`${schema.name}_${table.name}`],
-                    c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-                  );
-                  if (
-                    c[`${schema.name}_${table.name}_aggregate`].aggregate
-                      .count === 0
-                  )
-                    params.api.showNoRowsOverlay();
+                  if (data !== null && c !== null) {
+                    actions.setRows(data[`${schema.name}_${table.name}`]);
+                    actions.setRowCount(
+                      c[`${schema.name}_${table.name}_aggregate`].aggregate
+                        .count,
+                    );
+                    params.successCallback(
+                      data[`${schema.name}_${table.name}`],
+                      c[`${schema.name}_${table.name}_aggregate`].aggregate
+                        .count,
+                    );
+                    if (
+                      c[`${schema.name}_${table.name}_aggregate`].aggregate
+                        .count === 0
+                    )
+                      params.api.showNoRowsOverlay();
+                  }
                 },
                 error(error) {
                   console.error(error);
