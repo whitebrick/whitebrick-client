@@ -122,28 +122,28 @@ The easiest way to get started is to use our Gastby _Starter_ that installs our 
 
 1. **Clone the Whitebrick Starter Repository**
 
-   ```
-   git clone git@github.com:whitebrick/gatsby-starter-whitebrick.git
-   ```
+    ```
+    git clone git@github.com:whitebrick/gatsby-starter-whitebrick.git
+    ```
 
 2. **Install Packages**
 
-   ```
-   cd gatsby-starter-whitebrick
-   npm install
-   ```
+    ```
+    cd gatsby-starter-whitebrick
+    npm install
+    ```
 
 3. **Start Gatsby**
 
-   ```
-   npm run develop
-   ```
+    ```
+    npm run develop
+    ```
 
-   Gatsby will start a hot-reloading development environment accessible by default at `http://localhost:8000`.
+    Gatsby will start a hot-reloading development environment accessible by default at `http://localhost:8000`.
 
 4. **Customize**
 
-   Copy or add files to the `gatsby-starter-whitebrick/src` directory to make changes by overriding the corresponding [Whitebrick Theme files](https://github.com/whitebrick/whitebrick/tree/main/src).
+    Copy or add files to the `gatsby-starter-whitebrick/src` directory to make changes by overriding the corresponding [Whitebrick Theme files](https://github.com/whitebrick/whitebrick/tree/main/src).
 
 ### Forking & Contributing
 
@@ -151,32 +151,32 @@ To run the Whitebrick client independently (rather than as a Theme) simple clone
 
 1. **Clone or Fork the Whitebrick Client Repository**
 
-   ```
-   git clone git@github.com:whitebrick/whitebrick.git
-   ```
+    ```
+    git clone git@github.com:whitebrick/whitebrick.git
+    ```
 
 2. **Install Packages**
 
-   ```
-   cd whitebrick
-   npm install
-   ```
+    ```
+    cd whitebrick
+    npm install
+    ```
 
 3. **Configure the Client**
 
-   The `.env.development` is provided with default values - see `.env.example` for additional options.
+    The `.env.development` is provided with default values - see `.env.example` for additional options.
 
 4. **Start Gatsby**
 
-   ```
-   npm run develop
-   ```
+    ```
+    npm run develop
+    ```
 
-   Gatsby will start a hot-reloading development environment accessible by default at `http://localhost:8000`.
+    Gatsby will start a hot-reloading development environment accessible by default at `http://localhost:8000`.
 
 5. **Develop and Submit Pool Request**
 
-   Submit Pull Requests from the [Whitebrick GitHub](https://github.com/whitebrick/whitebrick) repository
+    Submit Pull Requests from the [Whitebrick GitHub](https://github.com/whitebrick/whitebrick) repository
 
 <!-- END:FRONTEND_SETUP ================================================== -->
 
