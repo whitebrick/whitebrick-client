@@ -7,6 +7,7 @@ import { useManualQuery, useMutation } from 'graphql-hooks';
 import { actions } from '../../../state/actions';
 import { SchemaItemType } from '../../../types';
 import FormMaker from '../../elements/formMaker';
+import { placeholders } from './placeholders';
 import { parseOptions } from '../../../utils/select';
 import {
   SCHEMA_TABLE_BY_NAME_QUERY,
@@ -39,8 +40,20 @@ const tableForm = (
         required: true,
         readOnly: type === 'editTable',
       },
-      { name: 'name', label: 'Table Name', type: 'text', required: true },
-      { name: 'label', label: 'Table Label', type: 'text', required: true },
+      {
+        name: 'name',
+        label: 'Table Name',
+        type: 'text',
+        placeholder: `${placeholders.tableName}`,
+        required: true,
+      },
+      {
+        name: 'label',
+        label: 'Table Label',
+        type: 'text',
+        placeholder: `${placeholders.tableLabel}`,
+        required: true,
+      },
     ],
     initialValues:
       type === 'editTable'

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { useFormik } from 'formik';
-import { Alert } from 'evergreen-ui';
+import { Alert, Button, PlusIcon } from 'evergreen-ui';
 import SidePanel from './sidePanel';
 import { actions } from '../../state/actions';
 import Field from './field';
@@ -15,8 +15,15 @@ type FormMakerPropsType = {
   initialValues: any;
   validationSchema: any;
   onSubmit: (values: any) => void;
+  setErrors: (value: null) => void;
   isLoading: boolean;
   actions: any;
+  columnFields: any;
+  columnType?: any;
+};
+
+const defaultProps = {
+  columnType: null,
 };
 
 const FormMaker = ({
@@ -27,9 +34,14 @@ const FormMaker = ({
   initialValues,
   validationSchema,
   onSubmit,
+  setErrors,
   isLoading,
   actions,
+  columnFields,
+  columnType,
 }: FormMakerPropsType) => {
+  const [newFields, setNewFields] = useState(fields);
+  // const [fieldCounter, setFieldCounter] = useState(1);
   const { values, errors, handleChange, handleSubmit, validateForm } =
     useFormik({
       initialValues,
@@ -39,6 +51,18 @@ const FormMaker = ({
       validateOnChange: false,
     });
 
+  const handleNewFields = () => {
+    const arr: any = fields.map(a => {
+      return { ...a };
+    });
+    for (let i = 0; i < arr.length; i += 1) {
+      arr[i].name = `${arr[i].name}_${columnFields}`;
+    }
+
+    setNewFields(newFields => [...newFields, ...arr]);
+    actions.setColumnFields(columnFields + 1);
+  };
+
   return (
     <SidePanel
       name={name}
@@ -46,9 +70,10 @@ const FormMaker = ({
       isLoading={isLoading}
       setShow={actions.setShow}
       values={values}
+      setErrors={setErrors}
       validateForm={validateForm}
       onSave={handleSubmit}>
-      <div className="w-75">
+      <div className="w-75" style={{ position: 'relative' }}>
         {formErrors && (
           <Alert
             intent="danger"
@@ -56,7 +81,7 @@ const FormMaker = ({
             className="mb-4"
           />
         )}
-        {fields.map((field, index) => (
+        {newFields.map((field, index) => (
           <Field
             // eslint-disable-next-line react/no-array-index-key
             key={index}
@@ -66,6 +91,16 @@ const FormMaker = ({
             handleChange={handleChange}
           />
         ))}
+        {columnType === 'addColumn' && (
+          <Button
+            right={-80}
+            position="absolute"
+            appearance="minimal"
+            iconBefore={PlusIcon}
+            onClick={() => handleNewFields()}>
+            Add new column
+          </Button>
+        )}
       </div>
     </SidePanel>
   );
@@ -73,10 +108,12 @@ const FormMaker = ({
 
 const mapStateToProps = state => ({
   show: state.show,
+  columnFields: state.columnFields,
 });
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(actions, dispatch),
 });
 
+FormMaker.defaultProps = defaultProps;
 export default connect(mapStateToProps, mapDispatchToProps)(FormMaker);

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import {
   TextInputField,
   SelectField,
@@ -14,7 +14,7 @@ import { actions } from '../../state/actions';
 import { ColumnItemType, SchemaItemType, TableItemType } from '../../types';
 import { REMOVE_OR_DELETE_FOREIGN_KEY } from '../../graphql/mutations/wb';
 import { SCHEMA_TABLE_BY_NAME_QUERY } from '../../graphql/queries/wb';
-import { parseOptions } from '../../utils/select';
+import ForeignKey from './foreignKey';
 
 type FieldPropsType = {
   name: string;
@@ -29,6 +29,7 @@ type FieldPropsType = {
     | 'select'
     | 'checkbox'
     | 'foreignKeyButton';
+  placeholder: string;
   options?: any;
   readOnly?: boolean;
   render?: any;
@@ -38,7 +39,6 @@ type FieldPropsType = {
   handleChange: (e: ChangeEvent<any>) => void;
   schema: SchemaItemType;
   table: TableItemType;
-  tables: TableItemType[];
   columns: ColumnItemType[];
   gridAPI: GridApi;
   actions: any;
@@ -58,6 +58,7 @@ const Field = ({
   required,
   hint,
   type,
+  placeholder,
   options,
   readOnly,
   render,
@@ -67,7 +68,6 @@ const Field = ({
   handleChange,
   schema,
   table,
-  tables,
   columns,
   gridAPI,
   actions,
@@ -75,22 +75,8 @@ const Field = ({
   const [fetchSchemaTable] = useManualQuery(SCHEMA_TABLE_BY_NAME_QUERY);
   const [removeOrDeleteForeignKey] = useMutation(REMOVE_OR_DELETE_FOREIGN_KEY);
 
-  const [columnOptions, setColumnOptions] = useState([]);
-
-  useEffect(() => {
-    const fetchColumns = async () => {
-      const { loading, data, error } = await fetchSchemaTable({
-        variables: {
-          schemaName: schema.name,
-          tableName: values.table,
-          withColumns: true,
-          withSettings: true,
-        },
-      });
-      if (!loading && !error) setColumnOptions(data.wbMyTableByName.columns);
-    };
-    if (formData.displayForeignKey && values.table) fetchColumns();
-  }, [fetchSchemaTable, formData.displayForeignKey, schema.name, values.table]);
+  const [fkIndex, setFkIndex] = useState(null);
+  const [showForeign, setShowForeign] = useState(false);
 
   const fetchTable = async () => {
     const { loading, data, error } = await fetchSchemaTable({
@@ -129,7 +115,7 @@ const Field = ({
           key={label}
           name={name}
           label={label}
-          placeholder={`Enter ${label}`}
+          placeholder={placeholder}
           hint={hint}
           value={values[name]}
           onChange={handleChange}
@@ -183,6 +169,9 @@ const Field = ({
         />
       );
     if (type === 'foreignKeyButton') {
+      let tablename;
+      let columnname;
+      let index;
       if (values?.foreignKeys?.length > 0)
         return (
           <div className="mt-4">
@@ -206,36 +195,33 @@ const Field = ({
             </div>
           </div>
         );
+      if (showForeign) {
+        if (fkIndex === -1) {
+          tablename = 'table';
+          columnname = 'column';
+        } else {
+          tablename = `table_${fkIndex}`;
+          columnname = `column_${fkIndex}`;
+        }
+        return (
+          <ForeignKey
+            tableName={tablename}
+            columnName={columnname}
+            handleChange={handleChange}
+            values={values}
+            schema={schema}
+          />
+        );
+      }
       if (formData.displayForeignKey)
         return (
-          <div className="mt-4">
-            <hr />
-            <h5 className="pb-2">Foreign Key Relation</h5>
-            <SelectField
-              name="table"
-              label="Table"
-              value={values?.table}
-              required
-              onChange={handleChange}>
-              {parseOptions(tables).map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.key}
-                </option>
-              ))}
-            </SelectField>
-            <SelectField
-              name="column"
-              label="Column"
-              value={values?.column}
-              required
-              onChange={handleChange}>
-              {parseOptions(columnOptions).map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.key}
-                </option>
-              ))}
-            </SelectField>
-          </div>
+          <ForeignKey
+            tableName="table"
+            columnName="column"
+            handleChange={handleChange}
+            values={values}
+            schema={schema}
+          />
         );
       return (
         <div className="mt-4">
@@ -247,9 +233,19 @@ const Field = ({
                 appearance="primary"
                 size="large"
                 iconBefore={PlusIcon}
-                onClick={() =>
-                  actions.setFormData({ ...formData, displayForeignKey: true })
-                }>
+                onClick={() => {
+                  index = name.lastIndexOf('_');
+                  if (index !== -1) {
+                    setFkIndex(name.substr(index + 1));
+                    setShowForeign(true);
+                  } else {
+                    actions.setFormData({
+                      ...formData,
+                    });
+                    setFkIndex(-1);
+                    setShowForeign(true);
+                  }
+                }}>
                 Create Foreign Key
               </Button>
             </div>
@@ -281,7 +277,6 @@ const mapStateToProps = state => ({
   formData: state.formData,
   schema: state.schema,
   table: state.table,
-  tables: state.tables,
   columns: state.columns,
   gridAPI: state.gridAPI,
 });

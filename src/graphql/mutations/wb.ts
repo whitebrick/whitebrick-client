@@ -37,8 +37,8 @@ export const REMOVE_OR_DELETE_TABLE_MUTATION = `mutation ($schemaName: String!, 
 }
 `;
 
-export const ADD_OR_CREATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $create: Boolean, $columnName: String!, $columnLabel: String!, $columnType: String, $isNotNullable: Boolean) {
-  wbAddOrCreateColumn(schemaName: $schemaName, tableName: $tableName, create: $create, columnName: $columnName, columnLabel: $columnLabel, columnType: $columnType, isNotNullable: $isNotNullable)
+export const ADD_OR_CREATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $create: Boolean, $columnName: String!, $columnLabel: String!, $columnType: String, $isNotNullable: Boolean, $skipTracking: Boolean) {
+  wbAddOrCreateColumn(schemaName: $schemaName, tableName: $tableName, create: $create, columnName: $columnName, columnLabel: $columnLabel, columnType: $columnType, isNotNullable: $isNotNullable, skipTracking: $skipTracking)
 }`;
 
 export const REMOVE_OR_DELETE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $columnName: String!, $del: Boolean){
@@ -57,8 +57,8 @@ export const REMOVE_OR_DELETE_FOREIGN_KEY = `mutation ($schemaName: String!, $ta
   wbRemoveOrDeleteForeignKey(schemaName: $schemaName, tableName: $tableName, columnNames: $columnNames, del: $del, parentTableName: $parentTableName)
 }`;
 
-export const UPDATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $columnName: String!, $newColumnName: String, $newColumnLabel: String, $newType: String, $newIsNotNullable: Boolean) {
-  wbUpdateColumn(schemaName: $schemaName, tableName: $tableName, columnName: $columnName, newColumnName: $newColumnName, newColumnLabel: $newColumnLabel, newType: $newType, newIsNotNullable: $newIsNotNullable)
+export const UPDATE_COLUMN_MUTATION = `mutation ($schemaName: String!, $tableName: String!, $columnName: String!, $newColumnName: String, $newColumnLabel: String, $newType: String, $newIsNotNullable: Boolean, $skipTracking: Boolean) {
+  wbUpdateColumn(schemaName: $schemaName, tableName: $tableName, columnName: $columnName, newColumnName: $newColumnName, newColumnLabel: $newColumnLabel, newType: $newType, newIsNotNullable: $newIsNotNullable, skipTracking: $skipTracking)
 }`;
 
 export const CREATE_ORGANIZATION_MUTATION = `mutation ($name: String!, $label: String!) {
@@ -119,3 +119,11 @@ export const ADD_OR_REMOVE_COLUMN_SEQUENCE = `mutation ($columnName: String!, $s
   wbAddOrRemoveColumnSequence(columnName: $columnName, schemaName: $schemaName, tableName: $tableName, nextSeqNumber: $nextSeqNumber, remove: $remove)
 }
 `;
+
+export const RETRACK_TABLE = `mutation ($schemaName: String!, $tableName: String!) {
+  wbRetrackTable(schemaName: $schemaName, tableName: $tableName)
+}`;
+
+export const INIT_TABLE_DATA = `mutation ($schemaName: String!, $tableName: String!) {
+  wbInitTableData(schemaName: $schemaName, tableName: $tableName)
+}`;

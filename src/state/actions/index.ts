@@ -133,6 +133,12 @@ export const actions = {
       payload: { isTableBuilding },
     };
   },
+  setColumnFields(columnFields) {
+    return {
+      type: types.SET_COLUMN_FIELDS,
+      payload: { columnFields },
+    };
+  },
   setRowCount(rowCount) {
     return {
       type: types.SET_ROW_COUNT,

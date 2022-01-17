@@ -57,6 +57,7 @@ const rowForm = (
       fields.push({
         name: column.name,
         label: column.label,
+        placeholder: `my_${column.name}`,
         type: 'text',
         required: column.isNotNullable,
         hint: getHint(column),

@@ -172,19 +172,23 @@ const Grid = ({
             next({ data }) {
               client.subscriptionClient.request(operationAgg).subscribe({
                 next({ data: c }) {
-                  actions.setRows(data[`${schema.name}_${table.name}`]);
-                  actions.setRowCount(
-                    c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-                  );
-                  params.successCallback(
-                    data[`${schema.name}_${table.name}`],
-                    c[`${schema.name}_${table.name}_aggregate`].aggregate.count,
-                  );
-                  if (
-                    c[`${schema.name}_${table.name}_aggregate`].aggregate
-                      .count === 0
-                  )
-                    params.api.showNoRowsOverlay();
+                  if (data !== null && c !== null) {
+                    actions.setRows(data[`${schema.name}_${table.name}`]);
+                    actions.setRowCount(
+                      c[`${schema.name}_${table.name}_aggregate`].aggregate
+                        .count,
+                    );
+                    params.successCallback(
+                      data[`${schema.name}_${table.name}`],
+                      c[`${schema.name}_${table.name}_aggregate`].aggregate
+                        .count,
+                    );
+                    if (
+                      c[`${schema.name}_${table.name}_aggregate`].aggregate
+                        .count === 0
+                    )
+                      params.api.showNoRowsOverlay();
+                  }
                 },
                 error(error) {
                   console.error(error);
@@ -352,7 +356,7 @@ const Grid = ({
   const columnActions = params => {
     return [
       {
-        name: 'Add Column',
+        name: 'Add Columns',
         action: () => onAddColumn(params, actions),
       },
       {
@@ -526,13 +530,32 @@ const Grid = ({
     tableName: string = null,
     type: 'foreignKey' | 'referencedBy' | null = null,
   ) => {
+    const Spinner =
+      '<div class="ag-cell-label-container" role="presentation">' +
+      '<span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button" aria-hidden="true"></span>' +
+      '<div ref="eLabel" class="ag-header-cell-label" role="presentation" unselectable="on">' +
+      '<span ref="eText" class="ag-header-cell-text" unselectable="on"></span>' +
+      '<span ref="eFilter" class="ag-header-icon ag-header-label-icon ag-filter-icon" aria-hidden="true"></span>' +
+      '<span ref="eSortOrder" class="ag-header-icon ag-header-label-icon ag-sort-order" aria-hidden="true"></span>' +
+      '<span ref="eSortAsc" class="ag-header-icon ag-header-label-icon ag-sort-ascending-icon" aria-hidden="true"></span>' +
+      '<span ref="eSortDesc" class="ag-header-icon ag-header-label-icon ag-sort-descending-icon" aria-hidden="true"></span>' +
+      '<span ref="eSortNone" class="ag-header-icon ag-header-label-icon ag-sort-none-icon" aria-hidden="true"></span>' +
+      `<div class="loader" id="${column.name}"></div>` +
+      '</div>' +
+      '</div>';
+
     if (column.foreignKeys.length > 0 && type === null) {
       return (
         <AgGridColumn
           hide={false}
           field={column.name}
           key={column.name}
-          headerName={column.label}
+          headerComponentParams={{
+            template: Spinner,
+            enableSorting: true,
+            enableMenu: true,
+            displayName: `${column.label}`,
+          }}
           headerTooltip={column.label}
           cellEditor="foreignKeyEditor"
           cellRenderer="foreignKeyRenderer"
@@ -546,7 +569,12 @@ const Grid = ({
           hide={false}
           field={column.name}
           key={column.name}
-          headerName={column.label}
+          headerComponentParams={{
+            template: Spinner,
+            enableSorting: true,
+            enableMenu: true,
+            displayName: `${column.label}`,
+          }}
           headerTooltip={column.label}
           editable={params => {
             if (column?.default?.startsWith('nextval'))
@@ -564,7 +592,12 @@ const Grid = ({
         initialHide={!!type}
         field={column.name}
         key={column.name}
-        headerName={column.label}
+        headerComponentParams={{
+          template: Spinner,
+          enableSorting: true,
+          enableMenu: true,
+          displayName: `${column.label}`,
+        }}
         headerTooltip={column.label}
         valueGetter={params => valueGetter(params, tableName, column, type)}
         editable={!type && hasPermission}

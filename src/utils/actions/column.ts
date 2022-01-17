@@ -28,6 +28,14 @@ export const onDeleteColumn = async (
   gridAPI,
   removeOrDeleteColumnMutation,
 ) => {
+  // Activate spinner
+  const elements = document.getElementsByClassName(
+    'loader',
+  ) as HTMLCollectionOf<HTMLElement>;
+  if (elements[colID]) {
+    elements[colID].style.visibility = 'visible';
+  }
+
   const { loading, error } = await removeOrDeleteColumnMutation({
     variables: {
       schemaName: schema.name,
@@ -37,6 +45,7 @@ export const onDeleteColumn = async (
     },
   });
   if (!loading && !error) {
+    actions.setIsTableBuilding(true);
     const col = columns.filter(c => c.name === colID)[0];
     const index = columns.indexOf(col);
     columns.splice(index, 1);

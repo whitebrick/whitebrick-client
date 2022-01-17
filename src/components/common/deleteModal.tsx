@@ -120,17 +120,19 @@ const DeleteModal = ({
           tableName: name,
           del: true,
         },
-      }).then(() => setIsLoading(false));
-      if (navigateBack) {
-        navigate(
-          schema.organizationOwnerName
-            ? `/${schema.organizationOwnerName}/${schema.name}/`
-            : `/db/${schema.name}/`,
-        );
-      } else {
-        actions.setTable('');
-        refetchTables().finally(() => setShow(false));
-      }
+      }).then(() => {
+        setIsLoading(false);
+        if (navigateBack) {
+          window.location.replace(
+            schema.organizationOwnerName
+              ? `/${schema.organizationOwnerName}/${schema.name}/`
+              : `/db/${schema.name}/`,
+          );
+        } else {
+          actions.setTable('');
+          refetchTables().finally(() => setShow(false));
+        }
+      });
     } else {
       setError(true);
     }
