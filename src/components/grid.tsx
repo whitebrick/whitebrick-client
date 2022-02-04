@@ -446,6 +446,7 @@ const Grid = ({
 
   const editValues = val => {
     let values = val;
+    let arrCol = null;
     values = [...Array.from(new Set(values))];
     values.forEach((params, index) => {
       const filteredParams = values.filter(
@@ -469,6 +470,10 @@ const Grid = ({
                 ? parseInt(data[key], 10)
                 : data[key],
           };
+        }
+
+        if (key.startsWith(`arr_${table.name}`)) {
+          arrCol = key;
         }
       });
       variables._set[params.colDef.field] =
@@ -494,14 +499,8 @@ const Grid = ({
       if (rc.ok) {
         if (rc.insert) {
           variables._set = rc.data;
-          updateTableData(
-            schema.name,
-            table.name,
-            variables,
-            client,
-            actions,
-            true,
-          );
+          if (arrCol !== null) delete variables._set[arrCol];
+          updateTableData(schema.name, table.name, variables, client, actions);
         } else
           updateTableData(schema.name, table.name, variables, client, actions);
       } else {
