@@ -440,7 +440,10 @@ const Grid = ({
       col => !Object.keys(values).includes(col),
     );
     value.data = values;
-    if (!params.oldValue) value.insert = true;
+    if (!params.oldValue) {
+      if (value.ok) value.insert = false;
+      else value.insert = true;
+    }
     return value;
   };
 
@@ -459,14 +462,17 @@ const Grid = ({
       });
       const variables = { where: {}, _set: {} };
       Object.keys(data).forEach(key => {
+        let dataValue = data[key];
+        if (data[key] === 0 && getColumnType(key) === 'numeric')
+          dataValue = true;
         if (
           !key.startsWith(`obj_${table.name}`) &&
           !key.startsWith(`arr_${table.name}`) &&
-          data[key]
+          dataValue
         ) {
           variables.where[key] = {
             _eq:
-              getColumnType(key) === 'integer'
+              getColumnType(key) === 'numeric'
                 ? parseInt(data[key], 10)
                 : data[key],
           };

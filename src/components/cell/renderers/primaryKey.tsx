@@ -36,7 +36,7 @@ const PrimaryKeyCellRenderer = ({
 
   const renderCell = () => {
     if (hasPermission) {
-      if (cellValue)
+      if (cellValue !== undefined)
         return (
           <Badge
             aria-hidden
