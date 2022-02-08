@@ -48,7 +48,7 @@ const AddData = ({
             actions.setFormData(
               type === 'createDatabase'
                 ? {
-                    organization: getOrganizationValue(organization.name),
+                    organization: getOrganizationValue(organization?.name),
                   }
                 : { schema: getSchemaValue(schema.name) },
             );
