@@ -22,7 +22,7 @@
 
 ---
 
-#### Current Project status as of December:
+#### Current Project status as of February:
 
 We're currently fixing bugs and trying to get the Beta release stable.
 
