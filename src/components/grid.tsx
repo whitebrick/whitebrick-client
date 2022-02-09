@@ -150,7 +150,7 @@ const Grid = ({
             },
             order_by: {
               value: {
-                [sortModel.colId]: sortModel.sort,
+                [sortModel?.colId]: sortModel?.sort,
               },
               type: `[${schema.name}_${table.name.concat('_order_by!')}]`,
             },
@@ -243,8 +243,15 @@ const Grid = ({
     params.columnApi.setColumnsVisible(columnsToHide, false);
   };
 
-  const onSortChanged = (event: SortChangedEvent) =>
-    setSortModel(event.api.getSortModel().pop());
+  const onSortChanged = (params: SortChangedEvent) => {
+    const columnState = [
+      {
+        colId: params.columnApi.getColumnState()[0].colId,
+        sort: params.columnApi.getColumnState()[0].sort,
+      },
+    ];
+    setSortModel(columnState.pop());
+  };
 
   useEffect(() => {
     const fetchSchema = async () => {
