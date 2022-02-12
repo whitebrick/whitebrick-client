@@ -10,11 +10,24 @@ export const parseOptions = options => {
 };
 
 export const getOrganizationValue = name => {
-  const { organizations } = store.getState();
   const opts = [];
-  organizations
-    .filter(org => org.name === name)
-    .map(org => opts.push({ key: org.label, value: org.name, ...org }));
+  if (name === undefined) {
+    // This is only in the case of "My Databases" since organization name and
+    // label are undefined
+    opts.push({
+      key: '--',
+      value: '--',
+      label: '--',
+      name: '--',
+      role: { name: 'organization_administrator' },
+    });
+  } else {
+    const { organizations } = store.getState();
+    organizations
+      .filter(org => org.name === name)
+      .map(org => opts.push({ key: org.label, value: org.name, ...org }));
+  }
+
   return opts[0];
 };
 

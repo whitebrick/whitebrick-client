@@ -150,7 +150,7 @@ const Grid = ({
             },
             order_by: {
               value: {
-                [sortModel.colId]: sortModel.sort,
+                [sortModel?.colId]: sortModel?.sort,
               },
               type: `[${schema.name}_${table.name.concat('_order_by!')}]`,
             },
@@ -243,8 +243,15 @@ const Grid = ({
     params.columnApi.setColumnsVisible(columnsToHide, false);
   };
 
-  const onSortChanged = (event: SortChangedEvent) =>
-    setSortModel(event.api.getSortModel().pop());
+  const onSortChanged = (params: SortChangedEvent) => {
+    const columnState = [
+      {
+        colId: params.columnApi.getColumnState()[0].colId,
+        sort: params.columnApi.getColumnState()[0].sort,
+      },
+    ];
+    setSortModel(columnState.pop());
+  };
 
   useEffect(() => {
     const fetchSchema = async () => {
@@ -472,7 +479,7 @@ const Grid = ({
         ) {
           variables.where[key] = {
             _eq:
-              getColumnType(key) === 'numeric'
+              getColumnType(key) === 'integer'
                 ? parseInt(data[key], 10)
                 : data[key],
           };
@@ -483,13 +490,21 @@ const Grid = ({
         }
       });
       variables._set[params.colDef.field] =
+        // eslint-disable-next-line no-nested-ternary
         getColumnType(params.colDef.field) === 'integer'
-          ? parseInt(params.newValue, 10)
+          ? // eslint-disable-next-line no-nested-ternary
+            parseInt(params.newValue, 10)
+          : getColumnType(params.colDef.field) === 'numeric'
+          ? parseFloat(params.newValue)
           : params.newValue;
       filteredParams.forEach(param => {
         variables._set[param.colDef.field] =
+          // eslint-disable-next-line no-nested-ternary
           getColumnType(param.colDef.field) === 'integer'
-            ? parseInt(params.newValue, 10)
+            ? // eslint-disable-next-line no-nested-ternary
+              parseInt(params.newValue, 10)
+            : getColumnType(params.colDef.field) === 'numeric'
+            ? parseFloat(params.newValue)
             : params.newValue;
       });
       values.splice(index, 1);
@@ -500,15 +515,25 @@ const Grid = ({
       const { field } = params.colDef;
       if (getColumnType(field) === 'integer') {
         rc.data[field] = parseInt(rc.data[field], 10);
+      } else if (getColumnType(field) === 'numeric') {
+        rc.data[field] = parseFloat(rc.data[field]);
       }
 
       if (rc.ok) {
         if (rc.insert) {
           variables._set = rc.data;
           if (arrCol !== null) delete variables._set[arrCol];
+          updateTableData(
+            schema.name,
+            table.name,
+            variables,
+            client,
+            actions,
+            true,
+          );
+        } else {
           updateTableData(schema.name, table.name, variables, client, actions);
-        } else
-          updateTableData(schema.name, table.name, variables, client, actions);
+        }
       } else {
         toaster.danger('Required fields are not found', {
           description: `${

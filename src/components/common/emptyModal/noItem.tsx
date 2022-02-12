@@ -6,6 +6,7 @@ import { actions } from '../../../state/actions';
 import { OrganizationItemType, SchemaItemType } from '../../../types';
 import { checkPermission } from '../../../utils/checkPermission';
 import { isObjectEmpty } from '../../../utils/objectEmpty';
+import { getOrganizationValue, getSchemaValue } from '../../../utils/select';
 
 type NoItemProps = {
   data: OrganizationItemType | SchemaItemType;
@@ -29,8 +30,8 @@ const NoItem = ({ data, actions, type }: NoItemProps) => {
   const actionType = type === 'schema' ? 'createDatabase' : 'createTable';
   const formData =
     type === 'schema'
-      ? { organization: { name: data?.name } }
-      : { schema: { name: data?.name } };
+      ? { organization: getOrganizationValue(data?.name) }
+      : { schema: getSchemaValue(data?.name) };
 
   return (
     <>
