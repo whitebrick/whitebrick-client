@@ -11,7 +11,7 @@ _or create new Databases with No Code_
 |                               <sub>Adding a record</sub>                               |                              <sub>Creating a column</sub>                              |                                <sub>Creating a DB</sub>                                |                               <sub>Managing access</sub>                               |
 
 ### Read and write new records or add new columns and tables just like using a spreadsheet.
-1. On-prem, SaaS or Hybrid—we provide the back end, you host and manage the front end.
+1. On-prem, SaaS or Hybrid. Currently supports PostgreSQL and Citus (MySQL, MS SQL Server coming soon).
 2. The front end is built on a [Gatsby static Jamstack](https://www.gatsbyjs.com/) for dead easy customization and deployment.
 3. The back end is a set of [Serverless functions](https://www.serverless.com/) for making DDL calls to your Database and configuring [Hasura](https://hasura.io/) for instant GraphQL.
 
