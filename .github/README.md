@@ -4,31 +4,30 @@
 
 <!-- START:HEADER ================================================== -->
 
-### Open Source Airtable Alternative (No Code DB)
-
+### Instant front end for your existing Database
+_or create new Databases with No Code_
 | ![Screenshot](https://hello.whitebrick.com/assets/whitebrick-landing-screenshot-1.png) | ![Screenshot](https://hello.whitebrick.com/assets/whitebrick-landing-screenshot-2.png) | ![Screenshot](https://hello.whitebrick.com/assets/whitebrick-landing-screenshot-3.png) | ![Screenshot](https://hello.whitebrick.com/assets/whitebrick-landing-screenshot-4.png) |
 | :------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
 |                               <sub>Adding a record</sub>                               |                              <sub>Creating a column</sub>                              |                                <sub>Creating a DB</sub>                                |                               <sub>Managing access</sub>                               |
 
-#### Whitebrick is a lightweight No Code Database with 3 points of difference:
+### Read and write new records or add new columns and tables just like using a spreadsheet.
+1. On-prem, SaaS or Hybrid—we provide the back end, you host and manage the front end.
+2. The front end is built on a [Gatsby static Jamstack](https://www.gatsbyjs.com/) for dead easy customization and deployment.
+3. The back end is a set of [Serverless functions](https://www.serverless.com/) for making DDL calls to your Database and configuring [Hasura](https://hasura.io/) for instant GraphQL.
 
-1. The front end uses a [Gatsby static Jamstack](https://www.gatsbyjs.com/) client for dead easy customization and deployment.
-2. The back end is a set of [Serverless functions](https://www.serverless.com/) for making DDL calls to [PostgreSQL](https://www.postgresql.org/) and configuring [Hasura GraphQL server](https://hasura.io/).
-3. The [PostgreSQL](https://www.postgresql.org/) database schemas can be accessed directly with psql for data import/export and integrations with other tools.
+##### Whitebrick stitches together the best-in-breed open source apps:
 
-##### Rather than reinventing the wheel Whitebrick stitches together the best-in-breed open source apps:
-
-[Hasura](https://hasura.io/) | [Gastsby](https://www.gatsbyjs.com/) | [PostgreSQL](https://www.postgresql.org/) | [AG Grid](https://ag-grid.com/) | [Apollo](https://www.apollographql.com/) | [Serverless](https://www.serverless.com/)
+[Hasura](https://hasura.io/) | [Gastsby](https://www.gatsbyjs.com/) | [AG Grid](https://ag-grid.com/) | [Apollo](https://www.apollographql.com/) | [Serverless](https://www.serverless.com/)
 
 ---
 
-#### Current Project status as of December:
+#### Current Project status as of February:
 
 We're currently fixing bugs and trying to get the Beta release stable.
 
 Please use GitHub [Issues](https://github.com/whitebrick/whitebrick/issues) to report bugs and [Discussions](https://github.com/whitebrick/whitebrick/discussions) for questions, features and suggestions.
 
-:point_right: **Background Job UI** - when a new column or new table is added/updated Hasura needs to re-track the schema and because this can take some time it is processed in the background. We currently do not have any progress indicator and instead just a "Please try again in a minute" message which is tedious to use.
+:point_right: **Background Job UI** - when a new column or new table is added/updated Hasura needs to re-track the schema and because this can take some time it is processed in the background. We currently do not have any progress indicator and instead just a "Please try again in a minute" which we're working on.
 
 **Roadmap:**
 
@@ -69,7 +68,7 @@ Whitebrick is [licensed](https://github.com/whitebrick/whitebrick-cloud/blob/mai
 
 <!-- START:SUMMARY ================================================== -->
 
-Whitebrick comprises a [front end Gatsby Jamstack](https://github.com/whitebrick/whitebrick) client and [back end Serverless](https://github.com/whitebrick/whitebrick-cloud) application (whitebrick-cloud) that adds multi-tenant DDL and access control functions to a [PostgreSQL](https://www.postgresql.org/) Database via the [Hasura](https://github.com/hasura/graphql-engine) GraphQL Server. The Jamstack client uses [AG Grid](https://ag-grid.com/) as a spreadsheet-like UI that reads/writes table data directly from/to Hasura over GraphQL. Additional functions (eg DDL and access control) are provided by whitebrick-cloud and exposed through the same Hasura endpoint using [Schema stitching](https://hasura.io/docs/latest/graphql/core/remote-schemas/index.html).
+Whitebrick comprises a [front end Gatsby Jamstack](https://github.com/whitebrick/whitebrick) client and [back end Serverless](https://github.com/whitebrick/whitebrick-cloud) application (whitebrick-cloud) that adds multi-tenant DDL and access control functions to a Database via the [Hasura](https://github.com/hasura/graphql-engine) GraphQL Server. The Jamstack client uses [AG Grid](https://ag-grid.com/) as a spreadsheet-like UI that reads/writes table data directly from/to Hasura over GraphQL. Additional functions (eg DDL and access control) are provided by whitebrick-cloud and exposed through the same Hasura endpoint using [Schema stitching](https://hasura.io/docs/latest/graphql/core/remote-schemas/index.html).
 
 <!-- END:SUMMARY ================================================== -->
 
@@ -77,9 +76,9 @@ Whitebrick comprises a [front end Gatsby Jamstack](https://github.com/whitebrick
 
 ### Hasura
 
-Hasura is a server application that automatically wraps a GraphQL API around a standard PostgreSQL relational database.
+Hasura is a server application that automatically wraps a GraphQL API around a standard relational database.
 Hasura is written in Haskell and can be easily deployed directly from a Docker image.
-The server comes with a web GUI admin console that allows the underlying database to be browsed and _tracked_ so that it can be accessed over GraphQL.
+The server comes with a web GUI admin console that allows the underlying database to be browsed and _Tracked_ so that it can be accessed over GraphQL.
 Hasura also provides a WebSocket endpoint for subscription queries.
 
 **Database Queries**
@@ -100,7 +99,7 @@ Because Hasura stitches together multiple APIs under the one unified endpoint it
 
 ### Whitebrick Cloud (back end)
 
-The Whitebrick Cloud back end is a set of functions written in Javascript using the Apollo GraohQL interface and executed on a Serverless provider. Whitebrick Cloud connects with the PostgreSQL database to make DDL calls such as creating new tables and columns. After mofifying the database Whitebrick Cloud then calls the Hasura Metadata API to _track_ the corresponding columns and tables. Whitebrick Cloud also manages additional metadata, background jobs, user permissions and settings, persisting them in a dedicated schema.
+The Whitebrick Cloud back end is a set of functions written in Javascript using the Apollo GraohQL interface and executed on a Serverless provider. Whitebrick Cloud connects with a database to make DDL calls such as creating new tables and columns. After mofifying the database Whitebrick Cloud then calls the Hasura Metadata API to _track_ the corresponding columns and tables. Whitebrick Cloud also manages additional metadata, background jobs, user permissions and settings, persisting them in a dedicated schema.
 
 ### Whitebrick (front end)
 
