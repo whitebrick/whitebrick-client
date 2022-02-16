@@ -448,8 +448,13 @@ const Grid = ({
     );
     value.data = values;
     if (!params.oldValue) {
-      if (value.ok) value.insert = false;
-      else value.insert = true;
+      if (value.ok) {
+        if (params.oldValue === undefined) {
+          value.insert = true;
+        } else {
+          value.insert = false;
+        }
+      } else value.insert = true;
     }
     return value;
   };
