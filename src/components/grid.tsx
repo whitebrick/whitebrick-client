@@ -8,6 +8,7 @@ import { toaster } from 'evergreen-ui';
 import {
   IServerSideGetRowsParams,
   GridReadyEvent,
+  CellKeyDownEvent,
   GridApi,
   GridSizeChangedEvent,
   SortChangedEvent,
@@ -84,6 +85,11 @@ const Grid = ({
   const [parsedFilters, setParsedFilters] = useState({});
   const [changedValues, setChangedValues] = useState([]);
   const [isGridReady, setIsGridReady] = useState(false);
+  const [enterPressed, setEnterPressed] = useState(false);
+  const [newRowValues, setNewRowValues] = useState({});
+  const [initRowParams, setInitRowParams] = useState({});
+  const [count, setCount] = useState(0);
+  const [insert, setInsert] = useState(false);
   const [sortModel, setSortModel] = useState({ colId: orderBy, sort: `asc` });
   const hasPermission = checkPermission('alter_table', table?.role?.name);
 
@@ -252,6 +258,55 @@ const Grid = ({
     ];
     setSortModel(columnState.pop());
   };
+
+  const onCellKeyDown = (params: CellKeyDownEvent) => {
+    if (params.event.code === 'Enter') {
+      setEnterPressed(true);
+    }
+  };
+
+  useEffect(() => {
+    if (enterPressed) {
+      const timer = setTimeout(() => {
+        if (insert) {
+          const variable = {
+            where: initRowParams,
+            _set: newRowValues,
+          };
+          updateTableData(
+            schema.name,
+            table.name,
+            variable,
+            client,
+            actions,
+            true,
+          ).finally(() => {
+            setEnterPressed(false);
+            setInsert(false);
+            setCount(0);
+          });
+        } else {
+          const variable = {
+            where: initRowParams,
+            _set: newRowValues,
+          };
+          updateTableData(
+            schema.name,
+            table.name,
+            variable,
+            client,
+            actions,
+          ).finally(() => {
+            setEnterPressed(false);
+            setCount(0);
+          });
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enterPressed, initRowParams, newRowValues, insert, count]);
 
   useEffect(() => {
     const fetchSchema = async () => {
@@ -488,6 +543,12 @@ const Grid = ({
                 ? parseInt(data[key], 10)
                 : data[key],
           };
+          if (count <= 0) {
+            // Take a record of initial row data before any changed are made.
+            // Using count as a trigger to allow to record only at the start of every row insertion or updation.
+            setInitRowParams(variables.where);
+            setCount(1);
+          }
         }
 
         if (key.startsWith(`arr_${table.name}`)) {
@@ -528,16 +589,11 @@ const Grid = ({
         if (rc.insert) {
           variables._set = rc.data;
           if (arrCol !== null) delete variables._set[arrCol];
-          updateTableData(
-            schema.name,
-            table.name,
-            variables,
-            client,
-            actions,
-            true,
-          );
+          setInsert(rc.insert);
+          setNewRowValues(rc.data);
         } else {
-          updateTableData(schema.name, table.name, variables, client, actions);
+          if (arrCol !== null) delete rc.data[arrCol];
+          setNewRowValues(rc.data);
         }
       } else {
         toaster.danger('Required fields are not found', {
@@ -695,6 +751,7 @@ const Grid = ({
         onGridSizeChanged={onGridSizeChanged}
         onSortChanged={onSortChanged}
         onGridReady={onGridReady}
+        onCellKeyDown={onCellKeyDown}
         onViewportChanged={onViewportChanged}>
         <AgGridColumn headerName={table.label}>
           {columns.map(column => renderColumn(column))}
