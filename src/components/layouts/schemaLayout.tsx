@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { useManualQuery } from 'graphql-hooks';
 import SchemaTablesList from '../dashboard/schemaTablesList';
 import Tabs from '../elements/tabs';
+import Graph from '../graph';
 import { SchemaItemType } from '../../types';
 import { actions } from '../../state/actions';
 import Members from '../common/members';
@@ -44,6 +45,10 @@ const SchemaLayout = ({
       title: 'Members',
       element: <Members name="schema" />,
       noPane: true,
+    },
+    {
+      title: 'API',
+      element: <Graph />,
     },
   ];
 
