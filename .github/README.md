@@ -21,7 +21,7 @@ _or create new Databases with No Code_
 
 ---
 
-#### Current Project status as of February:
+#### Current Project status as of March 2022:
 
 We're currently fixing bugs and trying to get the Beta release stable.
 
