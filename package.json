@@ -1,9 +1,9 @@
 {
-  "name": "gatsby-theme-whitebrick",
+  "name": "gatsby-theme-whitebrick-client",
   "private": false,
   "description": "Whitebrick Gastbsy Theme - Front End Jamstack Client for the Whitebrick No Code DB",
   "version": "0.1.10",
-  "homepage": "https://whitebrick.com",
+  "homepage": "https://github.com/whitebrick/whitebrick-client",
   "dependencies": {
     "@auth0/auth0-react": "^1.5.0",
     "@lifeomic/axios-fetch": "^2.0.2",
