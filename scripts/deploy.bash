@@ -1,6 +1,6 @@
 # !/usr/bin/env bash
 
-SITE="whitebrick"
+SITE="whitebrick-client"
 S3_DEV="s3://dev.whitebrick.com"
 S3_STAGING="s3://staging.whitebrick.com"
 S3_PROD="s3://whitebrick.com"
