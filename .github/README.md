@@ -48,7 +48,7 @@ Whitebrick is licensed under the MIT License however dependency licenses vary.
 #### Overview
 
 - See [https://github.com/whitebrick/whitebrick-cloud](https://github.com/whitebrick/whitebrick-cloud) for back end
-- [Documentation](https://hello.whitebrick.com/docs)
+- [Documentation](https://hello.whitebrick.com/platform/documentation/)
 
 ![system diagram](https://hello.whitebrick.com/assets/whitebrick-no-code-db-diagram.png)
 
