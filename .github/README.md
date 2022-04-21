@@ -54,7 +54,7 @@ Whitebrick is licensed under the MIT License however dependency licenses vary.
 
 <!-- START:SUMMARY ================================================== -->
 
-The Whitebrick No Code DB comprises a front end Gatsby Jamstack client and back end Serverless application (whitebrick-cloud) that adds multi-tenant DDL and access control functions to a Database via the Hasura GraphQL Server. The Jamstack client uses [AG Grid](https://ag-grid.com/) as a spreadsheet-like UI that reads/writes table data directly from/to Hasura over GraphQL. Additional functions including DDL are provided by whitebrick-cloud Serverless functions that are exposed through the Hasura endpoint via schema stitching.
+The Whitebrick No Code DB (Data Repository) comprises a front end Gatsby Jamstack client ([whitebrick-client](https://github.com/whitebrick/whitebrick-client)) and back end Serverless application ([whitebrick-cloud](https://github.com/whitebrick/whitebrick-cloud)) that adds multi-tenant DDL and access control functions to a Database via the [Hasura](https://github.com/hasura/graphql-engine) GraphQL Server. The Jamstack client uses [AG Grid](https://ag-grid.com/) as a spreadsheet-like UI that reads/writes table data directly from/to Hasura over GraphQL. Additional functions including DDL are provided by whitebrick-cloud Serverless functions that are exposed through the Hasura endpoint via schema stitching.
 
 <!-- END:SUMMARY ================================================== -->
 
@@ -93,11 +93,11 @@ The easiest way to get started is to use our Gastby _Starter_ that installs our 
 
 4. **Customize**
 
-    Copy or add files to the `gatsby-starter-whitebrick/src` directory to make changes by overriding the corresponding [Whitebrick Theme files](https://github.com/whitebrick/whitebrick/tree/main/src).
+    Copy or add files to the `gatsby-starter-whitebrick/src` directory to make changes by overriding the corresponding [Whitebrick Theme files](https://github.com/whitebrick/whitebrick-client/tree/main/src).
 
 ### Client Development
 
-To run the Whitebrick client independently (rather than as a Theme) simple clone the Whitebrick [repository](https://github.com/whitebrick/whitebrick), configure the `.env` and run Gatsby directly.
+To run the Whitebrick client independently (rather than as a Theme) simple clone the Whitebrick [repository](https://github.com/whitebrick/whitebrick-client), configure the `.env` and run Gatsby directly.
 
 1. **Clone or Fork the Whitebrick Client Repository**
 
