@@ -62,6 +62,8 @@ The Whitebrick No Code DB (Data Repository) comprises a front end Gatsby Jamstac
 
 ## Getting Started
 
+**UPDATE June 2022**: We were unable to find the community interest or commercial support to continue providing the Whitebrick Cloud back end as a service. You will need to run your own back end and authentication service following the instructions [here](https://hello.whitebrick.com/platform/documentation/repository/technical-guide/).
+
 <!-- START:FRONTEND_SETUP ================================================== -->
 
 ### Getting Started with Shadowing
