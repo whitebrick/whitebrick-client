@@ -126,6 +126,10 @@ To run the Whitebrick client independently (rather than as a Theme) simple clone
 
 <!-- END:FRONTEND_SETUP ================================================== -->
 
+## Contributing
+
+- Questions, comments, suggestions and contributions welcome - contact: _hello_ at _whitebrick_ dot _com_
+
 ---
 
 <!-- START:LINKS ================================================== -->
