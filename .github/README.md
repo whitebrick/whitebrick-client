@@ -1,6 +1,10 @@
 ![whitebrick logo](https://hello.whitebrick.com/assets/whitebrick-logo-white-hz-sm.png)
 
 # whitebrick-client No Code DB
+
+### :warning: **This project is no longer maintained**
+---
+
 _gatsby-theme-whitebrick-client_ (See [whitebrick-cloud](https://github.com/whitebrick/whitebrick-cloud) for back end)
 <!-- START:HEADER ================================================== -->
 
@@ -48,7 +52,7 @@ Whitebrick is licensed under the MIT License however dependency licenses vary.
 #### Overview
 
 - See [https://github.com/whitebrick/whitebrick-cloud](https://github.com/whitebrick/whitebrick-cloud) for back end
-- [Documentation](https://hello.whitebrick.com/platform/documentation/)
+- [Documentation](https://hello.whitebrick.com/integration-platform/documentation/)
 
 ![system diagram](https://hello.whitebrick.com/assets/whitebrick-no-code-db-diagram.png)
 
@@ -62,7 +66,7 @@ The Whitebrick No Code DB (Data Repository) comprises a front end Gatsby Jamstac
 
 ## Getting Started
 
-**UPDATE June 2022**: We were unable to find the community interest or commercial support to continue providing the Whitebrick Cloud back end as a service. You will need to run your own back end and authentication service following the instructions [here](https://hello.whitebrick.com/platform/documentation/repository/technical-guide/).
+**UPDATE June 2022**: We were unable to find the community interest or commercial support to continue providing the Whitebrick Cloud back end as a service. You will need to run your own back end and authentication service following the instructions [here](https://hello.whitebrick.com/integration-platform/documentation/repository/technical-guide/).
 
 <!-- START:FRONTEND_SETUP ================================================== -->
 
@@ -136,7 +140,7 @@ To run the Whitebrick client independently (rather than as a Theme) simple clone
 
 <!-- START:LINKS ================================================== -->
 
-- [Documentation](https://hello.whitebrick.com/platform/documentation/)
+- [Documentation](https://hello.whitebrick.com/integration-platform/documentation/)
 - [Discord](https://discord.gg/FPvjPCYt)
 - [Medium](https://towardsdatascience.com/towards-a-modern-lims-dynamic-tables-no-code-databases-and-serverless-validations-8dea03416105)
 
