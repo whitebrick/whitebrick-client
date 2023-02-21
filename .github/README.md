@@ -140,8 +140,7 @@ To run the Whitebrick client independently (rather than as a Theme) simple clone
 
 <!-- START:LINKS ================================================== -->
 
-- [Documentation](https://hello.whitebrick.com/integration-platform/documentation/)
-- [Discord](https://discord.gg/FPvjPCYt)
+- [Documentation](https://hello.whitebrick.com/workflow-automation-integration/documentation/)
 - [Medium](https://towardsdatascience.com/towards-a-modern-lims-dynamic-tables-no-code-databases-and-serverless-validations-8dea03416105)
 
 <!-- END:LINKS ================================================== -->
